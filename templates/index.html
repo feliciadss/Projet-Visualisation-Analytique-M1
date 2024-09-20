@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Accueil{% endblock %}
+{% block header %}Bienvenue sur l'Accueil{% endblock %}
+{% block description %}Voici la page principale avec quatre boutons{% endblock %}
+
+{% block content %}
+    <div class="buttons">
+        <a href="{{ url_for('page1') }}" class="btn">Page 1</a>
+        <a href="{{ url_for('page2') }}" class="btn">Page 2</a>
+        <a href="{{ url_for('page3') }}" class="btn">Page 3</a>
+        <a href="{{ url_for('page4') }}" class="btn">Page 4</a> <!-- Nouveau bouton -->
+    </div>
+{% endblock %}

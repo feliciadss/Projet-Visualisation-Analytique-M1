@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Page 4{% endblock %}
+{% block header %}Titre de la Page 4{% endblock %}
+{% block description %}Description de la Page 4{% endblock %}
+
+{% block content %}
+    <div class="graph-space">
+        <p>Espace pour les graphiques</p>
+    </div>
+{% endblock %}
