@@ -10,18 +10,16 @@ from constructeurDB import (
 def initialize_db():
     db = connect_to_db()
     genres = [
-        "pop", "rock", "hip-hop", "jazz", "classical", "electronic", "indie", 
-        "reggae", "blues", "metal", "punk", "folk", "country", "r&b", "soul", 
-        "dance", "disco", "funk", "gospel", "latin", "swing", "trap", "grime", 
-        "house", "techno", "dubstep", "k-pop", "afrobeat", "salsa", "tango"
-    ]
+    "pop", "rock", "hip-hop", "jazz", "classical", 
+    "electronic", "indie", "reggae", "blues", "metal",
+    "folk", "country", "r&b", "soul"]
 
     european_countries = [
-        "AL", "AD", "AT", "BE", "BA", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", 
-        "FR", "DE", "GR", "HU", "IS", "IE", "IT", "LV", "LI", "LT", "LU", "MT", 
-        "MC", "ME", "NL", "MK", "NO", "PL", "PT", "RO", "SM", "RS", "SK", "SI", 
-        "ES", "SE", "CH", "UA", "GB", "VA"
-    ]
+    "AL", "AT", "BE", "BA", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", 
+    "FR", "DE", "GR", "HU", "IS", "IE", "IT", "LV", "LI", "LT", "LU", "MT", 
+    "ME", "NL", "MK", "NO", "PL", "PT", "RO", "RS", "SK", "SI", 
+    "ES", "SE", "CH", "UA", "GB"]
+
 
     for genre in genres:
         for market in european_countries:

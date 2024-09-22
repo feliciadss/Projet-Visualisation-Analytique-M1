@@ -8,7 +8,7 @@ class AuthManager:
         self.client_secret = client_secret
 
         # Connexion à MongoDB
-        self.client = MongoClient("mongodb://feliciadossou:Femaliendos8@cluster0.mongodb.net/ProjetM1?retryWrites=true&w=majority")
+        self.client = MongoClient("mongodb+srv://groupe2:ProjetSpotify@cluster0.ekaxo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
         self.db = self.client[db_name]
     
     def get_token(self):
