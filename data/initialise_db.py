@@ -1,4 +1,4 @@
-from constructeur_db import (
+from constructeurDB import (
     get_genre_artists, save_artists_to_db,
     get_genre_albums, save_albums_to_db,
     get_album_tracks, save_tracks_to_db,
@@ -26,28 +26,28 @@ def initialize_db():
     for genre in genres:
         for market in european_countries:
             try:
-                # Récupérer et stocker les artistes
+                # Récupération et stockage des artistes
                 print(f"Fetching artists for genre {genre} in market {market}...")
                 artists = get_genre_artists(genre, market)
                 save_artists_to_db(artists, db)
 
-                # Récupérer et stocker les albums
+                # ... albums
                 print(f"Fetching albums for genre {genre} in market {market}...")
                 albums = get_genre_albums(genre, market)
                 save_albums_to_db(albums, db)
 
-                # Récupérer et stocker les morceaux des albums
+                # ... morceaux des albums
                 for album in albums:
                     print(f"Fetching tracks for album {album['id']}...")
                     tracks = get_album_tracks(album["id"])
                     save_tracks_to_db(tracks, db)
 
-                    # Récupérer et stocker les caractéristiques audio
+                    # ... caractéristiques audio
                     track_ids = [track["id"] for track in tracks]
                     audio_features = get_audio_features(track_ids)
                     save_audio_features_to_db(audio_features, db)
 
-                # Récupérer et stocker les playlists
+                # ... playlists
                 print(f"Fetching playlists for market {market}...")
                 playlists = get_popular_playlists(market)
                 save_playlists_to_db(playlists, db)
