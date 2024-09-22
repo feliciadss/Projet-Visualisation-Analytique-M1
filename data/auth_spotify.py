@@ -3,7 +3,10 @@
 import requests
 import base64
 import time
-import config
+import configparser
+
+config = configparser.ConfigParser()
+config.read("C:/Users/PC/OneDrive/Documents/projet-visualisation-analytique-m1/data/config.ini")
 
 TOKEN_URL = "https://accounts.spotify.com/api/token"
 
@@ -20,7 +23,7 @@ class SpotifyAuth:
         return self.token
 
     def request_new_token(self):
-        auth_header = base64.b64encode(f"{config.CLIENT_ID}:{config.CLIENT_SECRET}".encode()).decode()
+        auth_header = base64.b64encode(f"{config['SPOTIFY']['CLIENT_ID']}:{config['SPOTIFY']['CLIENT_SECRET']}".encode()).decode()
         headers = {
             "Authorization": f"Basic {auth_header}",
         }

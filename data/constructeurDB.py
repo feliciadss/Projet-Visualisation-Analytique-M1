@@ -1,22 +1,22 @@
 import requests
 from pymongo import MongoClient
 from auth_spotify import spotify_auth
-import configparser
 from itertools import combinations
+import configparser
 
 config = configparser.ConfigParser()
-config.read("data/config.ini")
+config.read("C:/Users/PC/OneDrive/Documents/projet-visualisation-analytique-m1/data/config.ini")
 
 BASE_URL = "https://api.spotify.com/v1/"
-
-# Connexion à MongoDB
+# Connexion MongoDB
 def connect_to_db():
-    client = MongoClient(config.MONGO_URI)
-    db = client[config.DB_NAME]
+    
+    client = MongoClient(config['MONGO_DB']['MONGO_URI'])
+    db = client[config['MONGO_DB']['DB_NAME']]
     return db
 
-# Récupération des artistes d'un genre musical spécifique dans un marché donné
-def get_genre_artists(genre, market):
+# Récupération des 50 artistes d'un genre musical spécifique dans un marché donné
+def get_genre_artists(genre, market, limit=50):
     token = spotify_auth.get_token()
     headers = {
         "Authorization": f"Bearer {token}"
@@ -25,15 +25,23 @@ def get_genre_artists(genre, market):
         "q": f"genre:{genre}",
         "type": "artist",
         "market": market,
-        "limit": 50  # Limite à 50 artistes/ requête
+        "limit": min(limit, 50)  #limite spotify 50/requete, pagination nécessaire
     }
-    response = requests.get(f"{BASE_URL}search", headers=headers, params=params)
-    if response.status_code == 200:
-        return response.json()["artists"]["items"]
-    else:
-        raise Exception(f"Failed to get artists for genre {genre} in {market}")
+    
+    artists = []
+    while len(artists) < limit:
+        response = requests.get(f"{BASE_URL}search", headers=headers, params=params)
+        if response.status_code == 200:
+            new_artists = response.json()["artists"]["items"]
+            artists.extend(new_artists)
+            if len(new_artists) < 50:
+                break  #stop pour moins de 50 artistes
+        else:
+            raise Exception(f"Failed to get artists for genre {genre} in {market}")
+    
+    return artists[:limit]  #100 premiers
 
-# Sauvegarder les artistes dans MongoDB
+# Sauvegardarde MongoDB
 def save_artists_to_db(artists, db):
     collection = db["artists"]
     for artist in artists:
@@ -42,9 +50,8 @@ def save_artists_to_db(artists, db):
             {"$set": artist}, 
             upsert=True
         )
-
-# Récupération des albums d'un genre musical spécifique dans un marché donné
-def get_genre_albums(genre, market):
+#recuperer les 20 premiers albums
+def get_genre_albums(genre, market, limit=20):
     token = spotify_auth.get_token()
     headers = {
         "Authorization": f"Bearer {token}"
@@ -53,15 +60,23 @@ def get_genre_albums(genre, market):
         "q": f"genre:{genre}",
         "type": "album",
         "market": market,
-        "limit": 50
+        "limit": min(limit, 50)
     }
-    response = requests.get(f"{BASE_URL}search", headers=headers, params=params)
-    if response.status_code == 200:
-        return response.json()["albums"]["items"]
-    else:
-        raise Exception(f"Failed to get albums for genre {genre} in {market}")
+    
+    albums = []
+    while len(albums) < limit:
+        response = requests.get(f"{BASE_URL}search", headers=headers, params=params)
+        if response.status_code == 200:
+            new_albums = response.json()["albums"]["items"]
+            albums.extend(new_albums)
+            if len(new_albums) < 50:
+                break  
+        else:
+            raise Exception(f"Failed to get albums for genre {genre} in {market}")
+    
+    return albums[:limit]  
 
-# Sauvegarder les albums dans MongoDB
+
 def save_albums_to_db(albums, db):
     collection = db["albums"]
     for album in albums:
@@ -93,22 +108,22 @@ def save_tracks_to_db(tracks, db):
             upsert=True
         )
 
-# Récupération des playlists populaires
-def get_popular_playlists(market, limit=50):
+# Récupération des 10 playlists les plus populaires
+def get_popular_playlists(market, limit=10):
     token = spotify_auth.get_token()
     headers = {
         "Authorization": f"Bearer {token}"
     }
     params = {
         "country": market,
-        "limit": limit
+        "limit": min(limit, 30)  # Limite à 30 playlists
     }
     response = requests.get(f"{BASE_URL}browse/featured-playlists", headers=headers, params=params)
     if response.status_code == 200:
-        return response.json()["playlists"]["items"]
+        return response.json()["playlists"]["items"][:limit]
     else:
         raise Exception(f"Failed to get playlists for market {market}")
-    
+
 # Sauvegarder les playlists dans MongoDB
 def save_playlists_to_db(playlists, db):
     collection = db["playlists"]
@@ -133,7 +148,7 @@ def get_audio_features(track_ids):
         return response.json()["audio_features"]
     else:
         raise Exception("Failed to get audio features")
-    
+
 # Sauvegarder les caractéristiques audio dans MongoDB
 def save_audio_features_to_db(audio_features, db):
     collection = db["audio_features"]
@@ -149,7 +164,6 @@ def save_audio_features_to_db(audio_features, db):
 def analyze_and_save_collaborations(playlists, db):
     collaboration_counts = {}
     for playlist in playlists:
-        # Supposons que chaque playlist contient une liste de morceaux avec artistes
         tracks = playlist.get("tracks", {}).get("items", [])
         artists_in_playlist = set()
         for item in tracks:
