@@ -1,10 +1,8 @@
 from constructeurDB import (
-    get_genre_artists, save_artists_to_db,
     get_genre_albums, save_albums_to_db,
     get_album_tracks, save_tracks_to_db,
-    get_popular_playlists, save_playlists_to_db,
-    get_audio_features, save_audio_features_to_db,
-    analyze_and_save_collaborations, connect_to_db
+    get_artists_from_tracks, save_artists_to_db,  # Correction des noms
+    connect_to_db
 )
 
 def initialize_db():
@@ -25,11 +23,6 @@ def initialize_db():
     for genre in genres:
         for market in european_countries:
             try:
-                # Récupération et stockage des artistes
-                print(f"Fetching artists for genre {genre} in market {market}...")
-                artists = get_genre_artists(genre, market)
-                save_artists_to_db(artists, genre, market, db)
-
                 # Récupération et stockage des albums
                 print(f"Fetching albums for genre {genre} in market {market}...")
                 albums = get_genre_albums(genre, market)
@@ -41,18 +34,10 @@ def initialize_db():
                     tracks = get_album_tracks(album["id"])
                     save_tracks_to_db(tracks, album["id"], db)
 
-                    # Récupération et stockage des caractéristiques audio
-                    track_ids = [track["id"] for track in tracks]
-                    audio_features = get_audio_features(track_ids)
-                    save_audio_features_to_db(audio_features, db)
-
-                # Récupération et stockage des playlists populaires
-                print(f"Fetching playlists for market {market}...")
-                playlists = get_popular_playlists(market)
-                save_playlists_to_db(playlists, market, db)
-
-                # Analyser et sauvegarder les collaborations entre artistes
-                analyze_and_save_collaborations(playlists, db)
+                    # Récupération et stockage des artistes associés aux morceaux de l'album
+                    print(f"Fetching artists for album {album['id']}...")
+                    artists = get_artists_from_tracks(tracks) 
+                    save_artists_to_db(artists, genre, market, db)
 
             except Exception as e:
                 print(f"Error processing genre {genre} in market {market}: {e}")
