@@ -6,56 +6,86 @@
     <title>Carte des genres musicaux</title>
     <!-- Charger la bibliothèque Plotly -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        /* Style général de la page */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: black;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Conteneur pour le titre et la sélection */
+        .form-container {
+            margin-bottom: 30px;  /* Espacement entre le formulaire et la carte */
+            text-align: center;  /* Centrer le texte */
+        }
+
+        /* Style du conteneur pour la carte */
+        #graph {
+            width: 80vw;  /* Largeur de la carte à 80% de la largeur de la fenêtre */
+            height: 60vh; /* Hauteur de la carte à 60% de la hauteur de la fenêtre */
+            margin-top: 20px; /* Espacement au-dessus de la carte */
+        }
+
+        /* Style du menu déroulant et du bouton */
+        select, button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        button {
+            cursor: pointer;
+            background-color: #4CAF50; /* Couleur verte */
+            color: white;
+            border: none;
+        }
+
+        button:hover {
+            background-color: #45a049; /* Couleur plus foncée au survol */
+        }
+    </style>
 </head>
 <body>
-    <h1>Carte des genres musicaux en Europe</h1>
-    
-    <!-- Div pour afficher la carte avec une taille plus grande et une largeur maximale -->
-    <div id="graph" style="width: 100vw; height: 90vh;"></div>
 
+    <!-- Conteneur pour le texte et la sélection du genre -->
+    <div class="form-container">
+        <h1>Choisissez un genre musical</h1>
+
+        <!-- Formulaire pour sélectionner le genre musical -->
+        <form method="POST">
+            <select name="genre">
+                <!-- Boucle sur les genres passés depuis Flask -->
+                {% for genre in genres %}
+                    <option value="{{ genre }}" {% if selected_genre == genre %}selected{% endif %}>{{ genre }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Afficher la carte</button>
+        </form>
+    </div>
+
+    <!-- Div où la carte Plotly sera affichée -->
+    <div id="graph"></div>
+
+    <!-- Vérifie si le JSON des données est disponible et crée la carte -->
+    {% if data_json %}
     <script type="text/javascript">
-        // Récupérer les données passées depuis Flask
+        // Charger les données JSON depuis Flask
         const data = {{ data_json | safe }};
+        
+        // Afficher le JSON dans la console pour le diagnostic
+        console.log("Data JSON:", data);
 
-        // Extraire les pays et les popularités
-        const countries = data.map(d => d['iso_a3']);
-        const popularity = data.map(d => d['popularity']);
-
-        // Construire la carte choropleth avec Plotly en utilisant JavaScript
-        var data_plotly = [{
-            type: 'choropleth',
-            locationmode: 'ISO-3',
-            locations: countries,
-            z: popularity,
-            colorscale: 'OrRd',
-            colorbar: {
-                title: 'Popularité'
-            }
-        }];
-
-        // Définir la taille de la carte et son layout
-        var layout = {
-            title: 'Popularité fictive des genres musicaux en Europe',
-            geo: {
-                scope: 'europe',
-                projection: { type: 'equirectangular' },  // Choisir une projection plus plate
-                showland: true,
-                landcolor: 'rgb(217, 217, 217)',
-                countrycolor: 'rgb(255, 255, 255)',
-                showcountries: true,
-                lonaxis: { range: [-30, 60] },  // Limiter l'étendue longitudinale
-                lataxis: { range: [35, 70] },   // Limiter l'étendue latitudinale pour une vue plus basse
-                center: { lon: 10, lat: 50 },
-            },
-            margin: {  // Réduire les marges pour utiliser tout l'espace
-                l: 0, r: 0, t: 0, b: 0
-            },
-            width: window.innerWidth,  // Adapter à la largeur de la fenêtre
-            height: window.innerHeight * 0.9  // Adapter à 90% de la hauteur de la fenêtre
-        };
-
-        // Afficher la carte avec Plotly
-        Plotly.newPlot('graph', data_plotly, layout);
+        // Créer la carte avec Plotly
+        Plotly.newPlot('graph', data);
     </script>
+    {% endif %}
+
 </body>
 </html>

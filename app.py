@@ -1,24 +1,24 @@
-from flask import Flask, render_template
-from view.map import build_map 
-from data.data_manager import get_genre_data_for_map
+from flask import Flask, render_template, request
+from view.map import build_map
+from static.enumerations import genres
 
 app = Flask(__name__)
 
+# Page d'accueil
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/page1')
+
+@app.route('/page1', methods=['GET', 'POST'])
 def page1():
-    # Récupérer les données pour la carte de chaleur
-    df = get_genre_data_for_map()
+    selected_genre = None
+    data_json = None
 
-    # Convertir les données en JSON pour les passer à la page HTML
-    data_json = df.to_json(orient='records')
-    
-    # Renvoyer le template avec les données
-    return render_template('page1.html', data_json=data_json)
-
+    if request.method == 'POST':
+        selected_genre = request.form['genre']
+        data_json = build_map(selected_genre) 
+    return render_template('page1.html', genres=genres, selected_genre=selected_genre, data_json=data_json)
 
 
 @app.route('/page2')
