@@ -11,16 +11,14 @@ def index():
 @app.route('/page1')
 def page1():
     # Récupérer les données pour la carte de chaleur
-    df_genres = get_genre_data_for_map()
+    df = get_genre_data_for_map()
 
-    # Générer la carte avec la fonction build_map
-    fig = build_map(df_genres)
+    # Convertir les données en JSON pour les passer à la page HTML
+    data_json = df.to_json(orient='records')
     
-    # Convertir la carte en HTML pour l'afficher dans le template
-    plot_html = fig.to_html(full_html=False)
-    
-    # Afficher la carte sur la page
-    return render_template('page1.html', plot=plot_html)
+    # Renvoyer le template avec les données
+    return render_template('page1.html', data_json=data_json)
+
 
 
 @app.route('/page2')
