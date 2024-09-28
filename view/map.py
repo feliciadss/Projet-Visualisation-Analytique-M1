@@ -6,7 +6,7 @@ from data.data_manager import DataManager
 def build_map(genre_filter):
     # Récupérer les données
     data_manager = DataManager()
-    df = data_manager.create_albums_artists_dataframe(genre_filter)
+    df = data_manager.create_tracks_artists_dataframe(genre_filter)
 
     # Vérifier si le DataFrame est correct
     print("DataFrame :")
@@ -16,8 +16,8 @@ def build_map(genre_filter):
         print(f"Aucune donnée disponible pour le genre {genre_filter}")
         return None
 
-    # Grouper par marché et compter le nombre d'artistes par pays (sans normalisation)
-    df_market_count = df.groupby('artist_market').size().reset_index(name='artist_count')
+    # Grouper par marché et compter le nombre d'artistes par pays
+    df_market_count = df.groupby('artist_market').size().reset_index(name='artist_count')  # Créer 'artist_count'
 
     # Vérifier le DataFrame après regroupement
     print("DataFrame après regroupement par marché :")

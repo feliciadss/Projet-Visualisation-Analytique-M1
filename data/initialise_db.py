@@ -33,11 +33,11 @@ def initialize_db():
                     print(f"Fetching tracks for album {album['id']}...")
                     tracks = get_album_tracks(album["id"])
                     save_tracks_to_db(tracks, album["id"], db)
-
-                    # Récupération et stockage des artistes associés aux morceaux de l'album
-                    print(f"Fetching artists for album {album['id']}...")
-                    artists = get_artists_from_tracks(tracks) 
-                    save_artists_to_db(artists, genre, market, db)
+                    
+                    for track in tracks:
+                        print(f"Fetching artists for track {track['id']}...")
+                        artists = get_artists_from_tracks([track])  # On passe chaque track un par un
+                        save_artists_to_db(artists, genre, market, db)
 
             except Exception as e:
                 print(f"Error processing genre {genre} in market {market}: {e}")

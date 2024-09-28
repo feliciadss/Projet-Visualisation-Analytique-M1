@@ -13,58 +13,64 @@ def get_collection_from_db(collection_name):
     collection = db[collection_name]
     return collection
 
-# Classe pour représenter un Album
-class Album:
-    def __init__(self, album_json):
-        self.id = album_json.get('id')
-        self.name = album_json.get('name')
-        self.artists = [artist['id'] for artist in album_json.get('artists', [])] 
-        self.market = album_json.get('market')
-        self.release_date = album_json.get('release_date') 
+# Classe pour représenter un Track
+class Track:
+    def __init__(self, track_json):
+        self.id = track_json.get('id')
+        self.name = track_json.get('name')
+        self.artists = [artist['id'] for artist in track_json.get('artists', [])]  # Liste des IDs des artistes
+        self.market = track_json.get('market')
+        self.album_id = track_json.get('album_id')
 
 # Classe pour représenter un Artiste
 class Artist:
     def __init__(self, artist_json):
-        self.id = artist_json.get('id')
-        self.genre = artist_json.get('genre')
-        self.market = artist_json.get('market')
-
-
+        self.id = artist_json.get('id', 'Unknown ID')
+        self.genre = artist_json.get('genre', 'Unknown Genre')
+        self.market = artist_json.get('market', 'Unknown Market')  # Assure un marché par défaut
 
 class DataManager:
     def __init__(self):
-        self.albums_collection = get_collection_from_db('albums')  # Collection des albums
-        self.artists_collection = get_collection_from_db('artists')  # Collection des artistes
+        self.tracks_collection = get_collection_from_db('tracks')
+        self.artists_collection = get_collection_from_db('artists')
 
-    def create_albums_artists_dataframe(self, genre_filter=None):
-        albums_cursor = self.albums_collection.find()
-        albums_list = list(albums_cursor)
-        print(f"Nombre d'albums récupérés : {len(albums_list)}")
+    def create_tracks_artists_dataframe(self, genre_filter=None):
+        tracks_cursor = self.tracks_collection.find()
+        tracks_list = list(tracks_cursor)
 
         data = []
         
-        # Parcourir chaque album pour extraire les artistes et leur marché
-        for album_json in albums_list:
-            album = Album(album_json)
+        # Parcourir chaque track pour extraire les artistes et leur marché
+        for track_json in tracks_list:
+            track_id = track_json.get('id')
+            track_artists = track_json.get('artists', [])  # Liste des artistes associés à ce track
             
-            # Parcourir les artistes associés à cet album
-            for artist_id in album.artists:
+            # Parcourir les artistes associés à chaque track
+            for artist_info in track_artists:
+                artist_id = artist_info.get('id')
                 artist_json = self.artists_collection.find_one({"id": artist_id})
+                
                 if artist_json:
                     artist = Artist(artist_json)
-
                     # Filtrer par genre si un genre est spécifié
                     if genre_filter is None or artist.genre == genre_filter:
-                        # Ajouter seulement les artistes avec un marché valide
-                        if artist.market:
+                        # Vérification que l'artiste a un marché et un genre
+                        if artist.market and artist.market != 'Unknown Market':
+                            # Ajout de l'artiste au DataFrame
                             data.append({
-                                'album_id': album.id,
+                                'track_id': track_id,
                                 'artist_id': artist.id,
                                 'artist_genre': artist.genre,
                                 'artist_market': artist.market
                             })
+                # Pas besoin de else, car on n'ajoute rien si l'artiste n'existe pas ou ne correspond pas
 
         # Créer un DataFrame avec les informations extraites
         df = pd.DataFrame(data)
-        print(f"DataFrame final créé : {len(df)} lignes")
+
+        if not df.empty:
+            # Compter la fréquence des marchés (pays) pour chaque artiste
+            market_counts = df['artist_market'].value_counts()
+            print("Répartition par marché :", market_counts)
+
         return df
