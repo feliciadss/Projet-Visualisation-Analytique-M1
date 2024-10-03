@@ -60,7 +60,7 @@ Ce fichier contient toutes les dépendances nécessaires pour exécuter l'applic
 ### **Mise à jour de la base de données**
 Si vous souhaitez créer ou mettre à jour la base de données MongoDB, vous pouvez vous rendre dans le dossier `data` et exécuter la commande suivante :
     ```bash
-    python initialise_db.py
+      python initialise_db.py
     ```
 
 Cependant, cette étape a déjà été effectuée lors de la configuration initiale du projet, donc il n'est généralement pas nécessaire de la relancer à moins que vous souhaitiez actualiser les données.
@@ -68,5 +68,5 @@ Cependant, cette étape a déjà été effectuée lors de la configuration initi
 ### **Lancement de l'Application**
 Pour lancer l'application, exécutez la commande suivante :
     ```bash
-    python app.py
+     python app.py
     ```
