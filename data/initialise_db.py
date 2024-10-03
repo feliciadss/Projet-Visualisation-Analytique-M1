@@ -43,5 +43,7 @@ def initialize_db():
             except Exception as e:
                 print(f"Error processing genre {genre} in market {market}: {e}")
 
+# Exécution du script
 if __name__ == "__main__":
     initialize_db()
+    

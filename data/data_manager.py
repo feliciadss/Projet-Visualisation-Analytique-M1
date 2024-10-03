@@ -2,11 +2,9 @@ import pandas as pd
 from pymongo import MongoClient
 import configparser
 
-# Charger la configuration pour MongoDB
 config = configparser.ConfigParser()
 config.read("./data/config.ini")
 
-# Fonction pour récupérer une collection depuis MongoDB
 def get_collection_from_db(collection_name):
     client = MongoClient(config['MONGO_DB']['MONGO_URI'])
     db = client[config['MONGO_DB']['DB_NAME']]
@@ -20,7 +18,6 @@ class Track:
         self.name = track_json.get('name')
         self.artists = [artist['id'] for artist in track_json.get('artists', [])]  # Liste des IDs des artistes
         self.album_id = track_json.get('album_id')
-        # Ajouter les nouvelles caractéristiques musicales
         self.tempo = track_json.get('audio_features', {}).get('tempo')
         self.energy = track_json.get('audio_features', {}).get('energy')
         self.danceability = track_json.get('audio_features', {}).get('danceability')
@@ -45,16 +42,13 @@ class DataManager:
 
     # Fonction pour créer un DataFrame de popularité des genres par pays
     def create_genre_popularity_dataframe(self, genre_filter=None):
-        # Filtrer les artistes par genre si nécessaire
         artists_cursor = self.artists_collection.find({"genre": genre_filter}) if genre_filter else self.artists_collection.find()
         artists_list = list(artists_cursor)
 
-        # Préparer une liste des données pour construire le DataFrame
         data = []
         for artist_json in artists_list:
             artist = Artist(artist_json)
 
-            # Ajouter l'artiste à la liste de données
             if artist.market and artist.popularity:
                 data.append({
                     'artist_id': artist.id,
@@ -64,13 +58,11 @@ class DataManager:
                     'artist_popularity': artist.popularity
                 })
 
-        # Construire le DataFrame
         df = pd.DataFrame(data)
-
-        # Si le DataFrame n'est pas vide, calculer la popularité moyenne par pays
+        
         if not df.empty:
             df_popularity = df.groupby('artist_market')['artist_popularity'].mean().reset_index()
-            df_popularity.columns = ['artist_market', 'average_popularity']  # Renommer les colonnes
+            df_popularity.columns = ['artist_market', 'average_popularity']
             return df_popularity
         else:
-            return pd.DataFrame()  # Retourner un DataFrame vide si aucun artiste n'a été trouvé
+            return pd.DataFrame()

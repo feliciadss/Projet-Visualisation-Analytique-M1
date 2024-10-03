@@ -4,11 +4,9 @@ from static.enumerations import genres
 
 app = Flask(__name__)
 
-# Page d'accueil
 @app.route('/')
 def index():
     return render_template('index.html')
-
 
 @app.route('/page1', methods=['GET', 'POST'])
 def page1():
