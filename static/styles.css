@@ -1,35 +1,45 @@
-body, html {
+/* Fond noir et texte en blanc pour tout le site */
+html, body {
     height: 100%;
     margin: 0;
-    font-family: Arial, sans-serif;
+    background-color: #000000; /* Fond noir */
+    color: #ffffff; /* Texte blanc */
+    font-family: Arial, sans-serif; /* Police plus sobre */
+    display: flex;
+    flex-direction: column;
 }
 
+/* La container prend tout l'espace disponible */
 .container {
+    flex: 1; /* Laisse de l'espace pour le footer */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh;
     text-align: center;
 }
 
+/* Style des titres */
 .main-title {
     font-size: 2.5em;
     margin-bottom: 20px;
 }
 
+/* Style de la description */
 .description {
     font-size: 1.2em;
     margin-bottom: 40px;
+    color: #cccccc; /* Gris clair */
 }
 
+/* Les boutons sont centrés et flexibles */
 .buttons {
     display: flex;
     flex-direction: column;
 }
 
 .btn {
-    background-color: #4CAF50;
+    background-color: #333333; /* Bouton gris foncé */
     color: white;
     padding: 15px 30px;
     margin: 10px;
@@ -38,12 +48,35 @@ body, html {
     font-size: 1.2em;
     border-radius: 5px;
     width: 200px;
+    border: 1px solid #555555; /* Bordure gris clair */
+    transition: background-color 0.3s ease;
 }
 
 .btn:hover {
-    background-color: #45a049;
+    background-color: #1e90ff; /* Bouton bleu au survol */
 }
 
+/* Espace pour les graphiques */
 .graph-space {
     margin-top: 20px;
+}
+
+/* Footer toujours en bas */
+.footer {
+    text-align: center;
+    background-color: #000000;
+    padding: 10px 0;
+    color: #cccccc;
+    font-size: 0.8em;
+    position: relative;
+    width: 100%;
+}
+
+.footer a {
+    color: #cccccc;
+    text-decoration: underline;
+}
+
+.footer a:hover {
+    color: #ffffff;
 }

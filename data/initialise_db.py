@@ -1,7 +1,7 @@
 from constructeurDB import (
     get_genre_albums, save_albums_to_db,
     get_album_tracks, save_tracks_to_db,
-    get_artists_from_tracks, save_artists_to_db,  # Correction des noms
+    get_artists_from_tracks, save_artists_to_db,
     connect_to_db
 )
 
@@ -34,9 +34,10 @@ def initialize_db():
                     tracks = get_album_tracks(album["id"])
                     save_tracks_to_db(tracks, album["id"], db)
                     
+                    # Récupération et stockage des artistes
                     for track in tracks:
                         print(f"Fetching artists for track {track['id']}...")
-                        artists = get_artists_from_tracks([track])  # On passe chaque track un par un
+                        artists = get_artists_from_tracks([track])
                         save_artists_to_db(artists, genre, market, db)
 
             except Exception as e:

@@ -2,6 +2,7 @@ import requests
 from pymongo import MongoClient
 from auth_spotify import spotify_auth
 import configparser
+from datetime import datetime
 
 config = configparser.ConfigParser()
 config.read("C:/Users/PC/OneDrive/Documents/projet-visualisation-analytique-m1/data/config.ini")
@@ -25,7 +26,7 @@ def get_genre_albums(genre, market, limit=50):
         "type": "album",
         "market": market,
         "limit": min(limit, 50),
-        "sort": "popularity"  #tri par popularité
+        "sort": "popularity"
     }
     
     albums = []
@@ -52,15 +53,15 @@ def save_albums_to_db(albums, genre, market, db):
     market_collection.update_one({"name": market}, {"$set": {"name": market}}, upsert=True)
 
     for album in albums:
-        album["genre"] = genre  # Associer le genre à l'album
-        album["market"] = market  # Associer le marché à l'album
+        album["genre"] = genre
+        album["market"] = market
         collection.update_one(
             {"id": album["id"]}, 
             {"$set": album}, 
             upsert=True
         )
 
-# Récupérer les morceaux d'un album
+# Récupérer les morceaux d'un album et leurs caractéristiques audio
 def get_album_tracks(album_id, limit=20):
     token = spotify_auth.get_token()
     headers = {
@@ -69,28 +70,77 @@ def get_album_tracks(album_id, limit=20):
     response = requests.get(f"{BASE_URL}albums/{album_id}/tracks", headers=headers)
     if response.status_code == 200:
         tracks = response.json()["items"]
-        return tracks[:limit]  # Limiter à 15 morceaux maximum
+        return tracks[:limit]
     else:
         raise Exception(f"Failed to get tracks for album {album_id}")
+
+# Récupérer les caractéristiques audio des morceaux
+def get_audio_features(track_ids):
+    token = spotify_auth.get_token()
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
+    response = requests.get(f"{BASE_URL}audio-features", headers=headers, params={"ids": ",".join(track_ids)})
+    if response.status_code == 200:
+        return response.json()["audio_features"]
+    else:
+        raise Exception(f"Failed to get audio features for tracks {track_ids}")
 
 # Sauvegarde MongoDB des morceaux
 def save_tracks_to_db(tracks, album_id, db):
     collection = db["tracks"]
-    for track in tracks:
-        track["album_id"] = album_id  # Associer l'album au morceau
-        collection.update_one(
-            {"id": track["id"]},
-            {"$set": track},
-            upsert=True
-        )
+    track_ids = [track["id"] for track in tracks]
+    audio_features = get_audio_features(track_ids)
 
-# Récupérer les artistes associés aux morceaux
-def get_artists_from_tracks(tracks): 
-    artists = set()
+    for track, features in zip(tracks, audio_features):
+        if features:  # Si les caractéristiques audio sont disponibles
+            track["album_id"] = album_id
+            track["audio_features"] = {
+                "tempo": features["tempo"],
+                "energy": features["energy"],
+                "danceability": features["danceability"],
+                "acousticness": features["acousticness"],
+                "valence": features["valence"],
+                "duration_ms": features["duration_ms"]
+            }
+            collection.update_one(
+                {"id": track["id"]},
+                {"$set": track},
+                upsert=True
+            )
+
+# Récupérer les artistes associés aux morceaux et leurs informations (âge, popularité, pays)
+def get_artists_from_tracks(tracks):
+    artists_data = []
     for track in tracks:
         for artist in track["artists"]:
-            artists.add(artist["id"])
-    return list(artists)
+            artist_info = get_artist_info(artist["id"])
+            if artist_info:
+                artists_data.append(artist_info)
+    return artists_data
+
+# Récupérer les informations d'un artiste
+def get_artist_info(artist_id):
+    token = spotify_auth.get_token()
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
+    response = requests.get(f"{BASE_URL}artists/{artist_id}", headers=headers)
+    
+    if response.status_code == 200:
+        artist_data = response.json()
+        artist_info = {
+            "id": artist_data["id"],
+            "name": artist_data["name"],
+            "popularity": artist_data["popularity"],
+            "followers": artist_data["followers"]["total"],
+            "genres": artist_data["genres"],
+            "country": artist_data.get("country", "Unknown")
+        }
+        return artist_info
+    else:
+        raise Exception(f"Failed to get artist info for {artist_id}")
+
 
 # Sauvegarde MongoDB des artistes
 def save_artists_to_db(artists, genre, market, db):
@@ -104,12 +154,17 @@ def save_artists_to_db(artists, genre, market, db):
 
     for artist in artists:
         artist_data = {
-            "id": artist,
+            "id": artist["id"],
+            "name": artist.get("name"),
+            "popularity": artist["popularity"],
+            "followers": artist["followers"],
+            "country": artist["country"],
+            "age": artist["age"],
             "genre": genre,
             "market": market
         }
         collection.update_one(
-            {"id": artist}, 
+            {"id": artist["id"]}, 
             {"$set": artist_data}, 
             upsert=True
         )

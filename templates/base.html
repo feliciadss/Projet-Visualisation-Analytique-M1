@@ -10,7 +10,14 @@
     <div class="container">
         <h1 class="main-title">{% block header %}Titre{% endblock %}</h1>
         <p class="description">{% block description %}Ceci est la description{% endblock %}</p>
-        {% block content %}{% endblock %}
+        <div class="content">
+            {% block content %}{% endblock %}
+        </div>
     </div>
+
+    <!-- Footer en dehors de la container pour qu'il ne soit pas affecté par son comportement flex -->
+    <footer class="footer">
+        {% block footer %}{% endblock %}
+    </footer>
 </body>
 </html>

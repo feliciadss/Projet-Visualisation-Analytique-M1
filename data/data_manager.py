@@ -19,58 +19,58 @@ class Track:
         self.id = track_json.get('id')
         self.name = track_json.get('name')
         self.artists = [artist['id'] for artist in track_json.get('artists', [])]  # Liste des IDs des artistes
-        self.market = track_json.get('market')
         self.album_id = track_json.get('album_id')
+        # Ajouter les nouvelles caractéristiques musicales
+        self.tempo = track_json.get('audio_features', {}).get('tempo')
+        self.energy = track_json.get('audio_features', {}).get('energy')
+        self.danceability = track_json.get('audio_features', {}).get('danceability')
+        self.acousticness = track_json.get('audio_features', {}).get('acousticness')
+        self.valence = track_json.get('audio_features', {}).get('valence')
+        self.duration_ms = track_json.get('audio_features', {}).get('duration_ms')
 
 # Classe pour représenter un Artiste
 class Artist:
     def __init__(self, artist_json):
-        self.id = artist_json.get('id', 'Unknown ID')
-        self.genre = artist_json.get('genre', 'Unknown Genre')
-        self.market = artist_json.get('market', 'Unknown Market')  # Assure un marché par défaut
+        self.id = artist_json.get('id')
+        self.name = artist_json.get('name')
+        self.popularity = artist_json.get('popularity')  # Popularité de l'artiste
+        self.followers = artist_json.get('followers', {}).get('total')  # Nombre d'abonnés
+        self.genre = artist_json.get('genre')
+        self.market = artist_json.get('market')  # Pays d'origine de l'artiste
 
 class DataManager:
     def __init__(self):
         self.tracks_collection = get_collection_from_db('tracks')
         self.artists_collection = get_collection_from_db('artists')
 
-    def create_tracks_artists_dataframe(self, genre_filter=None):
-        tracks_cursor = self.tracks_collection.find()
-        tracks_list = list(tracks_cursor)
+    # Fonction pour créer un DataFrame de popularité des genres par pays
+    def create_genre_popularity_dataframe(self, genre_filter=None):
+        # Filtrer les artistes par genre si nécessaire
+        artists_cursor = self.artists_collection.find({"genre": genre_filter}) if genre_filter else self.artists_collection.find()
+        artists_list = list(artists_cursor)
 
+        # Préparer une liste des données pour construire le DataFrame
         data = []
-        
-        # Parcourir chaque track pour extraire les artistes et leur marché
-        for track_json in tracks_list:
-            track_id = track_json.get('id')
-            track_artists = track_json.get('artists', [])  # Liste des artistes associés à ce track
-            
-            # Parcourir les artistes associés à chaque track
-            for artist_info in track_artists:
-                artist_id = artist_info.get('id')
-                artist_json = self.artists_collection.find_one({"id": artist_id})
-                
-                if artist_json:
-                    artist = Artist(artist_json)
-                    # Filtrer par genre si un genre est spécifié
-                    if genre_filter is None or artist.genre == genre_filter:
-                        # Vérification que l'artiste a un marché et un genre
-                        if artist.market and artist.market != 'Unknown Market':
-                            # Ajout de l'artiste au DataFrame
-                            data.append({
-                                'track_id': track_id,
-                                'artist_id': artist.id,
-                                'artist_genre': artist.genre,
-                                'artist_market': artist.market
-                            })
-                # Pas besoin de else, car on n'ajoute rien si l'artiste n'existe pas ou ne correspond pas
+        for artist_json in artists_list:
+            artist = Artist(artist_json)
 
-        # Créer un DataFrame avec les informations extraites
+            # Ajouter l'artiste à la liste de données
+            if artist.market and artist.popularity:
+                data.append({
+                    'artist_id': artist.id,
+                    'artist_name': artist.name,
+                    'artist_genre': artist.genre,
+                    'artist_market': artist.market,
+                    'artist_popularity': artist.popularity
+                })
+
+        # Construire le DataFrame
         df = pd.DataFrame(data)
 
+        # Si le DataFrame n'est pas vide, calculer la popularité moyenne par pays
         if not df.empty:
-            # Compter la fréquence des marchés (pays) pour chaque artiste
-            market_counts = df['artist_market'].value_counts()
-            print("Répartition par marché :", market_counts)
-
-        return df
+            df_popularity = df.groupby('artist_market')['artist_popularity'].mean().reset_index()
+            df_popularity.columns = ['artist_market', 'average_popularity']  # Renommer les colonnes
+            return df_popularity
+        else:
+            return pd.DataFrame()  # Retourner un DataFrame vide si aucun artiste n'a été trouvé
