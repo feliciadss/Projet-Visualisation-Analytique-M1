@@ -66,3 +66,74 @@ class DataManager:
             return df_popularity
         else:
             return pd.DataFrame()
+        
+     # Fonction autonome pour créer le DataFrame (aucune interaction avec app.py)
+# Fonction autonome pour créer le DataFrame avec des impressions pour débogage
+def create_spider_chart_dataframe(selected_genres):
+    print(f"Genres sélectionnés: {selected_genres}")
+    
+    # Récupération des collections MongoDB
+    tracks_collection = get_collection_from_db('tracks')
+    artists_collection = get_collection_from_db('artists')
+
+    # Récupérer les artistes des genres sélectionnés
+    artists_cursor = artists_collection.find({"genre": {"$in": selected_genres}})
+    artists_cursor = artists_collection.find().limit(5)  # Limiter à 5 résultats pour l'affichage
+    # Rechercher des artistes avec les genres "jazz" ou "classical"
+    artists_cursor = artists_collection.find({"genre": {"$in": ["jazz", "classical"]}})
+    print(list(artists_cursor))  # Afficher la liste des artistes trouvés
+
+    artist_genre_map = {artist['id']: artist['genre'] for artist in artists_cursor}
+    print(f"Nombre d'artistes récupérés: {len(artist_genre_map)}")
+    print(f"Artistes et leurs genres: {artist_genre_map}")
+
+    if not artist_genre_map:
+        print("Aucun artiste trouvé pour les genres sélectionnés.")
+        return pd.DataFrame()  # Retourner un DataFrame vide si aucun artiste n'a été trouvé
+
+    # Récupérer les morceaux associés aux artistes
+    tracks_cursor = tracks_collection.find({"artists": {"$in": list(artist_genre_map.keys())}})
+    data = []
+
+    # Ajouter les caractéristiques audio des morceaux pour chaque genre
+    for track in tracks_cursor:
+        print(f"Traitement du morceau: {track['name']} (ID: {track['id']})")
+
+        if 'audio_features' not in track:
+            print(f"Pas de caractéristiques audio pour le morceau {track['id']}")
+            continue
+
+        features = {
+            'tempo': track['audio_features'].get('tempo', None),
+            'energy': track['audio_features'].get('energy', None),
+            'danceability': track['audio_features'].get('danceability', None),
+            'acousticness': track['audio_features'].get('acousticness', None),
+            'valence': track['audio_features'].get('valence', None)
+        }
+
+        print(f"Caractéristiques audio du morceau {track['id']}: {features}")
+
+        genre = list(set(artist_genre_map.get(artist_id) for artist_id in track['artists'] if artist_genre_map.get(artist_id)))
+
+        if not genre:
+            print(f"Aucun genre associé pour le morceau {track['id']}")
+            continue
+
+        print(f"Genres associés au morceau {track['id']}: {genre}")
+
+        # Ajouter les données pour chaque genre et chaque feature
+        for feature, value in features.items():
+            if value is not None:
+                print(f"Ajout de la valeur pour {feature}: {value}")
+                data.append({
+                    "track_id": track['id'],
+                    "track_name": track['name'],
+                    "genre": genre[0],  # Utilisation d'un genre
+                    "feature": feature,
+                    "value": value / 100 if feature == 'tempo' else value  # Normalisation du tempo
+                })
+
+    # Créer et retourner le DataFrame
+    df = pd.DataFrame(data)
+    print(f"DataFrame créé avec {len(df)} lignes.")
+    return df

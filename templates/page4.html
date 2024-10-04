@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Page 4{% endblock %}
+{% block header %}Visualisation des Caractéristiques Musicales{% endblock %}
+{% block description %}Sélectionnez les genres musicaux pour créer une Spider Chart{% endblock %}
+
+{% block content %}
+    <form method="POST">
+        <h3>Choisissez les genres musicaux :</h3>
+        <div>
+            {% for genre in genres %}
+                <label><input type="checkbox" name="genres" value="{{ genre }}">{{ genre }}</label>
+            {% endfor %}
+        </div>
+
+        <button type="submit">Générer Spider Chart</button>
+    </form>
+
+    {% if spider_chart %}
+        <div class="graph-space">
+            {{ spider_chart|safe }}
+        </div>
+    {% endif %}
+{% endblock %}
