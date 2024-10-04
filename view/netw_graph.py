@@ -1,7 +1,19 @@
 import plotly.graph_objects as go
 import networkx as nx
+import json
+from plotly.io import to_json
+from data.data_manager import DataManager
 
 G = nx.random_geometric_graph(200, 0.125) #créer un graph aléatoire 
+
+def build_network_graph(genre_filter):
+    # Récupérer les données de popularité par genre et pays
+    data_manager = DataManager()
+    df = data_manager.create_genre_popularity_dataframe(genre_filter)
+    
+    if df.empty:
+        print(f"Aucune donnée disponible pour le genre {genre_filter}")
+        return None
 
 # Création des aretes
 # Ajoute des aretes, comme des lignes déconnectées et des noeuds dispersés.
@@ -60,16 +72,16 @@ for node, adjacencies in enumerate(G.adjacency()):
     node_adjacencies.append(len(adjacencies[1]))
     node_text.append('# of connections: '+str(len(adjacencies[1])))
 
-# On peut aussi choisir de faire varier la couleur et non la taille, qu'est ce qui conviendrait le mieux ??????
-node_trace.marker.size = node_adjacencies
+# On peut aussi choisir de faire varier la taille et non la couleur, qu'est ce qui conviendrait le mieux ??????
+node_trace.marker.color = node_adjacencies
 node_trace.text = node_text
 
 # Création du Network Graph
 fig = go.Figure(data=[edge_trace, node_trace],
              layout=go.Layout(
                 title='<br>Collaboration entre genres',
-                titlefont_size=16,
-                showlegend=False,
+                titlefont_size=18,
+                showlegend=True,
                 hovermode='closest',
                 margin=dict(b=20,l=5,r=5,t=40),
                 annotations=[ dict(
