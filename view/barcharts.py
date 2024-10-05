@@ -4,7 +4,7 @@ from data.data_manager import DataManager
 # Fonction pour créer tous les bar charts pour les features
 def build_barcharts(selected_genres):
     data_manager = DataManager()
-    df = data_manager.create_radar_dataframe(selected_genres)  # Réutilisation du DataFrame
+    df = data_manager.create_audiofeatures_dataframe(selected_genres)  # Réutilisation du DataFrame
     
     if df is None or df.empty:
         print("Le DataFrame est vide ou None")

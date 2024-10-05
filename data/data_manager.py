@@ -30,44 +30,40 @@ class Artist:
     def __init__(self, artist_json):
         self.id = artist_json.get('id')
         self.name = artist_json.get('name')
-        self.popularity = artist_json.get('popularity')  # Popularité de l'artiste
-        self.followers = artist_json.get('followers', {}).get('total')  # Nombre d'abonnés
+        self.popularity = artist_json.get('popularity') 
+        self.followers = artist_json.get('followers', {}).get('total') 
         self.genre = artist_json.get('genre')
-        self.market = artist_json.get('market')  # Pays d'origine de l'artiste
+        self.market = artist_json.get('market')
 
 class DataManager:
     def __init__(self):
         self.tracks_collection = get_collection_from_db('tracks')
         self.artists_collection = get_collection_from_db('artists')
 
-    def create_radar_dataframe(self, selected_genres):
+    def create_audiofeatures_dataframe(self, selected_genres):
         all_track_data = []
         
         for genre_selectionné in selected_genres:
 
-            # Étape 1 : Récupérer tous les artistes avec le genre sélectionné
             artists = self.artists_collection.find({'genre': genre_selectionné})
             artist_ids = [artist['id'] for artist in artists]
 
             if not artist_ids:
                 print(f"Aucun artiste trouvé pour le genre {genre_selectionné}")
                 continue
-
-            # Étape 2 : Récupérer tous les tracks associés à ces artistes
+            
             tracks = list(self.tracks_collection.find({'artists.id': {'$in': artist_ids}}))  # Convertir en liste
 
             if not tracks:
                 print(f"Aucun track trouvé pour les artistes de {genre_selectionné}")
                 continue
 
-            # Étape 3 : Extraire les audio features de ces tracks et les stocker dans une liste
             for track in tracks:
                 audio_features = track.get('audio_features', {})
-                # Ajouter les artistes du track (géré comme un array d'objets)
                 track_artists = track.get('artists', [])
                 for artist in track_artists:
                     artist_id = artist.get('id')
-                    if artist_id in artist_ids:  # Si l'artiste est dans la liste des artistes trouvés
+                    if artist_id in artist_ids: 
                         track_info = {
                             'track_id': track.get('id'),
                             'name': track.get('name'),

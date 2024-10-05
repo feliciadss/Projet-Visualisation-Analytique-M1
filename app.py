@@ -39,10 +39,7 @@ def page4():
         selected_genres = request.form.getlist('genres')
 
         if selected_genres:
-            # Créer la radar chart avec les genres sélectionnés
             radar_chart = build_radar(selected_genres).to_html()
-
-            # Créer les bar charts avec les genres sélectionnés
             bar_charts = build_barcharts(selected_genres)
 
     return render_template('page4.html', genres=genres, radar_chart=radar_chart, bar_charts=bar_charts)
