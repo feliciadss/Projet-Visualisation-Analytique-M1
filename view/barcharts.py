@@ -1,7 +1,8 @@
 import plotly.graph_objects as go
 from data.data_manager import DataManager
+from static.enumerations import genre_colors 
 
-
+# Fonction pour créer tous les bar charts pour les features
 def build_barcharts(selected_genres):
     data_manager = DataManager()
     df = data_manager.create_audiofeatures_dataframe(selected_genres) 
@@ -17,13 +18,14 @@ def build_barcharts(selected_genres):
         fig = go.Figure()
 
         df_avg = df.groupby('genre')[feature].mean().reset_index()
+        colors = [genre_colors.get(genre, '#ffffff') for genre in df_avg['genre']]
 
         fig.add_trace(go.Bar(
             x=df_avg['genre'],
             y=df_avg[feature],
             text=df_avg[feature], 
             textposition='auto',
-            marker_color=['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b'],  # Couleurs
+            marker_color=colors, 
         ))
 
         # Configuration du layout
@@ -31,12 +33,12 @@ def build_barcharts(selected_genres):
             title=f'Comparaison des genres pour {feature}', 
             xaxis_title='Genres', 
             yaxis_title=feature, 
-            paper_bgcolor='black',  
+            paper_bgcolor='black',  # Fond noir
             plot_bgcolor='black',  # Fond noir 
             font=dict(color='white'),  # Texte en blanc
             showlegend=False
         )
-
+        
         bar_charts.append(fig.to_html())
 
     return bar_charts

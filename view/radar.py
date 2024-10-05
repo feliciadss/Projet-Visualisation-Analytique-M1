@@ -1,17 +1,17 @@
 import plotly.graph_objects as go
 import pandas as pd
 from data.data_manager import DataManager
+from static.enumerations import genre_colors 
 
 # Fonction pour normaliser chaque colonne manuellement entre 0 et 1
 def normalize_column(col):
     return (col - col.min()) / (col.max() - col.min())  
 
-
 def build_radar(selected_genres):
     
     data_manager = DataManager()
     df = data_manager.create_audiofeatures_dataframe(selected_genres)
-    
+
     if df is None or df.empty:
         print("Le DataFrame est vide ou None")
         return None 
@@ -39,19 +39,20 @@ def build_radar(selected_genres):
             r=mean_features.values, 
             theta=features,
             fill='toself',
-            name=f'Average Features for {genre}'
+            name=f'Average Features for {genre}',
+            line_color=genre_colors.get(genre, '#ffffff')  # Utilisation de la couleur du genre depuis le dictionnaire
         ))
 
     fig.update_layout(
         polar=dict(
-            radialaxis=dict(visible=False),  # Supprimer unités
+            radialaxis=dict(visible=False),  
         ),
-        paper_bgcolor='black',  # Fond noir de la chart
-        plot_bgcolor='black',  # Fond noir pour la partie du graphique
-        font=dict(color='white'),  # Couleur du texte en blanc
+        paper_bgcolor='black',  
+        plot_bgcolor='black',  
+        font=dict(color='white'),  
         showlegend=True,
         title='Radar Chart Comparing Audio Features by Genre',
-        title_font=dict(color='white')  # Couleur du titre en blanc
+        title_font=dict(color='white')
     )
 
     return fig

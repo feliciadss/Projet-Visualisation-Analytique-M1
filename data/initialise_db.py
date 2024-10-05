@@ -10,17 +10,16 @@ def initialize_db():
     db = connect_to_db()
 
     european_countries = [
-        "AL", "AT", "BE", "BA", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", 
+         "BE", "BA", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", 
         "FR", "DE", "GR", "HU", "IS", "IE", "IT", "LV", "LI", "LT", "LU", "MT", 
         "ME", "NL", "MK", "NO", "PL", "PT", "RO", "RS", "SK", "SI", 
         "ES", "SE", "CH", "UA", "GB"
-    ]
+    ]#attention je retire des pays a chaque relance, pour eviter les requetes doublons 
 
     try:
-        # Pour chaque pays, récupérer les playlists populaires
         for country in european_countries:
             print(f"Fetching popular playlists for {country}...")
-            playlists = get_popular_playlists(country, limit=10)  # Limite à 10 playlists par pays
+            playlists = get_popular_playlists(country, limit=10)  
 
             for playlist in playlists:
                 print(f"Fetching tracks for playlist {playlist['name']}...")

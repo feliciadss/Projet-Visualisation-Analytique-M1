@@ -34,18 +34,32 @@ class Artist:
         self.followers = artist_json.get('followers', {}).get('total') 
         self.genre = artist_json.get('genre')
         self.market = artist_json.get('market')
+        
+class Album:
+    def __init__(self, album_json):
+        self.id = album_json.get('id')
+        self.name = album_json.get('name')
+        self.album_type = album_json.get('album_type')
+        self.artists = [artist['id'] for artist in album_json.get('artists', [])]
+        self.available_markets = album_json.get('available_markets', [])
+        self.release_date = album_json.get('release_date')
+        self.total_tracks = album_json.get('total_tracks')
+        self.uri = album_json.get('uri')
+        self.top_market = album_json.get('top_market', [])
 
 class DataManager:
     def __init__(self):
         self.tracks_collection = get_collection_from_db('tracks')
         self.artists_collection = get_collection_from_db('artists')
+        self.albums_collection = get_collection_from_db('albums')
 
+    # Fonction pour créer un DataFrame sur les fetaures audios des tracks
     def create_audiofeatures_dataframe(self, selected_genres):
         all_track_data = []
         
         for genre_selectionné in selected_genres:
 
-            artists = self.artists_collection.find({'genre': genre_selectionné})
+            artists = self.artists_collection.find({'genres': {'$regex': genre_selectionné, '$options': 'i'}})
             artist_ids = [artist['id'] for artist in artists]
 
             if not artist_ids:
@@ -75,8 +89,39 @@ class DataManager:
                             'valence': audio_features.get('valence'),
                             'duration_ms': audio_features.get('duration_ms')
                         }
-                        print(f"Ajout du track : {track_info}")
                         all_track_data.append(track_info)
                         break 
         df = pd.DataFrame(all_track_data)
         return df
+    
+    # Fonction pour créer un DataFrame avec la popularité des genres par pays
+    def create_album_genre_popularity_dataframe(self, selected_genre):  # un seul genre est sélectionné ici
+        all_album_data = []
+        
+        albums = self.albums_collection.find()
+
+        for album in albums:
+            album_artists = album.get('artists', [])  
+            top_markets = album.get('top_market', [])  
+            
+            for artist in album_artists:
+                artist_data = self.artists_collection.find_one({'id': artist['id'], 'genres': {'$regex': selected_genre, '$options': 'i'}})
+                
+                if artist_data and top_markets:
+                    for market in top_markets:
+                        album_info = {
+                            'album_id': album.get('id'),
+                            'album_name': album.get('name'),
+                            'market': market,  
+                            'genre': selected_genre  
+                        }
+                        all_album_data.append(album_info)
+
+        df = pd.DataFrame(all_album_data)
+        
+        if df.empty:
+            return pd.DataFrame()
+
+        df_popularity = df.groupby(['market', 'genre']).size().reset_index(name='popularity')
+
+        return df_popularity

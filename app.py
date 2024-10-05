@@ -33,7 +33,7 @@ def page3():
 def page4():
     selected_genres = None
     radar_chart = None
-    bar_charts = []  # Initialiser la liste pour les bar charts
+    bar_charts = []
 
     if request.method == 'POST':
         selected_genres = request.form.getlist('genres')
