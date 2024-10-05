@@ -32,18 +32,21 @@ html, body {
     color: #cccccc; /* Gris clair */
 }
 
-/* Les boutons sont centrés et flexibles */
+/* Les boutons sont alignés à gauche */
 .buttons {
     display: flex;
     flex-direction: column;
+    align-items: flex-start; /* Aligne les boutons à gauche */
+    margin-left: 20px; /* Ajuster la marge si nécessaire */
 }
 
+/* Style des boutons */
 .btn {
     background-color: #333333; /* Bouton gris foncé */
     color: white;
     padding: 15px 30px;
     margin: 10px;
-    text-align: center;
+    text-align: left; /* Alignement du texte à gauche pour correspondre au positionnement */
     text-decoration: none;
     font-size: 1.2em;
     border-radius: 5px;

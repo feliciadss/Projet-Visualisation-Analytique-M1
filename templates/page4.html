@@ -2,23 +2,42 @@
 
 {% block title %}Page 4{% endblock %}
 {% block header %}Visualisation des Caractéristiques Musicales{% endblock %}
-{% block description %}Sélectionnez les genres musicaux pour créer une Spider Chart{% endblock %}
+{% block description %}Sélectionnez les genres musicaux pour créer une radar Chart{% endblock %}
 
 {% block content %}
-    <form method="POST">
-        <h3>Choisissez les genres musicaux :</h3>
-        <div>
-            {% for genre in genres %}
-                <label><input type="checkbox" name="genres" value="{{ genre }}">{{ genre }}</label>
-            {% endfor %}
-        </div>
+    <table style="width:100%; table-layout: fixed;">
+        <tr>
+            <!-- Colonne pour les boutons alignée à gauche avec un peu de padding -->
+            <td align="left" style="vertical-align: top; width: 250px; padding: 10px 20px 10px 30px;">
+                <form method="POST">
+                    <h3>Choisissez les genres musicaux :</h3>
+                    <div>
+                        {% for genre in genres %}
+                            <label><input type="checkbox" name="genres" value="{{ genre }}">{{ genre }}</label><br>
+                        {% endfor %}
+                    </div>
+                    <button type="submit">Générer radar Chart</button>
+                </form>
+            </td>
+            
+            <!-- Colonne pour le radar chart -->
+            <td style="vertical-align: top;">
+                {% if radar_chart %}
+                    <div>
+                        {{ radar_chart|safe }}
+                    </div>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
 
-        <button type="submit">Générer Spider Chart</button>
-    </form>
+    <!-- Affichage des 6 bar charts organisés en 2 lignes de 3 colonnes -->
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-top: 20px;">
+        {% for chart in bar_charts %}
+            <div style="flex-basis: 30%; margin-bottom: 20px;">
+                {{ chart|safe }}
+            </div>
+        {% endfor %}
+    </div>
 
-    {% if spider_chart %}
-        <div class="graph-space">
-            {{ spider_chart|safe }}
-        </div>
-    {% endif %}
 {% endblock %}

@@ -22,6 +22,39 @@ def handle_rate_limit(response):
         print(f"Rate limit hit. Retrying after {retry_after} seconds.")
         time.sleep(retry_after)
 
+
+# Récupérer les playlists populaires pour un pays
+def get_popular_playlists(country, limit=20):
+    token = spotify_auth.get_token()
+    headers = {"Authorization": f"Bearer {token}"}
+    params = {
+        "market": country,
+        "limit": limit
+    }
+    response = requests.get(f"{BASE_URL}browse/featured-playlists", headers=headers, params=params)
+    
+    if response.status_code == 429:
+        handle_rate_limit(response)
+        return get_popular_playlists(country, limit)  # Réessayer après délai
+    elif response.status_code == 200:
+        return response.json()["playlists"]["items"]
+    else:
+        raise Exception(f"Failed to get playlists for country {country}")
+
+# Récupérer les tracks d'une playlist
+def get_playlist_tracks(playlist_id):
+    token = spotify_auth.get_token()
+    headers = {"Authorization": f"Bearer {token}"}
+    response = requests.get(f"{BASE_URL}playlists/{playlist_id}/tracks", headers=headers)
+    
+    if response.status_code == 429:
+        handle_rate_limit(response)
+        return get_playlist_tracks(playlist_id)
+    elif response.status_code == 200:
+        return response.json()["items"]
+    else:
+        raise Exception(f"Failed to get tracks for playlist {playlist_id}")
+
 # Récupérer les albums populaires par pays
 def get_popular_albums(country, limit=50):
     token = spotify_auth.get_token()

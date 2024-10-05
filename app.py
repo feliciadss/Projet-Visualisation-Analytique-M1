@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request
 from view.map import build_map
 from static.enumerations import genres
-from view.spider import create_spider_chart
+from view.radar import build_radar
+from view.barcharts import build_barcharts
 
 app = Flask(__name__)
 
@@ -31,17 +32,21 @@ def page3():
 @app.route('/page4', methods=['GET', 'POST'])
 def page4():
     selected_genres = None
-    spider_chart = None
+    radar_chart = None
+    bar_charts = []  # Initialiser la liste pour les bar charts
 
     if request.method == 'POST':
         selected_genres = request.form.getlist('genres')
 
         if selected_genres:
-            # Créer la spider chart avec les genres sélectionnés
-            spider_chart = create_spider_chart(selected_genres).to_html()
-            print(spider_chart.head())
+            # Créer la radar chart avec les genres sélectionnés
+            radar_chart = build_radar(selected_genres).to_html()
 
-    return render_template('page4.html', genres=genres, spider_chart=spider_chart)
+            # Créer les bar charts avec les genres sélectionnés
+            bar_charts = build_barcharts(selected_genres)
+
+    return render_template('page4.html', genres=genres, radar_chart=radar_chart, bar_charts=bar_charts)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
