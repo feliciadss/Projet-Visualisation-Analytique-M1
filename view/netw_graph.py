@@ -93,3 +93,37 @@ fig = go.Figure(data=[edge_trace, node_trace],
                 yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
                 )
 fig.show()
+
+
+def create_sankey_genre_dataframe(self):
+        all_sankey_data = []
+        
+        # Rechercher tous les tracks ayant 2 artistes ou plus
+        tracks = self.tracks_collection.find({"$where": "this.artists.length > 1"})
+        
+        for track in tracks:
+            track_artists = track.get('artists', [])
+            
+            # Collecter les genres de chaque artiste
+            artist_genres = []
+            for artist in track_artists:
+                artist_data = self.artists_collection.find_one({'id': artist['id']})
+                if artist_data:
+                    artist_genre = artist_data.get('genre', None)
+                    if artist_genre:
+                        artist_genres.append(artist_genre)
+            
+            # Si on a des genres pour au moins 2 artistes
+            if len(artist_genres) > 1:
+                track_info = {
+                    'track_id': track.get('id'),
+                    'track_name': track.get('name'),
+                    'artists_count': len(track_artists),
+                    'genres': artist_genres  # Liste des genres associés aux artistes
+                }
+                all_sankey_data.append(track_info)
+
+        df_sankey = pd.DataFrame(all_sankey_data)
+        
+        return df_sankey
+

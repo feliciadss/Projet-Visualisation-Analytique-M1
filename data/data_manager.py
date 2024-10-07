@@ -53,7 +53,7 @@ class DataManager:
         self.artists_collection = get_collection_from_db('artists')
         self.albums_collection = get_collection_from_db('albums')
 
-    # Fonction pour créer un DataFrame sur les fetaures audios des tracks
+    # Fonction pour créer un DataFrame sur les features audios des tracks
     def create_audiofeatures_dataframe(self, selected_genres):
         all_track_data = []
         
@@ -126,35 +126,60 @@ class DataManager:
 
         return 
     
-    def create_sankey_genre_dataframe(self):
-        all_sankey_data = []
-        
-        # Rechercher tous les tracks ayant 2 artistes ou plus
-        tracks = self.tracks_collection.find({"$where": "this.artists.length > 1"})
+# Fonction pour créer la matrice des collaborations entre genres
+    def create_genre_collaboration_matrix(tracks_collection, artists_collection):
+        collaborations = []
+        genre_pairs = []
+
+        # Parcourir chaque piste pour récupérer les collaborations entre artistes
+        tracks = tracks_collection.find({"$where": "this.artists.length > 1"})
         
         for track in tracks:
             track_artists = track.get('artists', [])
-            
-            # Collecter les genres de chaque artiste
             artist_genres = []
+
+        # Récupérer les genres pour chaque artiste sur la piste
             for artist in track_artists:
-                artist_data = self.artists_collection.find_one({'id': artist['id']})
-                if artist_data:
-                    artist_genre = artist_data.get('genre', None)
-                    if artist_genre:
-                        artist_genres.append(artist_genre)
-            
-            # Si on a des genres pour au moins 2 artistes
-            if len(artist_genres) > 1:
-                track_info = {
-                    'track_id': track.get('id'),
-                    'track_name': track.get('name'),
-                    'artists_count': len(track_artists),
-                    'genres': artist_genres  # Liste des genres associés aux artistes
-                }
-                all_sankey_data.append(track_info)
-
-        df_sankey = pd.DataFrame(all_sankey_data)
+                artist_data = artists_collection.find_one({'id': artist['id']})
+                if artist_data and artist_data.get('genre'):
+                    artist_genres.append(artist_data['genre'])
         
-        return df_sankey
+        # Créer des paires de genres à partir des genres récupérés
+            for i in range(len(artist_genres)):
+                for j in range(i + 1, len(artist_genres)):
+                    genre1 = artist_genres[i]
+                    genre2 = artist_genres[j]
+                    genre_pairs.append((genre1, genre2))
+                    genre_pairs.append((genre2, genre1))  # Matrice symétrique
+    
+    # Convertir les paires en DataFrame pour comptabiliser les occurrences
+    df_collaborations = pd.DataFrame(genre_pairs, columns=['Genre1', 'Genre2'])
 
+    # Construire la matrice des collaborations entre genres
+    genre_matrix = pd.crosstab(df_collaborations['Genre1'], df_collaborations['Genre2'])
+    return genre_matrix
+
+# Fonction pour créer le Chord Diagram
+    def plot_chord_diagram(genre_matrix):
+        genres = genre_matrix.index.tolist()
+        matrix_values = genre_matrix.values
+
+        # Créer le diagramme de chord
+        fig = go.Figure(data=[go.Chord(
+            labels=genres,
+            matrix=matrix_values,
+            colorscale='Blues'
+        )])
+
+        fig.update_layout(title_text="Chord Diagram des collaborations entre genres musicaux",
+                      font=dict(size=14))
+        fig.show()
+
+    # Appel des fonctions
+    data_manager = DataManager()
+
+    # Créer la matrice de collaboration entre genres
+    genre_matrix = create_genre_collaboration_matrix(data_manager.tracks_collection, data_manager.artists_collection)
+
+    # Générer et afficher le diagramme de chord
+    plot_chord_diagram(genre_matrix)
