@@ -1,11 +1,42 @@
 {% extends 'base.html' %}
 
 {% block title %}Page 3{% endblock %}
-{% block header %}Titre de la Page 3{% endblock %}
-{% block description %}Description de la Page 3{% endblock %}
+{% block header %}Visualisation des collaborations entre genres{% endblock %}
+{% block description %}Sélectionnez un genre musical pour visualiser ses collaborations{% endblock %}
 
 {% block content %}
-    <div class="graph-space">
-        <p>Espace pour les graphiques</p>
+    <table style="width:100%; table-layout: fixed;">
+        <tr>
+            <!-- Colonne pour les boutons alignée à gauche avec un peu de padding -->
+            <td align="left" style="vertical-align: top; width: 250px; padding: 10px 20px 10px 30px;">
+                <form method="POST">
+                    <h3>Choisissez le genre musical qui vous interesse :</h3>
+                    <div>
+                        {% for genre in genres %}
+                            <label><input type="checkbox" name="genres" value="{{ genre }}">{{ genre }}</label><br>
+                        {% endfor %}
+                    </div>
+                    <button type="submit">Générer le chord diagram du genre sélectionné</button>
+                </form>
+            </td>
+            
+            <!-- Colonne pour le diagramme -->
+            <td style="vertical-align: top;">
+                {% if chord_diag %}
+                    <div>
+                        {{ chord_diag|safe }}
+                    </div>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+    <!-- Affichage des 6 bar charts organisés en 2 lignes de 3 colonnes -->
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-top: 20px;">
+        {% for chart in bar_charts %}
+            <div style="flex-basis: 30%; margin-bottom: 20px;">
+                {{ chart|safe }}
+            </div>
+        {% endfor %}
     </div>
 {% endblock %}
