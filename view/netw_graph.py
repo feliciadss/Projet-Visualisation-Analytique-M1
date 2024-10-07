@@ -1,129 +1,25 @@
-import plotly.graph_objects as go
-import networkx as nx
-import json
-from plotly.io import to_json
-from data.data_manager import DataManager
 
-G = nx.random_geometric_graph(200, 0.125) #créer un graph aléatoire 
-
-def build_network_graph(genre_filter):
-    # Récupérer les données de popularité par genre et pays
-    data_manager = DataManager()
-    df = data_manager.create_genre_popularity_dataframe(genre_filter)
+# Fonction pour créer le Chord Diagram
+def plot_chord_diagram(genre_matrix):
+    genres = genre_matrix.index.tolist()
+    matrix_values = genre_matrix.values
     
-    if df.empty:
-        print(f"Aucune donnée disponible pour le genre {genre_filter}")
-        return None
+    # Créer le diagramme de chord
+    fig = go.Figure(data=[go.Chord(
+        labels=genres,           
+        matrix=matrix_values,
+        colorscale='Blues'
+    )])
 
-# Création des aretes
-# Ajoute des aretes, comme des lignes déconnectées et des noeuds dispersés.
+    fig.update_layout(title_text="Chord Diagram des collaborations entre genres musicaux",
+                      font=dict(size=14))
+    fig.show()
 
-edge_x = []
-edge_y = []
-for edge in G.edges():
-    x0, y0 = G.nodes[edge[0]]['pos']
-    x1, y1 = G.nodes[edge[1]]['pos']
-    edge_x.append(x0)
-    edge_x.append(x1)
-    edge_x.append(None)
-    edge_y.append(y0)
-    edge_y.append(y1)
-    edge_y.append(None)
+# Appel des fonctions
+data_manager = DataManager()
 
-edge_trace = go.Scatter(
-    x=edge_x, y=edge_y,
-    line=dict(width=0.5, color='#888'),
-    hoverinfo='none',
-    mode='lines')
+# Créer la matrice de collaboration entre genres
+genre_matrix = create_genre_collaboration_matrix(data_manager.tracks_collection, data_manager.artists_collection)
 
-node_x = []
-node_y = []
-for node in G.nodes():
-    x, y = G.nodes[node]['pos']
-    node_x.append(x)
-    node_y.append(y)
-
-node_trace = go.Scatter(
-    x=node_x, y=node_y,
-    mode='markers',
-    hoverinfo='text',
-    marker=dict(
-        showscale=True,
-        # colorscale options
-        #'Greys' | 'YlGnBu' | 'Greens' | 'YlOrRd' | 'Bluered' | 'RdBu' |
-        #'Reds' | 'Blues' | 'Picnic' | 'Rainbow' | 'Portland' | 'Jet' |
-        #'Hot' | 'Blackbody' | 'Earth' | 'Electric' | 'Viridis' |
-        colorscale='YlGnBu',
-        reversescale=True,
-        color=[],
-        size=10,
-        colorbar=dict(
-            thickness=15,
-            title='Node Connections',
-            xanchor='left',
-            titleside='right'
-        ),
-        line_width=2))
-
-# Ajuste la taille des noeuds en fonction de leur nombre de connexions
-node_adjacencies = []
-node_text = []
-for node, adjacencies in enumerate(G.adjacency()):
-    node_adjacencies.append(len(adjacencies[1]))
-    node_text.append('# of connections: '+str(len(adjacencies[1])))
-
-# On peut aussi choisir de faire varier la taille et non la couleur, qu'est ce qui conviendrait le mieux ??????
-node_trace.marker.color = node_adjacencies
-node_trace.text = node_text
-
-# Création du Network Graph
-fig = go.Figure(data=[edge_trace, node_trace],
-             layout=go.Layout(
-                title='<br>Collaboration entre genres',
-                titlefont_size=18,
-                showlegend=True,
-                hovermode='closest',
-                margin=dict(b=20,l=5,r=5,t=40),
-                annotations=[ dict(
-                    text="Python code: <a href='https://plotly.com/python/network-graphs/'> https://plotly.com/python/network-graphs/</a>",
-                    showarrow=False,
-                    xref="paper", yref="paper",
-                    x=0.005, y=-0.002 ) ],
-                xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
-                )
-fig.show()
-
-
-def create_sankey_genre_dataframe(self):
-        all_sankey_data = []
-        
-        # Rechercher tous les tracks ayant 2 artistes ou plus
-        tracks = self.tracks_collection.find({"$where": "this.artists.length > 1"})
-        
-        for track in tracks:
-            track_artists = track.get('artists', [])
-            
-            # Collecter les genres de chaque artiste
-            artist_genres = []
-            for artist in track_artists:
-                artist_data = self.artists_collection.find_one({'id': artist['id']})
-                if artist_data:
-                    artist_genre = artist_data.get('genre', None)
-                    if artist_genre:
-                        artist_genres.append(artist_genre)
-            
-            # Si on a des genres pour au moins 2 artistes
-            if len(artist_genres) > 1:
-                track_info = {
-                    'track_id': track.get('id'),
-                    'track_name': track.get('name'),
-                    'artists_count': len(track_artists),
-                    'genres': artist_genres  # Liste des genres associés aux artistes
-                }
-                all_sankey_data.append(track_info)
-
-        df_sankey = pd.DataFrame(all_sankey_data)
-        
-        return df_sankey
-
+# Générer et afficher le diagramme de chord
+plot_chord_diagram(genre_matrix)
