@@ -1,41 +1,48 @@
 import plotly.express as px
 from data.data_manager import DataManager
-from static.enumerations import genre_colors  # Assurez-vous que le chemin est correct
+from static.enumerations import genre_colors  
 
 def build_bubble_chart(genre):
-    # Créer une instance de DataManager
     data_manager = DataManager()
-
-    # Obtenir les sous-genres pour le genre sélectionné
     df_subgenres = data_manager.get_top_subgenres_per_genre(genre)
     
     if df_subgenres.empty:
         print("Aucune donnée disponible pour les sous-genres.")
         return None
     
-    # Obtenir la couleur du genre depuis le dictionnaire genre_colors
-    genre_color = genre_colors.get(genre.lower(), '#ffffff')  # Blanc par défaut si non trouvé
+    genre_color = genre_colors.get(genre.lower(), '#ffffff')  # Blanc par défaut
 
-    # Créer un diagramme en bulles avec Plotly
     fig = px.scatter(df_subgenres, 
                      x='subgenre', 
                      y='count', 
                      size='count', 
-                     color_discrete_sequence=[genre_color],  # Utiliser la couleur du genre sélectionné
+                     color_discrete_sequence=[genre_color],  
                      hover_name='subgenre',
                      title=f'Diagramme en Bulles pour le genre {genre}',
                      labels={'subgenre': 'Sous-genres', 'count': 'Nombre d\'artistes'},
-                     size_max=60)  # Taille max des bulles
+                     size_max=60) 
 
-    # Personnaliser la mise en page pour un fond noir
+
     fig.update_layout(
-        plot_bgcolor='black',  # Fond noir pour le graphique
-        paper_bgcolor='black',  # Fond noir pour l'ensemble de la figure
-        font_color='white',  # Texte en blanc pour contraste
-        title_font_color=genre_color,  # Titre en couleur du genre
-        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False)
+        plot_bgcolor='black',  
+        paper_bgcolor='black',  # Fond noir 
+        font_color='white',  # Texte en blanc 
+        title_font_color='white',  # Titre blanc
+        xaxis=dict(
+            title_font=dict(color='white'), 
+            tickfont=dict(color='white'),    
+            showgrid=False, 
+            zeroline=False
+        ),
+        yaxis=dict(
+            title_font=dict(color='white'), 
+            tickfont=dict(color='white'), 
+            showgrid=False, 
+            zeroline=False
+        ),
+        title=dict(
+            font=dict(color='white') 
+        )
     )
 
-    # Convertir la figure en HTML pour l'intégrer dans la page web
     return fig.to_html(full_html=False)

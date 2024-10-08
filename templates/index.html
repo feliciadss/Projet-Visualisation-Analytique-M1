@@ -1,8 +1,19 @@
 {% extends 'base.html' %}
 
 {% block title %}Visualisation des Genres et Sous-genres{% endblock %}
-{% block header %}Sélection d'un Genre Musical{% endblock %}
-{% block description %}Choisissez un genre pour afficher son diagramme en bulles avec les sous-genres associés.{% endblock %}
+
+{% block header %}Exploration des Genres Musicaux{% endblock %}
+
+{% block description %}
+    <p style="color: #006400; font-weight: bold; font-size: 1.1em;">
+        Comment les genres musicaux évoluent-ils et se popularisent-ils en Europe, et quels facteurs influencent cette dynamique, aidant ainsi les labels à prendre des décisions d'investissement stratégiques ?
+    </p>
+    <p style="font-size: 0.9em;">
+        Ce projet vise à fournir aux labels des informations clés sur la popularité des genres musicaux en Europe, l'évolution des tendances par pays, et les collaborations entre artistes de différents genres. 
+        En analysant les données de ces dernières années, il permet aux labels de suivre la croissance ou le déclin des genres et d’évaluer la diversité et l'influence des genres à travers des featurings, 
+        aidant ainsi à identifier les opportunités d'investissement dans de nouveaux artistes et collaborations.
+    </p>
+{% endblock %}
 
 {% block content %}
     <!-- Section avec boutons pour explorer plus de pages (placée au-dessus) -->
@@ -13,11 +24,19 @@
         <a href="{{ url_for('page4') }}" class="btn btn-orange">Analyses Avancées</a>
     </div>
 
+    <!-- Espace ajouté entre les boutons et le paragraphe -->
+    <div style="margin-top: 30px;"></div>
+
+    <!-- Paragraphe expliquant le regroupement des genres -->
+    <p style="text-align: left;">
+        Dans notre projet, nous avons regroupé les genres en 15 catégories incluant plusieurs sous-genres.
+    </p>
+
     <!-- Section de sélection de genre -->
     <table style="width:100%; table-layout: fixed;">
         <tr>
             <!-- Colonne pour les boutons alignée à gauche avec un peu de padding -->
-            <td align="left" style="vertical-align: top; width: 250px; padding: 10px 20px 10px 30px;">
+            <td align="left" style="vertical-align: top; width: 250px; padding: 10px 40px 10px 40px;">
                 <form method="POST">
                     <h3>Choisissez un genre musical :</h3>
                     <div>
@@ -25,12 +44,14 @@
                             <label><input type="radio" name="genre" value="{{ genre }}">{{ genre }}</label><br>
                         {% endfor %}
                     </div>
-                    <button type="submit">Afficher le diagramme en bulles</button>
+                    <div style="text-align: right; margin-top: 10px;">
+                        <button type="submit">Afficher le diagramme en bulles</button>
+                    </div>
                 </form>
             </td>
 
             <!-- Colonne pour afficher le diagramme en bulles -->
-            <td style="vertical-align: top;">
+            <td style="vertical-align: top; padding: 20px;">
                 {% if bubble_chart %}
                     <div>
                         {{ bubble_chart|safe }}
@@ -41,7 +62,7 @@
     </table>
 
     <!-- Diagramme en bulles généré par Plotly -->
-    <div class="bubble-chart-container">
+    <div class="bubble-chart-container" style="padding: 20px;">
         {% if bubble_chart_data %}
             <div id="bubble-chart"></div>
             <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> <!-- Inclusion de Plotly -->
@@ -69,18 +90,23 @@
                     height: 600,
                     width: 1000,
                     xaxis: {
-                        title: 'Genres'
+                        title: 'Genres',
+                        tickfont: { color: 'white' }
                     },
                     yaxis: {
-                        title: 'Sous-genres'
-                    }
+                        title: 'Sous-genres',
+                        tickfont: { color: 'white' }
+                    },
+                    plot_bgcolor: 'black',  // Fond du graphique en noir
+                    paper_bgcolor: 'black', // Fond de la page en noir
+                    font: { color: 'white' }  // Couleur du texte en blanc
                 };
                 
                 // Création du graphique avec Plotly
                 Plotly.newPlot('bubble-chart', [trace], layout);
             </script>
         {% else %}
-            <p>Aucune donnée disponible pour le diagramme en bulles.</p>
+            <p> </p>
         {% endif %}
     </div>
 
@@ -105,7 +131,8 @@
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            margin-bottom: 50px;
+            margin-bottom: 20px;
+            padding: 0 40px;  /* Ajouté pour décoller les boutons des bords */
         }
 
         .btn {
@@ -147,11 +174,17 @@
             justify-content: center;
             align-items: center;
             margin-top: 50px;
+            padding: 20px;
         }
 
         #bubble-chart {
             width: 80%;
             height: 500px;
+        }
+
+        /* Style du bouton "Afficher le diagramme en bulles" aligné à droite */
+        form button {
+            float: right;
         }
     </style>
 {% endblock %}

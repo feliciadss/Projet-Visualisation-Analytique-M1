@@ -160,20 +160,16 @@ class DataManager:
         return genre_matrix
 
     # Fonction pour récupérer les sous-genres les plus fréquents pour un genre
-    def get_top_subgenres_per_genre(self, genre, top_n=6):
-        # Rechercher les artistes du genre sélectionné
+    def get_top_subgenres_per_genre(self, genre, top_n=10):
         artists = self.artists_collection.find({'genres': {'$regex': genre, '$options': 'i'}})
         
         subgenres = []
         for artist in artists:
-            subgenres.extend(artist.get('genres', []))  # Récupérer les sous-genres
+            subgenres.extend(artist.get('genres', []))  # Recuperation sous genres
 
-        # Compter les sous-genres et garder les 6 plus fréquents
         subgenre_counts = pd.Series(subgenres).value_counts().reset_index()
         subgenre_counts.columns = ['subgenre', 'count']
         top_subgenres = subgenre_counts.head(top_n)
 
-        # Créer un DataFrame avec les résultats
         df_subgenres = pd.DataFrame(top_subgenres)
-        df_subgenres['genre'] = genre  # Ajouter une colonne 'genre' pour chaque sous-genre
-        return df_subgenres
+        df_subgenres['genre'] = genre 
