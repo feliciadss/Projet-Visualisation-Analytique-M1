@@ -32,7 +32,7 @@ class Artist:
         self.name = artist_json.get('name')
         self.popularity = artist_json.get('popularity') 
         self.followers = artist_json.get('followers', {}).get('total') 
-        self.genre = artist_json.get('genre')
+        self.genres = artist_json.get('genres', [])
         self.market = artist_json.get('market')
         
 class Album:
@@ -152,9 +152,28 @@ class DataManager:
                     genre_pairs.append((genre1, genre2))
                     genre_pairs.append((genre2, genre1))  # Matrice symétrique
     
-    # Convertir les paires en DataFrame pour comptabiliser les occurrences
-    df_collaborations = pd.DataFrame(genre_pairs, columns=['Genre1', 'Genre2'])
+        # Convertir les paires en DataFrame pour comptabiliser les occurrences
+        df_collaborations = pd.DataFrame(genre_pairs, columns=['Genre1', 'Genre2'])
 
-    # Construire la matrice des collaborations entre genres
-    genre_matrix = pd.crosstab(df_collaborations['Genre1'], df_collaborations['Genre2'])
-    return genre_matrix
+        # Construire la matrice des collaborations entre genres
+        genre_matrix = pd.crosstab(df_collaborations['Genre1'], df_collaborations['Genre2'])
+        return genre_matrix
+
+    # Fonction pour récupérer les sous-genres les plus fréquents pour un genre
+    def get_top_subgenres_per_genre(self, genre, top_n=6):
+        # Rechercher les artistes du genre sélectionné
+        artists = self.artists_collection.find({'genres': {'$regex': genre, '$options': 'i'}})
+        
+        subgenres = []
+        for artist in artists:
+            subgenres.extend(artist.get('genres', []))  # Récupérer les sous-genres
+
+        # Compter les sous-genres et garder les 6 plus fréquents
+        subgenre_counts = pd.Series(subgenres).value_counts().reset_index()
+        subgenre_counts.columns = ['subgenre', 'count']
+        top_subgenres = subgenre_counts.head(top_n)
+
+        # Créer un DataFrame avec les résultats
+        df_subgenres = pd.DataFrame(top_subgenres)
+        df_subgenres['genre'] = genre  # Ajouter une colonne 'genre' pour chaque sous-genre
+        return df_subgenres

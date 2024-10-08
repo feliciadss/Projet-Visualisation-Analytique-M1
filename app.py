@@ -3,12 +3,24 @@ from view.map import build_map
 from static.enumerations import genres
 from view.radar import build_radar
 from view.barcharts import build_barcharts
+from view.bubblechart import build_bubble_chart
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template('index.html')
+    selected_genre = None
+    bubble_chart = None
+
+    if request.method == 'POST':
+        selected_genre = request.form.get('genre')
+
+        if selected_genre:
+            bubble_chart = build_bubble_chart(selected_genre)
+
+    return render_template('index.html', genres=genres, bubble_chart=bubble_chart)
+
+
 
 @app.route('/page1', methods=['GET', 'POST'])
 def page1():
