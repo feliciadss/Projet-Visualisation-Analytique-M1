@@ -4,6 +4,7 @@ from static.enumerations import genres
 from view.radar import build_radar
 from view.barcharts import build_barcharts
 from view.bubblechart import build_bubble_chart
+from view.sankey_diagram import plot_sankey_diagram
 
 app = Flask(__name__)
 
@@ -37,9 +38,20 @@ def page1():
 def page2():
     return render_template('page2.html')
 
-@app.route('/page3')
+
+@app.route('/page3', methods=['GET', 'POST'])
 def page3():
-    return render_template('page3.html')
+    selected_genres = None
+    sankey_diagram = None
+
+    if request.method == 'POST':
+        selected_genres = request.form.getlist('genres')
+
+        if selected_genres:
+            sankey_diagram = plot_sankey_diagram(selected_genres)
+
+    return render_template('page3.html', genres=genres, radar_chart=sankey_diagram)
+
 
 @app.route('/page4', methods=['GET', 'POST'])
 def page4():

@@ -5,6 +5,12 @@ import configparser
 config = configparser.ConfigParser()
 config.read("./data/config.ini")
 
+global_genres = [
+    "pop", "rock", "hip-hop", "jazz", "classical", 
+    "electronic", "indie", "reggae", "blues", "metal",
+    "folk", "country", "r&b", "soul"
+]
+
 def get_collection_from_db(collection_name):
     client = MongoClient(config['MONGO_DB']['MONGO_URI'])
     db = client[config['MONGO_DB']['DB_NAME']]
@@ -124,40 +130,56 @@ class DataManager:
 
         df_popularity = df.groupby(['market', 'genre']).size().reset_index(name='popularity')
 
-        return 
+        return df_popularity
     
 # Fonction pour créer la matrice des collaborations entre genres
-    def create_genre_collaboration_matrix(tracks_collection, artists_collection):
+    def create_genre_collaboration_matrix(self, selected_genre):
         collaborations = []
         genre_pairs = []
 
-        # Parcourir chaque piste pour récupérer les collaborations entre artistes
-        tracks = tracks_collection.find({"$where": "this.artists.length > 1"})
+        # Trouver tous les artistes appartenant au genre sélectionné ou aux sous-genres correspondants
+        artists_in_genre = self.artists_collection.find({'genres': {'$regex': selected_genre, '$options': 'i'}})
+        artist_ids = [artist['id'] for artist in artists_in_genre]
+
+        if not artist_ids:
+            print(f"Aucun artiste trouvé pour le genre {selected_genre}")
+            return pd.DataFrame()  # Retourner un DataFrame vide si aucun artiste trouvé
+
+        # Récupérer toutes les pistes ayant ces artistes
+        tracks = self.tracks_collection.find({'artists.id': {'$in': artist_ids, '$exists': True}})
         
         for track in tracks:
             track_artists = track.get('artists', [])
             artist_genres = []
 
-        # Récupérer les genres pour chaque artiste sur la piste
+            # Récupérer les genres pour chaque artiste sur la piste
             for artist in track_artists:
-                artist_data = artists_collection.find_one({'id': artist['id']})
-                if artist_data and artist_data.get('genre'):
-                    artist_genres.append(artist_data['genre'])
-        
-        # Créer des paires de genres à partir des genres récupérés
+                artist_data = self.artists_collection.find_one({'id': artist['id']})
+                if artist_data and artist_data.get('genres'):
+                    # Récupérer tous les genres de l'artiste et filtrer ceux en lien avec le genre sélectionné
+                    relevant_genres = [genre for genre in artist_data['genres'] if selected_genre.lower() in genre.lower()]
+                    if relevant_genres:
+                        artist_genres.extend(relevant_genres)
+            
+            # Créer des paires de genres à partir des genres récupérés
             for i in range(len(artist_genres)):
                 for j in range(i + 1, len(artist_genres)):
                     genre1 = artist_genres[i]
                     genre2 = artist_genres[j]
                     genre_pairs.append((genre1, genre2))
                     genre_pairs.append((genre2, genre1))  # Matrice symétrique
-    
+
+        if not genre_pairs:
+            return pd.DataFrame()  # Retourner un DataFrame vide si aucun pair trouvé
+
         # Convertir les paires en DataFrame pour comptabiliser les occurrences
         df_collaborations = pd.DataFrame(genre_pairs, columns=['Genre1', 'Genre2'])
 
         # Construire la matrice des collaborations entre genres
         genre_matrix = pd.crosstab(df_collaborations['Genre1'], df_collaborations['Genre2'])
+        print(genre_matrix.head())
         return genre_matrix
+
 
     # Fonction pour récupérer les sous-genres les plus fréquents pour un genre
     def get_top_subgenres_per_genre(self, genre, top_n=10):
@@ -172,4 +194,5 @@ class DataManager:
         top_subgenres = subgenre_counts.head(top_n)
 
         df_subgenres = pd.DataFrame(top_subgenres)
-        df_subgenres['genre'] = genre 
+        df_subgenres['genre'] = genre
+        return df_subgenres
