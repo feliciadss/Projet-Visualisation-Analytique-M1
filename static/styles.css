@@ -19,9 +19,32 @@ html, body {
     text-align: center;
 }
 
+/* Style pour la bannière de navigation */
+nav {
+    background-color: #000000; /* Fond noir */
+    padding: 10px 0; /* Espacement pour le confort visuel */
+    position: fixed; /* Fixé en haut de la page */
+    top: 0; /* Toujours en haut */
+    width: 100%; /* Prend toute la largeur */
+    z-index: 1000; /* Position devant le reste du contenu */
+    text-align: right; /* Aligner le lien à droite */
+}
+
+nav a {
+    color: #ffffff; /* Texte blanc pour le lien */
+    margin-right: 20px; /* Espace du lien par rapport au bord droit */
+    text-decoration: none; /* Supprimer la décoration du lien */
+    font-size: 1.2em; /* Taille du texte du lien */
+    font-weight: bold; /* Texte en gras pour plus de visibilité */
+}
+
+nav a:hover {
+    color: #1e90ff; /* Changer la couleur lors du survol */
+}
+
 /* Style des titres */
 .main-title {
-    font-size: 2.5em;
+    font-size: 1.6em;
     margin-bottom: 20px;
 }
 

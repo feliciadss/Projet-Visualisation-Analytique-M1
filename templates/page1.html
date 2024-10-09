@@ -1,7 +1,18 @@
 {% extends 'base.html' %}
 
-{% block title %}Visualisation Répartition des Genres en Europe{% endblock %}
-{% block header %}Visualisation Répartition des Genres en Europe{% endblock %}
+{% block title %}Répartition des Genres en Europe{% endblock %}
+{% block header %}
+    <!-- Banière de navigation fine, centrée et très discrète -->
+    <nav style="background-color: #000; padding: 5px 0; position: fixed; top: 0; width: 100%; z-index: 2000; text-align: right;">
+        <a href="{{ url_for('index') }}" style="color: white; margin: 0 15px; text-decoration: none; font-size: 1.2em;">Retour Accueil</a>
+    </nav>
+
+    <!-- Ajouter un espace pour compenser la bannière fixe -->
+    <div style="padding-top: 50px;">
+        <h1 class="main-title">Visualisation Répartition des Genres en Europe</h1> <!-- Utilisation de la classe main-title -->
+    </div>
+{% endblock %}
+
 {% block description %}Sélectionnez un genre musical pour afficher sa répartition en Europe{% endblock %}
 
 {% block content %}
@@ -36,7 +47,6 @@
             </td>
         </tr>
     </table>
-
 {% endblock %}
 
 {% block footer %}
@@ -47,13 +57,7 @@
 
 {% block styles %}
     <style>
-        /* Styles pour la page */
-        body, html {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-
+        /* Styles spécifiques à cette page */
         h3 {
             font-size: 1.2em;
             margin-bottom: 10px;
