@@ -50,7 +50,7 @@ def page3():
         if selected_genres:
             sankey_diagram = plot_sankey_diagram(selected_genres)
 
-    return render_template('page3.html', genres=genres, radar_chart=sankey_diagram)
+    return render_template('page3.html', genres=genres, sankey_diagram=sankey_diagram)
 
 
 @app.route('/page4', methods=['GET', 'POST'])

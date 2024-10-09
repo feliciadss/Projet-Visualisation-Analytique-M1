@@ -2,11 +2,17 @@ import plotly.express as px
 import json
 from plotly.io import to_json
 from data.data_manager import DataManager
-from static.enumerations import genre_colors  
+from static.enumerations import genre_colors
+import pycountry
+
+def convert_iso2_to_iso3(iso2_code):
+    country = pycountry.countries.get(alpha_2=iso2_code)
+    return country.alpha_3 if country else None  
 
 def build_map(genre_filter):
     data_manager = DataManager()
     df = data_manager.create_album_genre_popularity_dataframe(genre_filter)
+    df['market'] = df['market'].apply(convert_iso2_to_iso3)
 
     if df.empty:
         print(f"Aucune donnée disponible pour le genre {genre_filter}")

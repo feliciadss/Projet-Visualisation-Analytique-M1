@@ -5,11 +5,6 @@ import configparser
 config = configparser.ConfigParser()
 config.read("./data/config.ini")
 
-global_genres = [
-    "pop", "rock", "hip-hop", "jazz", "classical", 
-    "electronic", "indie", "reggae", "blues", "metal",
-    "folk", "country", "r&b", "soul"
-]
 
 def get_collection_from_db(collection_name):
     client = MongoClient(config['MONGO_DB']['MONGO_URI'])
@@ -129,7 +124,7 @@ class DataManager:
             return pd.DataFrame()
 
         df_popularity = df.groupby(['market', 'genre']).size().reset_index(name='popularity')
-
+        print(df.head())
         return df_popularity
     
 # Fonction pour créer la matrice des collaborations entre genres
@@ -182,7 +177,7 @@ class DataManager:
 
 
     # Fonction pour récupérer les sous-genres les plus fréquents pour un genre
-    def get_top_subgenres_per_genre(self, genre, top_n=10):
+    def get_top_subgenres_per_genre(self, genre, top_n=15):
         artists = self.artists_collection.find({'genres': {'$regex': genre, '$options': 'i'}})
         
         subgenres = []

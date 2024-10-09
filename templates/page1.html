@@ -1,94 +1,103 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carte des genres musicaux</title>
-    <!-- Charger la bibliothèque Plotly -->
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+{% extends 'base.html' %}
+
+{% block title %}Visualisation Répartition des Genres en Europe{% endblock %}
+{% block header %}Visualisation Répartition des Genres en Europe{% endblock %}
+{% block description %}Sélectionnez un genre musical pour afficher sa répartition en Europe{% endblock %}
+
+{% block content %}
+    <table style="width:100%; table-layout: fixed;">
+        <tr>
+            <!-- Colonne pour les boutons radio, alignée à gauche avec plus de padding -->
+            <td align="left" style="vertical-align: top; width: 250px; padding: 10px 40px 10px 40px;">
+                <form method="POST">
+                    <h3>Choisissez un genre musical :</h3>
+                    <div>
+                        {% for genre in genres %}
+                            <label><input type="radio" name="genre" value="{{ genre }}">{{ genre }}</label><br>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" style="margin-top: 10px;">Afficher la répartition</button>
+                </form>
+            </td>
+            
+            <!-- Colonne pour la carte Plotly -->
+            <td style="vertical-align: top; padding: 20px;">
+                {% if data_json %}
+                    <div id="graph" style="width: 80vw; height: 60vh; background-color: black;"></div>
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                    <script type="text/javascript">
+                        // Charger les données JSON depuis Flask
+                        const data = {{ data_json | safe }};
+                        
+                        // Créer la carte avec Plotly
+                        Plotly.newPlot('graph', data);
+                    </script>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+{% endblock %}
+
+{% block footer %}
+    <div class="data-source">
+        <p>Données fournies par <a href="https://developer.spotify.com/documentation/web-api/" target="_blank">Spotify API</a></p>
+    </div>
+{% endblock %}
+
+{% block styles %}
     <style>
-        /* Style général de la page */
+        /* Styles pour la page */
         body, html {
+            height: 100%;
             margin: 0;
             padding: 0;
-            height: 100%;
-            background-color: black;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
         }
 
-        /* Conteneur pour le titre et la sélection */
-        .form-container {
-            margin-bottom: 30px;  /* Espacement entre le formulaire et la carte */
-            text-align: center;  /* Centrer le texte */
+        h3 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
         }
 
-        /* Style du conteneur pour la carte */
-        #graph {
-            width: 80vw;  /* Largeur de la carte à 80% de la largeur de la fenêtre */
-            height: 60vh; /* Hauteur de la carte à 60% de la hauteur de la fenêtre */
-            margin-top: 20px; /* Espacement au-dessus de la carte */
+        table {
+            width: 100%;
+            margin-top: 20px;
         }
 
-        /* Style du menu déroulant et du bouton */
-        select, button {
-            margin: 10px;
+        td {
             padding: 10px;
-            font-size: 16px;
         }
 
         button {
-            cursor: pointer;
-            background-color: #4CAF50; /* Couleur verte */
+            padding: 10px;
+            background-color: #4CAF50;
             color: white;
             border: none;
+            cursor: pointer;
         }
 
         button:hover {
-            background-color: #45a049; /* Couleur plus foncée au survol */
+            background-color: #45a049;
+        }
+
+        .data-source {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 0.8em;
+            color: #cccccc;
+            padding: 10px 0;
+            background-color: #000000;
+        }
+
+        .data-source a {
+            color: #cccccc;
+            text-decoration: underline;
+        }
+
+        .data-source a:hover {
+            color: #ffffff;
         }
     </style>
-</head>
-<body>
-    <nav style="background-color: #000; padding: 3px 0; position: fixed; top: 0; width: 100%; z-index: 1000; text-align: center;">
-        <a href="{{ url_for('index') }}" style="color: white; margin: 0 8px; text-decoration: none; font-size: 0.35em;">Retour Accueil</a>
-    </nav>
-
-    <!-- Conteneur pour le texte et la sélection du genre -->
-    <div class="form-container">
-        <h1>Choisissez un genre musical</h1>
-
-        <!-- Formulaire pour sélectionner le genre musical -->
-        <form method="POST">
-            <select name="genre">
-                <!-- Boucle sur les genres passés depuis Flask -->
-                {% for genre in genres %}
-                    <option value="{{ genre }}" {% if selected_genre == genre %}selected{% endif %}>{{ genre }}</option>
-                {% endfor %}
-            </select>
-            <button type="submit">Afficher la carte</button>
-        </form>
-    </div>
-
-    <!-- Div où la carte Plotly sera affichée -->
-    <div id="graph"></div>
-
-    <!-- Vérifie si le JSON des données est disponible et crée la carte -->
-    {% if data_json %}
-    <script type="text/javascript">
-        // Charger les données JSON depuis Flask
-        const data = {{ data_json | safe }};
-        
-        // Afficher le JSON dans la console pour le diagnostic
-        console.log("Data JSON:", data);
-
-        // Créer la carte avec Plotly
-        Plotly.newPlot('graph', data);
-    </script>
-    {% endif %}
-
-</body>
-</html>
+{% endblock %}
