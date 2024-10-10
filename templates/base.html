@@ -8,16 +8,26 @@
 </head>
 <body>
     <div class="container">
+        <!-- Bouton Accueil en haut à droite -->
+        <div class="home-button">
+            <a href="{{ url_for('index') }}">🏠</a>
+        </div>
+
+        <!-- Titre principal -->
         <h1 class="main-title">{% block header %}Titre{% endblock %}</h1>
         <p class="description">{% block description %}Ceci est la description{% endblock %}</p>
+        
+        <!-- Contenu principal -->
         <div class="content">
             {% block content %}{% endblock %}
         </div>
     </div>
 
-    <!-- Footer en dehors de la container pour qu'il ne soit pas affecté par son comportement flex -->
+    <!-- Footer standard -->
     <footer class="footer">
-        {% block footer %}{% endblock %}
+        {% block footer %}
+        <p>Données fournies par <a href="https://developer.spotify.com/documentation/web-api/" target="_blank">Spotify API</a></p>
+        {% endblock %}
     </footer>
 </body>
 </html>

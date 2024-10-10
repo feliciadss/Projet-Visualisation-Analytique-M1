@@ -6,14 +6,14 @@
 
 {% block description %}
     <!-- Encadré pour la description -->
-    <div style="border: 2px solid #cccccc; padding: 20px; font-size: 1.2em; margin: 20px 50px; background-color: #080000;">
+    <div class="description-box">
         Ce site web vous fournit des informations clés sur la popularité des genres musicaux en Europe, l'évolution des tendances par pays, ainsi que les collaborations entre artistes de différents genres.
         En analysant les données des dernières années, vous pourrez suivre la croissance ou le déclin des genres, évaluer la diversité et l'influence des genres à travers les featurings, et ainsi identifier les meilleures opportunités d'investissement dans de nouveaux artistes et collaborations.
     </div>
 {% endblock %}
 
 {% block content %}
-    <!-- Section avec boutons pour explorer plus de pages (placée au-dessus) -->
+    <!-- Section avec boutons pour explorer plus de pages -->
     <div class="button-container">
         <a href="{{ url_for('page1') }}" class="btn btn-blue">Popularité des Genres Musicaux</a>
         <a href="{{ url_for('page2') }}" class="btn btn-green">Évolution d'un Genre</a>
@@ -22,7 +22,7 @@
     </div>
 
     <!-- Grand espace ajouté entre les boutons et le paragraphe -->
-    <div style="margin-top: 80px;"></div>
+    <div style="margin-top: 40px;"></div>
 
     <!-- Paragraphe expliquant le regroupement des genres -->
     <p style="text-align: left; margin: 0 50px;"> 
@@ -31,36 +31,29 @@
     </p>
 
     <!-- Section de sélection de genre -->
-    <table style="width:100%; table-layout: fixed;">
-        <tr>
-            <!-- Colonne pour les boutons alignée à gauche avec un peu de padding -->
-            <td align="left" style="vertical-align: top; width: 250px; padding: 10px 40px 10px 40px;">
-                <form method="POST">
-                    <h3>Choisissez un genre musical :</h3>
-                    <div>
-                        {% for genre in genres %}
-                            <label><input type="radio" name="genre" value="{{ genre }}">{{ genre }}</label><br>
-                        {% endfor %}
-                    </div>
-                    <div style="text-align: right; margin-top: 10px;">
-                        <button type="submit">Afficher les sous-genres associés</button> 
-                    </div>
-                </form>
-            </td>
+    <td align="left" style="vertical-align: top; width: 250px; padding: 10px 40px 10px 40px;">
+        <form method="POST">
+            <h3>Choisissez un genre musical :</h3>
+            <div>
+                {% for genre in genres %}
+                    <label><input type="radio" name="genre" value="{{ genre }}">{{ genre }}</label><br>
+                {% endfor %}
+            </div>
+            <button type="submit" style="margin-top: 10px;">Visualiser</button>
+        </form>
+    </td>
 
-            <!-- Colonne pour afficher le diagramme en bulles -->
-            <td style="vertical-align: top; padding: 20px;">
-                {% if bubble_chart %}
-                    <div>
-                        {{ bubble_chart|safe }}
-                    </div>
-                {% endif %}
-            </td>
-        </tr>
-    </table>
+    <!-- Colonne pour afficher le diagramme en bulles -->
+    <div class="visualisation-space">
+        {% if bubble_chart %}
+            <div>
+                {{ bubble_chart|safe }}
+            </div>
+        {% endif %}
+    </div>
 
     <!-- Diagramme en bulles généré par Plotly -->
-    <div class="bubble-chart-container" style="padding: 20px;">
+    <div class="bubble-chart-container">
         {% if bubble_chart_data %}
             <div id="bubble-chart"></div>
             <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> <!-- Inclusion de Plotly -->
@@ -114,75 +107,4 @@
     <div class="data-source">
         <p>Données fournies par <a href="https://developer.spotify.com/documentation/web-api/" target="_blank">Spotify API</a></p>
     </div>
-{% endblock %}
-
-{% block styles %}
-    <style>
-        /* Styles pour la page d'accueil */
-        body, html {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-
-        .button-container {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-            padding: 0 40px;  /* Ajouté pour décoller les boutons des bords */
-        }
-
-        .btn {
-            padding: 15px 40px;
-            margin: 10px;
-            font-size: 1.1em;
-            text-decoration: none;
-            text-transform: uppercase;
-            border: 1px solid #555555;
-            border-radius: 30px;
-            transition: all 0.3s ease;
-            color: #ffffff;
-        }
-
-        /* Positionner le footer en bas de la page */
-        .data-source {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            text-align: center;
-            font-size: 0.8em;
-            color: #cccccc;
-            padding: 10px 0;
-            background-color: #000000;
-        }
-
-        .data-source a {
-            color: #cccccc;
-            text-decoration: underline;
-        }
-
-        .data-source a:hover {
-            color: #ffffff;
-        }
-
-        /* Styles pour centrer le diagramme en bulles */
-        .bubble-chart-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 50px;
-            padding: 20px;
-        }
-
-        #bubble-chart {
-            width: 80%;
-            height: 500px;
-        }
-
-        /* Style du bouton "Afficher le diagramme en bulles" aligné à droite */
-        form button {
-            float: right;
-        }
-    </style>
 {% endblock %}

@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 
-{% block title %}Diagramme Multilinéaire{% endblock %}
 {% block header %}Visualisation du Nombre de Tracks par Genre{% endblock %}
 {% block description %}Sélectionnez les genres musicaux pour créer un diagramme multilinéaire{% endblock %}
 
@@ -16,7 +15,7 @@
                             <label><input type="checkbox" name="genres" value="{{ genre }}">{{ genre }}</label><br>
                         {% endfor %}
                     </div>
-                    <button type="submit">Générer Diagramme Multilinéaire</button>
+                    <button type="submit" style="margin-top: 10px;">Visualiser</button>
                 </form>
             </td>
             

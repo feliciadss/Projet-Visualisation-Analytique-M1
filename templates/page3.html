@@ -1,18 +1,8 @@
 {% extends 'base.html' %}
 
-{% block title %}Collaborations entre genres{% endblock %}
-{% block header %}
-    <!-- Banière de navigation fine, centrée et très discrète avec les styles appliqués inline -->
-    <nav style="background-color: #000; padding: 10px 0; position: fixed; top: 0; width: 100%; z-index: 10000; text-align: right;">
-        <!-- Bouton retour avec styles inline pour éviter les conflits CSS -->
-        <a href="{{ url_for('index') }}" style="color: white; margin-right: 20px; text-decoration: none; font-size: 1.2em; font-weight: bold;">Retour Accueil</a>
-    </nav>
+{% block header %}Collaborations entre genres{% endblock %}
 
-    <!-- Ajouter un espace pour compenser la bannière fixe -->
-    <div style="padding-top: 60px;">
-        <h1 style="font-size: 2em; font-weight: bold; text-align: center; margin-bottom: 20px;">Collaborations entre genres</h1>
-    </div>
-{% endblock %}
+
 
 {% block description %}Sélectionnez un genre musical pour visualiser ses collaborations{% endblock %}
 
@@ -28,7 +18,7 @@
                             <label><input type="checkbox" name="genres" value="{{ genre }}">{{ genre }}</label><br>
                         {% endfor %}
                     </div>
-                    <button type="submit" style="margin-top: 10px; background-color: #4CAF50; color: white; padding: 10px 20px; border: none; cursor: pointer; font-size: 1.1em; border-radius: 5px; transition: background-color 0.3s ease;">Générer le chord diagram</button>
+                    <button type="submit" style="margin-top: 10px;">visualiser</button>
                 </form>
             </td>
             
@@ -56,7 +46,7 @@
 {% endblock %}
 
 {% block footer %}
-    <div class="data-source" style="position: fixed; bottom: 0; width: 100%; text-align: center; font-size: 0.8em; color: #cccccc; padding: 10px 0; background-color: #000000;">
-        <p>Données fournies par <a href="https://developer.spotify.com/documentation/web-api/" target="_blank" style="color: #cccccc; text-decoration: underline;">Spotify API</a></p>
+    <div class="data-source">
+        <p>Données fournies par <a href="https://developer.spotify.com/documentation/web-api/" target="_blank">Spotify API</a></p>
     </div>
 {% endblock %}
