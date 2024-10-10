@@ -190,3 +190,37 @@ class DataManager:
         df_subgenres = pd.DataFrame(top_subgenres)
         df_subgenres['genre'] = genre
         return df_subgenres
+    
+    # Fonction pour collecter les albums dont les artistes font partie des selected_genres et renvoyer un DataFrame avec la release date
+    def create_album_release_dataframe(self, selected_genres):
+        all_album_data = []
+        
+        for genre_selectionné in selected_genres:
+            artists = self.artists_collection.find({'genres': {'$regex': genre_selectionné, '$options': 'i'}})
+            artist_ids = [artist['id'] for artist in artists]
+            
+            if not artist_ids:
+                print(f"Aucun artiste trouvé pour le genre {genre_selectionné}")
+                continue
+            
+            albums = self.albums_collection.find({'artists.id': {'$in': artist_ids}})
+            
+            if not albums:
+                print(f"Aucun album trouvé pour les artistes de {genre_selectionné}")
+                continue
+
+            for album in albums:
+                album_info = {
+                    'album_id': album.get('id'),
+                    'album_name': album.get('name'),
+                    'release_date': album.get('release_date'),
+                    'genre': genre_selectionné,
+                    'artists': [artist['id'] for artist in album.get('artists', [])],
+                    'available_markets': album.get('available_markets', [])
+                }
+                all_album_data.append(album_info)
+        
+        df = pd.DataFrame(all_album_data)
+        
+        df['release_date'] = pd.to_datetime(df['release_date'], errors='coerce') #conversion pour plotly
+        return df

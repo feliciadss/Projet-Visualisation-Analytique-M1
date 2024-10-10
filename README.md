@@ -46,6 +46,7 @@ Ce dossier stocke les objets de visualisation.
 - **`barcharts.py`**
 - **`radar.py`**
 - **`bubblechart.py`**
+- **`linear.py`**
 
 ### **5. Fichier `requirements.txt`**
 Ce fichier contient toutes les dépendances nécessaires pour exécuter l'application. Il regroupe les packages et leurs versions, notamment Flask, MongoDB, Spotipy, Plotly, Pandas, et autres bibliothèques utilisées dans le projet.
