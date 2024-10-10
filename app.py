@@ -3,25 +3,14 @@ from view.map import build_map
 from static.enumerations import genres
 from view.radar import build_radar
 from view.barcharts import build_barcharts
-from view.bubblechart import build_bubble_chart
-from view.sankey_diagram import plot_sankey_diagram
+from view.linear import build_linear_chart
+
 
 app = Flask(__name__)
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
-    selected_genre = None
-    bubble_chart = None
-
-    if request.method == 'POST':
-        selected_genre = request.form.get('genre')
-
-        if selected_genre:
-            bubble_chart = build_bubble_chart(selected_genre)
-
-    return render_template('index.html', genres=genres, bubble_chart=bubble_chart)
-
-
+    return render_template('index.html')
 
 @app.route('/page1', methods=['GET', 'POST'])
 def page1():
@@ -33,33 +22,23 @@ def page1():
         data_json = build_map(selected_genre) 
     return render_template('page1.html', genres=genres, selected_genre=selected_genre, data_json=data_json)
 
-
-@app.route('/page2')
+@app.route('/page2', methods=['GET', 'POST'])
 def page2():
     selected_genres = None
     chart = None
 
     if request.method == 'POST':
-        selected_genres = request.form.getlist('genres') 
-        if selected_genres:
-            chart = build_linear_chart(selected_genres).to_html() 
-
-    return render_template('page2.html', genres=genres, selected_genres=selected_genres, chart=chart)
-
-
-@app.route('/page3', methods=['GET', 'POST'])
-def page3():
-    selected_genres = None
-    sankey_diagram = None
-
-    if request.method == 'POST':
         selected_genres = request.form.getlist('genres')
 
         if selected_genres:
-            sankey_diagram = plot_genre_collab_sankey(selected_genres).to_html()
+            chart = build_linear_chart(selected_genres).to_html()
+    
+    return render_template('page2.html', genres=genres, selected_genres=selected_genres, chart=chart)
 
-    return render_template('page3.html', genres=genres, sankey_diagram=sankey_diagram)
 
+@app.route('/page3')
+def page3():
+    return render_template('page3.html')
 
 @app.route('/page4', methods=['GET', 'POST'])
 def page4():
