@@ -34,12 +34,14 @@
             
             <!-- Colonne pour le diagramme de collaborations -->
             <td style="vertical-align: top; padding: 20px;">
-                {% if chord_diag %}
-                    <div id="chord-diagram">
-                        {{ chord_diag|safe }}
+                {% if sankey %}
+                    <div id="sankey-diagram">
+                        {{ sankey|safe }}
                     </div>
+                {% else %}
+                    <p>Aucun diagramme de Sankey à afficher pour les genres sélectionnés.</p>
                 {% endif %}
-            </td>
+            </td>            
         </tr>
     </table>
 

@@ -4,13 +4,25 @@ from static.enumerations import genres
 from view.radar import build_radar
 from view.barcharts import build_barcharts
 from view.linear import build_linear_chart
+from view.bubblechart import build_bubble_chart
+from view.sankey_diagram import build_sankey_diagram
 
 
 app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    selected_genre = None
+    bubble_chart = None
+
+    if request.method == 'POST':
+        selected_genre = request.form.get('genre')
+
+        if selected_genre:
+            bubble_chart = build_bubble_chart(selected_genre)
+
+    return render_template('index.html', genres=genres, bubble_chart=bubble_chart)
+
 
 @app.route('/page1', methods=['GET', 'POST'])
 def page1():
@@ -21,6 +33,7 @@ def page1():
         selected_genre = request.form['genre']
         data_json = build_map(selected_genre) 
     return render_template('page1.html', genres=genres, selected_genre=selected_genre, data_json=data_json)
+
 
 @app.route('/page2', methods=['GET', 'POST'])
 def page2():
@@ -35,10 +48,22 @@ def page2():
     
     return render_template('page2.html', genres=genres, selected_genres=selected_genres, chart=chart)
 
-
-@app.route('/page3')
+@app.route('/page3', methods=['GET', 'POST'])
 def page3():
-    return render_template('page3.html')
+    selected_genres = None
+    sankey = None
+
+    if request.method == 'POST':
+        selected_genres = request.form.getlist('genres')
+
+        if selected_genres:
+            sankey = build_sankey_diagram(selected_genres).to_html()
+            if sankey:
+                print("Sankey diagram HTML generated successfully.")
+            else:
+                print("Sankey diagram generation failed.")
+    
+    return render_template('page3.html', genres=genres, selected_genres=selected_genres, sankey=sankey)
 
 @app.route('/page4', methods=['GET', 'POST'])
 def page4():

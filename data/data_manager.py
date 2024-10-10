@@ -96,84 +96,34 @@ class DataManager:
         return df
     
     # Fonction pour créer un DataFrame avec la popularité des genres par pays
-    def create_album_genre_popularity_dataframe(self, selected_genre):  # un seul genre est sélectionné ici
+    def create_album_top_market_dataframe(self, selected_genre):
         all_album_data = []
         
         albums = self.albums_collection.find()
 
         for album in albums:
             album_artists = album.get('artists', [])  
-            top_markets = album.get('top_market', [])  
+            top_markets = album.get('top_market', [])
             
             for artist in album_artists:
                 artist_data = self.artists_collection.find_one({'id': artist['id'], 'genres': {'$regex': selected_genre, '$options': 'i'}})
-                
+
                 if artist_data and top_markets:
                     for market in top_markets:
                         album_info = {
                             'album_id': album.get('id'),
                             'album_name': album.get('name'),
-                            'market': market,  
-                            'genre': selected_genre  
+                            'market': market 
                         }
                         all_album_data.append(album_info)
 
         df = pd.DataFrame(all_album_data)
-        
         if df.empty:
+            print(f"Aucun album trouvé pour le genre {selected_genre}")
             return pd.DataFrame()
-
-        df_popularity = df.groupby(['market', 'genre']).size().reset_index(name='popularity')
-        print(df.head())
-        return df_popularity
-    
-# Fonction pour créer la matrice des collaborations entre genres
-    def create_genre_collaboration_matrix(self, selected_genre):
-        genre_pairs = []
-
-        # Trouver tous les artistes appartenant au genre sélectionné ou aux sous-genres correspondants
-        artists_in_genre = self.artists_collection.find({'genres': {'$regex': selected_genre, '$options': 'i'}})
-        artist_ids = [artist['id'] for artist in artists_in_genre]
-
-        if not artist_ids:
-            print(f"Aucun artiste trouvé pour le genre {selected_genre}")
-            return pd.DataFrame()  # Retourner un DataFrame vide si aucun artiste trouvé
-
-        # Récupérer toutes les pistes ayant ces artistes
-        tracks = self.tracks_collection.find({'artists.id': {'$in': artist_ids, '$exists': True}})
-    
-        for track in tracks:
-            track_artists = track.get('artists', [])
-            artist_genres = []
-
-            # Récupérer les genres pour chaque artiste sur la piste
-            for artist in track_artists:
-                artist_data = self.artists_collection.find_one({'id': artist['id']})
-                if artist_data and artist_data.get('genres'):
-                    # Récupérer tous les genres de l'artiste et filtrer ceux en lien avec le genre sélectionné
-                    relevant_genres = [genre for genre in artist_data['genres'] if selected_genre.lower() in genre.lower()]
-                    if relevant_genres:
-                        artist_genres.extend(relevant_genres)
         
-            # Créer des paires de genres à partir des genres récupérés
-            for i in range(len(artist_genres)):
-                for j in range(i + 1, len(artist_genres)):
-                    genre1 = artist_genres[i]
-                    genre2 = artist_genres[j]
-                    genre_pairs.append((genre1, genre2))
-                    genre_pairs.append((genre2, genre1))  # Matrice symétrique
+        return df
 
-        if not genre_pairs:
-            return pd.DataFrame()  # Retourner un DataFrame vide si aucun pair trouvé
-
-        # Convertir les paires en DataFrame pour comptabiliser les occurrences
-        df_collaborations = pd.DataFrame(genre_pairs, columns=['Genre1', 'Genre2'])
-
-        # Construire la matrice des collaborations entre genres
-        genre_matrix = pd.crosstab(df_collaborations['Genre1'], df_collaborations['Genre2'])
-    
-        print(genre_matrix.head())
-    
 
     # Fonction pour récupérer les sous-genres les plus fréquents pour un genre
     def get_top_subgenres_per_genre(self, genre, top_n=15):
@@ -224,3 +174,55 @@ class DataManager:
         
         df['release_date'] = pd.to_datetime(df['release_date'], errors='coerce') #conversion pour plotly
         return df
+    
+    
+    #Fonction pour collecter les collaborations entre genres dans les tracks featurings
+    def create_genre_collaboration_matrix(self, selected_genres):
+        global_genres = [
+            "pop", "rock", "hip-hop", "jazz", "classical", 
+            "electronic", "indie", "reggae", "blues", "metal",
+            "folk", "country", "r&b", "soul"
+        ]
+
+        genre_pairs = []
+
+        regex_patterns = [{"genres": {"$regex": f"^{genre}", "$options": "i"}} for genre in selected_genres]
+        
+        artists_in_selected_genres = self.artists_collection.find({"$or": regex_patterns})
+        artist_ids = [artist['id'] for artist in artists_in_selected_genres]
+
+        if not artist_ids:
+            print(f"Aucun artiste trouvé pour les genres {selected_genres}")
+            return pd.DataFrame()
+        tracks = self.tracks_collection.find({'artists.id': {'$in': artist_ids, '$exists': True}})
+
+        for track in tracks:
+            track_artists = track.get('artists', [])
+            artist_genres = []
+            for artist in track_artists:
+                artist_data = self.artists_collection.find_one({'id': artist['id']})
+                if artist_data and artist_data.get('genres'):
+                    for genre in artist_data['genres']:
+                        for global_genre in global_genres:
+                            if genre.lower().startswith(global_genre.lower()):
+                                artist_genres.append(global_genre)
+                                break
+
+            # Création paires de genres(matrice)
+            if len(artist_genres) > 1:
+                for i in range(len(artist_genres)):
+                    for j in range(i + 1, len(artist_genres)):
+                        genre1 = artist_genres[i]
+                        genre2 = artist_genres[j]
+                        genre_pairs.append((genre1, genre2))
+                        genre_pairs.append((genre2, genre1))
+
+        if not genre_pairs:
+            return pd.DataFrame()
+
+        df_collaborations = pd.DataFrame(genre_pairs, columns=['Genre1', 'Genre2'])
+
+        df_filtered = df_collaborations[df_collaborations['Genre1'].isin(selected_genres)]
+
+        genre_matrix = pd.crosstab(df_filtered['Genre1'], df_filtered['Genre2'])
+        return genre_matrix
