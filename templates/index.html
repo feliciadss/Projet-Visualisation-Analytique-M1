@@ -5,7 +5,6 @@
 {% block header %}Exploration des Genres Musicaux{% endblock %}
 
 {% block description %}
-    <!-- Encadré pour la description -->
     <div class="description-box">
         Ce site web vous fournit des informations clés sur la popularité des genres musicaux en Europe, l'évolution des tendances par pays, ainsi que les collaborations entre artistes de différents genres.
         En analysant les données des dernières années, vous pourrez suivre la croissance ou le déclin des genres, évaluer la diversité et l'influence des genres à travers les featurings, et ainsi identifier les meilleures opportunités d'investissement dans de nouveaux artistes et collaborations.
@@ -21,86 +20,27 @@
         <a href="{{ url_for('page4') }}" class="btn btn-orange">Analyses Avancées</a>
     </div>
 
-    <!-- Grand espace ajouté entre les boutons et le paragraphe -->
-    <div style="margin-top: 40px;"></div>
+    <div style="display: flex; margin-top: 40px;">
+        <!-- Section de sélection de genre alignée à gauche -->
+        <div class="genre-selection">
+            <form method="POST">
+                <h3>Choisissez un genre musical :</h3>
+                <div>
+                    {% for genre in genres %}
+                        <label><input type="radio" name="genre" value="{{ genre }}">{{ genre }}</label><br>
+                    {% endfor %}
+                </div>
+                <button type="submit" style="margin-top: 10px;">Visualiser</button>
+            </form>
+        </div>
 
-    <!-- Paragraphe expliquant le regroupement des genres -->
-    <p style="text-align: left; margin: 0 50px;"> 
-        <br><br><br><br> <!-- Saute au moins 4 lignes -->
-        Dans notre projet, nous avons regroupé les genres en 14 catégories incluant plusieurs sous-genres.
-    </p>
-
-    <!-- Section de sélection de genre -->
-    <td align="left" style="vertical-align: top; width: 250px; padding: 10px 40px 10px 40px;">
-        <form method="POST">
-            <h3>Choisissez un genre musical :</h3>
-            <div>
-                {% for genre in genres %}
-                    <label><input type="radio" name="genre" value="{{ genre }}">{{ genre }}</label><br>
-                {% endfor %}
-            </div>
-            <button type="submit" style="margin-top: 10px;">Visualiser</button>
-        </form>
-    </td>
-
-    <!-- Colonne pour afficher le diagramme en bulles -->
-    <div class="visualisation-space">
-        {% if bubble_chart %}
-            <div>
-                {{ bubble_chart|safe }}
-            </div>
-        {% endif %}
+        <!-- Colonne pour afficher le diagramme en bulles au centre droit -->
+        <div class="visualisation-space">
+            {% if bubble_chart %}
+                <div>{{ bubble_chart|safe }}</div>
+            {% endif %}
+        </div>
     </div>
-
-    <!-- Diagramme en bulles généré par Plotly -->
-    <div class="bubble-chart-container">
-        {% if bubble_chart_data %}
-            <div id="bubble-chart"></div>
-            <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> <!-- Inclusion de Plotly -->
-
-            <script>
-                // Convertir les données JSON en JavaScript
-                const bubbleChartData = JSON.parse('{{ bubble_chart_data | safe }}');
-                
-                // Transformer les données pour Plotly (exemple)
-                const trace = {
-                    x: bubbleChartData.map(item => item.genre),  // Axe X pour les genres
-                    y: bubbleChartData.map(item => item.subgenre),  // Axe Y pour les sous-genres
-                    text: bubbleChartData.map(item => item.subgenre),  // Texte des bulles (nom des sous-genres)
-                    mode: 'markers',  // Afficher les bulles
-                    marker: {
-                        size: bubbleChartData.map(item => item.bubble_size),  // Taille des bulles en fonction du count
-                        color: bubbleChartData.map(item => item.bubble_size),  // Couleur en fonction du count
-                        colorscale: 'Viridis'
-                    }
-                };
-                
-                const layout = {
-                    title: 'Diagramme en Bulles des Sous-genres',
-                    showlegend: false,
-                    height: 600,
-                    width: 1000,
-                    xaxis: {
-                        title: 'Genres',
-                        tickfont: { color: 'white' }
-                    },
-                    yaxis: {
-                        title: 'Sous-genres',
-                        tickfont: { color: 'white' }
-                    },
-                    plot_bgcolor: 'black',  // Fond du graphique en noir
-                    paper_bgcolor: 'black', // Fond de la page en noir
-                    font: { color: 'white' }  // Couleur du texte en blanc
-                };
-                
-                // Création du graphique avec Plotly
-                Plotly.newPlot('bubble-chart', [trace], layout);
-            </script>
-        {% else %}
-            <p> </p>
-        {% endif %}
-    </div>
-
 {% endblock %}
 
 {% block footer %}

@@ -11,15 +11,16 @@ from view.sankey_diagram import build_sankey_diagram
 app = Flask(__name__)
 
 @app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
     selected_genre = None
     bubble_chart = None
 
     if request.method == 'POST':
-        selected_genre = request.form.get('genre')
+        selected_genre = request.form.get('genre')  # Récupère le genre sélectionné dans le formulaire
 
         if selected_genre:
-            bubble_chart = build_bubble_chart(selected_genre)
+            bubble_chart = build_bubble_chart(selected_genre)  # Génère le diagramme en fonction du genre
 
     return render_template('index.html', genres=genres, bubble_chart=bubble_chart)
 
