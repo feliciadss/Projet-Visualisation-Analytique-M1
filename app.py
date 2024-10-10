@@ -48,7 +48,7 @@ def page3():
         selected_genres = request.form.getlist('genres')
 
         if selected_genres:
-            sankey_diagram = plot_sankey_diagram(selected_genres)
+            sankey_diagram = plot_genre_collab_sankey(selected_genres).to_html()
 
     return render_template('page3.html', genres=genres, sankey_diagram=sankey_diagram)
 

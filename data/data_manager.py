@@ -129,7 +129,6 @@ class DataManager:
     
 # Fonction pour créer la matrice des collaborations entre genres
     def create_genre_collaboration_matrix(self, selected_genre):
-        collaborations = []
         genre_pairs = []
 
         # Trouver tous les artistes appartenant au genre sélectionné ou aux sous-genres correspondants
@@ -142,7 +141,7 @@ class DataManager:
 
         # Récupérer toutes les pistes ayant ces artistes
         tracks = self.tracks_collection.find({'artists.id': {'$in': artist_ids, '$exists': True}})
-        
+    
         for track in tracks:
             track_artists = track.get('artists', [])
             artist_genres = []
@@ -155,7 +154,7 @@ class DataManager:
                     relevant_genres = [genre for genre in artist_data['genres'] if selected_genre.lower() in genre.lower()]
                     if relevant_genres:
                         artist_genres.extend(relevant_genres)
-            
+        
             # Créer des paires de genres à partir des genres récupérés
             for i in range(len(artist_genres)):
                 for j in range(i + 1, len(artist_genres)):
@@ -172,9 +171,9 @@ class DataManager:
 
         # Construire la matrice des collaborations entre genres
         genre_matrix = pd.crosstab(df_collaborations['Genre1'], df_collaborations['Genre2'])
+    
         print(genre_matrix.head())
-        return genre_matrix
-
+    
 
     # Fonction pour récupérer les sous-genres les plus fréquents pour un genre
     def get_top_subgenres_per_genre(self, genre, top_n=15):

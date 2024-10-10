@@ -5,70 +5,83 @@ from plotly.io import to_json
 from static.enumerations import genre_colors  # Importer le dictionnaire des couleurs
 
 
-def plot_sankey_diagram(selected_genres):
-    data_manager = DataManager()
-    
-    # Créer la matrice des collaborations entre les genres sélectionnés
-    all_genre_pairs = []
-    
-    for genre_selectionné in selected_genres:
-        genre_matrix = data_manager.create_genre_collaboration_matrix(genre_selectionné)
-        if not genre_matrix.empty:
-            all_genre_pairs.append(genre_matrix)
+import pandas as pd
+import plotly.graph_objects as go
 
-    if not all_genre_pairs:
-        return "Aucune collaboration trouvée pour les genres sélectionnés."
-    
-    # Fusionner toutes les matrices de collaboration et convertir en valeurs numériques
-    combined_genre_matrix = pd.concat(all_genre_pairs).groupby(level=0).sum()
-    
-    # S'assurer que toutes les valeurs sont numériques
-    combined_genre_matrix = combined_genre_matrix.apply(pd.to_numeric, errors='coerce').fillna(0)
+# Fonction pour créer un diagramme de Sankey avec les collaborations entre plusieurs genres
+def plot_genre_collab_sankey(self, selected_genres):
+    genre_pairs = []
 
-    # Genres (sources = genres sélectionnés, cibles = genres avec collaborations)
-    selected_genres_list = selected_genres
-    all_genres = combined_genre_matrix.columns.tolist()
+    # Récupérer les artistes appartenant à un ou plusieurs des genres sélectionnés depuis MongoDB
+    genres_regex = '|'.join([f'({genre})' for genre in selected_genres])  # Construire une regex pour matcher plusieurs genres
+    artists_in_genre = self.artists_collection.find({'genres': {'$regex': genres_regex, '$options': 'i'}})
+    artist_ids = [artist['id'] for artist in artists_in_genre]  # Extraire les IDs des artistes trouvés
 
-    # Création des sources, cibles et valeurs pour le Sankey Diagram
-    sources = []
-    targets = []
-    values = []
-    colors = []
+    if not artist_ids:
+        print(f"Aucun artiste trouvé pour les genres {', '.join(selected_genres)}")
+        return pd.DataFrame()  # Retourner un DataFrame vide si aucun artiste trouvé
 
-    for i, genre_selected in enumerate(selected_genres_list):
-        for j, genre in enumerate(all_genres):
-            if combined_genre_matrix.iloc[i, j] > 0:  # Seule comparaison avec des entiers/float
-                sources.append(i)
-                targets.append(len(selected_genres_list) + j)  # Indice pour le genre cible
-                values.append(combined_genre_matrix.iloc[i, j])
-                colors.append(genre_colors.get(genre_selected, 'grey'))  # Couleur du genre sélectionné
+    # Récupérer toutes les pistes avec les artistes trouvés
+    tracks = self.tracks_collection.find({'artists.id': {'$in': artist_ids, '$exists': True}})
 
-    # Noeuds (à gauche : genres sélectionnés, à droite : genres avec collaborations)
-    labels = selected_genres_list + all_genres
-    node_colors = [genre_colors.get(genre, 'grey') for genre in labels]
+    # Parcourir les pistes pour identifier les collaborations entre genres
+    for track in tracks:
+        track_artists = track.get('artists', [])  # Liste des artistes sur la piste
+        artist_genres = []
 
-    # Créer le diagramme de Sankey
-    fig = go.Figure(data=[go.Sankey(
+        # Récupérer les genres pour chaque artiste sur la piste
+        for artist in track_artists:
+            artist_data = self.artists_collection.find_one({'id': artist['id']})  # Chercher l'artiste dans la base
+            if artist_data and artist_data.get('genres'):
+                # Récupérer tous les genres de l'artiste et filtrer ceux en lien avec les genres sélectionnés
+                relevant_genres = [genre for genre in artist_data['genres'] if any(selected_genre.lower() in genre.lower() for selected_genre in selected_genres)]
+                if relevant_genres:
+                    artist_genres.extend(relevant_genres)  # Ajouter les genres pertinents à la liste
+
+        # Créer des paires de genres à partir des genres récupérés
+        for i in range(len(artist_genres)):
+            for j in range(i + 1, len(artist_genres)):
+                genre1 = artist_genres[i]
+                genre2 = artist_genres[j]
+                genre_pairs.append((genre1, genre2))
+                genre_pairs.append((genre2, genre1))  # Matrice symétrique
+
+    # Si aucune paire n'a été trouvée, retourner un DataFrame vide
+    if not genre_pairs:
+        return pd.DataFrame()
+
+    # Convertir les paires en DataFrame pour comptabiliser les occurrences
+    df_collaborations = pd.DataFrame(genre_pairs, columns=['Genre1', 'Genre2'])
+
+    # Compter le nombre de collaborations entre chaque paire de genres
+    df_collaboration_count = df_collaborations.groupby(['Genre1', 'Genre2']).size().reset_index(name='count')
+
+    # Créer une liste unique de genres pour les nœuds du diagramme Sankey
+    genres = list(pd.unique(df_collaboration_count[['Genre1', 'Genre2']].values.ravel('K')))
+    genre_index = {genre: i for i, genre in enumerate(genres)}  # Créer des indices pour chaque genre
+
+    # Transformer les genres en indices pour le diagramme Sankey
+    df_collaboration_count['source'] = df_collaboration_count['Genre1'].apply(lambda x: genre_index[x])
+    df_collaboration_count['target'] = df_collaboration_count['Genre2'].apply(lambda x: genre_index[x])
+
+    # Création du diagramme de Sankey
+    fig = go.Figure(go.Sankey(
         node=dict(
             pad=15,
             thickness=20,
             line=dict(color="black", width=0.5),
-            label=labels,
-            color=node_colors  # Couleurs des genres
+            label=genres,  # Les noms des genres
         ),
         link=dict(
-            source=sources,
-            target=targets,
-            value=values,
-            color=colors  # Couleurs des liens correspondant aux genres sélectionnés
+            source=df_collaboration_count['source'],  # Les indices des genres source
+            target=df_collaboration_count['target'],  # Les indices des genres cible
+            value=df_collaboration_count['count'],    # Le nombre de collaborations (poids des liens)
         )
-    )])
+    ))
 
-    # Mise en page du diagramme
-    fig.update_layout(
-        title_text=f"Sankey Diagram des collaborations pour les genres sélectionnés",
-        font=dict(size=14)
-    )
-    
-    # Retourner le diagramme au format JSON pour l'affichage
-    return to_json(fig)
+    fig.update_layout(title_text=f"Collaborations entre genres pour {', '.join(selected_genres)}", font_size=10)
+    fig.show()
+
+    return fig
+
+
