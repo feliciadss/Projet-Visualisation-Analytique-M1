@@ -36,7 +36,15 @@ def page1():
 
 @app.route('/page2')
 def page2():
-    return render_template('page2.html')
+    selected_genres = None
+    chart = None
+
+    if request.method == 'POST':
+        selected_genres = request.form.getlist('genres') 
+        if selected_genres:
+            chart = build_linear_chart(selected_genres).to_html() 
+
+    return render_template('page2.html', genres=genres, selected_genres=selected_genres, chart=chart)
 
 
 @app.route('/page3', methods=['GET', 'POST'])
