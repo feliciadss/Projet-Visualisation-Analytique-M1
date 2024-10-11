@@ -1,5 +1,5 @@
 genres = [
-    "pop", "rock", "hip-hop", "jazz", "classical", 
+    "pop", "rock", "latin", "jazz", "classical", 
     "electronic", "indie", "reggae", "blues", "metal",
     "folk", "country", "r&b", "soul"
 ]
@@ -14,7 +14,7 @@ european_countries = [
 genre_colors = {
     'pop': '#e6194B',      # Rouge vif
     'rock': '#3cb44b',     # Vert vif
-    'hip-hop': '#ffe119',  # Jaune vif
+    'latin': '#ffe119',  # Jaune vif
     'jazz': '#4363d8',     # Bleu vif
     'classical': '#f58231',# Orange vif
     'electronic': '#911eb4',# Violet vif

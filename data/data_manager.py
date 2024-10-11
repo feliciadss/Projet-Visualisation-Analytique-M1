@@ -179,7 +179,7 @@ class DataManager:
     #Fonction pour collecter les collaborations entre genres dans les tracks featurings
     def create_genre_collaboration_matrix(self, selected_genres):
         global_genres = [
-            "pop", "rock", "hip-hop", "jazz", "classical", 
+            "pop", "rock", "latin", "jazz", "classical", 
             "electronic", "indie", "reggae", "blues", "metal",
             "folk", "country", "r&b", "soul"
         ]
