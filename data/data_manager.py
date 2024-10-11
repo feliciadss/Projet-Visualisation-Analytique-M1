@@ -121,7 +121,7 @@ class DataManager:
         if df.empty:
             print(f"Aucun album trouvé pour le genre {selected_genre}")
             return pd.DataFrame()
-        
+        print(df.head())
         return df
 
 

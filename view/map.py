@@ -10,21 +10,17 @@ def convert_iso2_to_iso3(iso2_code):
     country = pycountry.countries.get(alpha_2=iso2_code)
     return country.alpha_3 if country else None
 
-# Fonction pour créer une carte de popularité par genre avec une seule couleur
+# Fonction pour créer une carte de popularité par genre
 def build_map(genre_filter):
     data_manager = DataManager()
-    
-    # Utiliser la nouvelle fonction pour récupérer le top_market des albums par genre
     df = data_manager.create_album_top_market_dataframe(genre_filter)
     
-    # Convertir les codes ISO2 des marchés en ISO3
     df['market'] = df['market'].apply(convert_iso2_to_iso3)
     
     if df.empty:
         print(f"Aucune donnée disponible pour le genre {genre_filter}")
         return None
 
-    # Chemin vers le fichier GeoJSON personnalisé pour l'Europe
     geojson_path = "./static/custom.geo.json"
     try:
         with open(geojson_path, "r", encoding="utf-8") as geojson_file:
@@ -34,22 +30,18 @@ def build_map(genre_filter):
         print(f"Fichier non trouvé à l'emplacement : {geojson_path}")
         return None
 
-    # Couleur du genre sélectionné (une seule couleur dont l'intensité varie)
-    color_for_genre = genre_colors.get(genre_filter.lower(), '#ffffff')  # Couleur associée au genre, blanc par défaut
-
-    # Créer une carte choropleth avec une seule couleur dont l'intensité varie
+    color_for_genre = genre_colors.get(genre_filter.lower(), '#ffffff') 
     fig = px.choropleth(
         df,
         geojson=europe_geojson,
-        locations="market",  # Codes ISO3 des pays
-        featureidkey="properties.ISO_A3",  # Correspondance avec le GeoJSON
-        color="album_id",  # On utilise la colonne pour l'intensité (nombre d'albums)
-        hover_name="market",  # Nom du marché au survol
-        color_continuous_scale=[[0, '#000000'], [1, color_for_genre]],  # Une seule couleur qui varie en intensité
+        locations="market",  # Codes ISO3 pays
+        featureidkey="properties.ISO_A3",  # Correspondance GeoJSON
+        color="album_id",  
+        hover_name="market",  
+        color_continuous_scale=[[0, '#000000'], [1, color_for_genre]], 
         title=f"Popularité du genre '{genre_filter.title()}' par pays"
     )
 
-    # Configuration de la carte (centrée sur l'Europe)
     fig.update_geos(
         scope="europe",
         projection_type="equirectangular", 
@@ -61,7 +53,6 @@ def build_map(genre_filter):
         visible=True
     )
 
-    # Mise à jour du layout pour ajuster l'apparence
     fig.update_layout(
         title_font_size=20,
         geo=dict(showframe=False, showcoastlines=False),

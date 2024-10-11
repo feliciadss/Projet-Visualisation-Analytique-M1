@@ -10,7 +10,6 @@ from view.sankey_diagram import build_sankey_diagram
 
 app = Flask(__name__)
 
-@app.route('/')
 @app.route('/', methods=['GET', 'POST'])
 def index():
     selected_genre = None
