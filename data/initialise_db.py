@@ -28,7 +28,6 @@ def initialize_db():
                     track = item["track"]
                     album = track["album"]
 
-                    # Sauvegarder l'album et les artistes associés
                     save_album_to_db(album, country, db)
                     save_track_to_db(track, album["id"], db)
 
@@ -39,6 +38,5 @@ def initialize_db():
     except Exception as e:
         print(f"Error processing playlists: {e}")
 
-# Exécution du script
 if __name__ == "__main__":
     initialize_db()
