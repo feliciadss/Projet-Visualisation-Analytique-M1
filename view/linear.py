@@ -1,44 +1,65 @@
+from dash import html, dcc, callback, Input, Output
 import pandas as pd
 import plotly.express as px
+from static.enumerations import genres
 from data.data_manager import DataManager
-from static.enumerations import genre_colors
 
+layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding': '20px', 'textAlign': 'center'}, children=[
+    html.H1('Évolution de la popularité des genres', style={'color': 'white'}),
+    html.H3(
+        "Cette page illustre l'évolution du nombre de pistes musicales par genre au fil des ans. ",
+        style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal'}
+    ),
+    html.H3(
+        "En sélectionnant différents genres dans la liste, vous pourrez observer les tendances de popularité et ",
+        style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal'}),
 
-def build_linear_chart(selected_genres):
-    data_manager = DataManager()
+    html.H3(
+        "identifier les variations de la production musicale.",
+        style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal'}),
     
-    album_data = pd.DataFrame()
+    html.P(
+        "Sélectionnez un ou plusieurs genres :", 
+        style={'fontWeight': 'bold', 'color': 'white'}
+    ),
+    # Conteneur pour centrer la checklist et le graphique
+    html.Div(style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'flex-start'}, children=[
+        # Liste des genres
+        html.Div(style={'marginRight': '20px'}, children=[
+            dcc.Checklist(
+                id="linear-checklist",
+                options=genres,
+                value=["pop", "rock"],
+                inline=False, 
+                style={'color': 'white'}
+            )
+        ]),
 
-    for genre in selected_genres:
-        genre_album_df = data_manager.create_album_release_dataframe([genre])
-        genre_album_df['genre'] = genre 
-        album_data = pd.concat([album_data, genre_album_df], ignore_index=True)
+        # Graphique
+        html.Div(style={'width': '70%'}, children=[
+            dcc.Graph(id="linear-graph", style={'backgroundColor': 'black'})
+        ]),
+    ]),
+])
+
+def register_callback(app):
+    @app.callback(
+        Output("linear-graph", "figure"), 
+        Input("linear-checklist", "value"))
+    def update_line_chart(selected_genres):
+        data_manager = DataManager()
+        df = data_manager.create_album_release_dataframe(selected_genres)
+        df['release_date'] = pd.to_datetime(df['release_date'])
+        df['year'] = df['release_date'].dt.year
+        albums_per_year = df.groupby(['year', 'genre']).size().reset_index(name='album_count')
+        fig = px.line(albums_per_year, 
+                       x="year", y="album_count", color='genre')
+        
     
-    if album_data.empty:
-        print("Aucun album trouvé pour les genres sélectionnés.")
-        return None
-    
-    album_data['release_year'] = album_data['release_date'].dt.year
-    genre_yearly_data = album_data.groupby(['genre', 'release_year']).size().reset_index(name='album_count')
-    
-    fig = px.line(
-        genre_yearly_data, 
-        x='release_year', 
-        y='album_count', 
-        color='genre', 
-        title='Évolution du nombre d\'albums par genre au fil des années',
-        line_shape='linear',
-        markers=True,
-        color_discrete_map=genre_colors 
-    )
-    
-    fig.update_layout(
-        xaxis_title='Année', 
-        yaxis_title='Nombre d\'albums', 
-        legend_title='Genres',
-        plot_bgcolor='black',  # Fond noir
-        paper_bgcolor='black',  # Fond noir
-        font=dict(color='white')  # Texte blanc
-    )
-    
-    return fig
+        fig.update_layout(
+            plot_bgcolor='black', 
+            paper_bgcolor='black', 
+            font_color='white'
+        )
+        
+        return fig

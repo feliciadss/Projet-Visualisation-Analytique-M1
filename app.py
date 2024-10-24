@@ -1,85 +1,62 @@
-from flask import Flask, render_template, request
-from view.map import build_map
-from static.enumerations import genres
-from view.radar import build_radar
-from view.barcharts import build_barcharts
-from view.linear import build_linear_chart
-from view.bubblechart import build_bubble_chart
-from view.sankey_diagram import build_sankey_diagram
+from dash import Dash, html, dcc
+from dash.dependencies import Input, Output
+from view.map import layout as map_layout, register_callback as register_map_callback
+from view.linear import layout as linear_layout, register_callback as register_linear_callback
+from view.sankey_diagram import layout as sankey_layout, register_callback as register_sankey_callback
 
+app = Dash(__name__, suppress_callback_exceptions=True)
 
-app = Flask(__name__)
+#Layout de la page d'accueil
+home_layout = html.Div(style={'backgroundColor': 'black', 'height': '100vh', 'display': 'flex', 'flexDirection': 'column', 'alignItems': 'center', 'justifyContent': 'center', 'color': 'white'}, children=[
+    html.H1("Analyse des Genres Musicaux en Europe"),
+    html.H2(
+        "Ce site web vous fournit des informations clés sur la popularité des genres musicaux en Europe, "
+        "l'évolution des tendances par pays, ainsi que les collaborations entre artistes de différents genres. "
+        "En analysant les données des dernières années, vous pourrez suivre la croissance ou le déclin des genres, "
+        "évaluer la diversité et l'influence des genres à travers les featurings, et ainsi identifier les meilleures "
+        "opportunités d'investissement dans de nouveaux artistes et collaborations.",
+        style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal'}
+    )
+,
+    html.P("Sélectionnez une analyse à explorer :"),
+    html.Div([
+        dcc.Link(
+            html.Button('Popularité des genres', style={'margin': '10px', 'color': 'black', 'backgroundColor': 'white', 'fontSize': '20px', 'padding': '15px 30px'}),
+            href='/map'
+        ),
+        dcc.Link(
+            html.Button('Évolution des genres', style={'margin': '10px', 'color': 'black', 'backgroundColor': 'white', 'fontSize': '20px', 'padding': '15px 30px'}),
+            href='/linear'
+        ),
+        dcc.Link(
+            html.Button('Collaborations entre genres ', style={'margin': '10px', 'color': 'black', 'backgroundColor': 'white', 'fontSize': '20px', 'padding': '15px 30px'}),
+            href='/sankey'
+        ),
+    ], style={'display': 'flex', 'justifyContent': 'center', 'flexDirection': 'row', 'gap': '20px'}) 
+])
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    selected_genre = None
-    bubble_chart = None
+app.layout = html.Div([
+    dcc.Location(id='url', refresh=False),
+    html.Div(id='page-content')
+])
 
-    if request.method == 'POST':
-        selected_genre = request.form.get('genre') 
+# Callback pour la navigation entre les pages
+@app.callback(Output('page-content', 'children'), [Input('url', 'pathname')])
+def display_page(pathname):
+    if pathname == '/linear':
+        return linear_layout
+    elif pathname == '/sankey':
+        return sankey_layout
+    elif pathname == '/map':
+        return map_layout
+    else:
+        return home_layout  # Page d'accueil par défaut
 
-        if selected_genre:
-            bubble_chart = build_bubble_chart(selected_genre)  
-
-    return render_template('index.html', genres=genres, bubble_chart=bubble_chart)
-
-
-@app.route('/page1', methods=['GET', 'POST'])
-def page1():
-    selected_genre = None
-    data_json = None
-
-    if request.method == 'POST':
-        selected_genre = request.form['genre']
-        data_json = build_map(selected_genre) 
-    return render_template('page1.html', genres=genres, selected_genre=selected_genre, data_json=data_json)
-
-
-@app.route('/page2', methods=['GET', 'POST'])
-def page2():
-    selected_genres = None
-    chart = None
-
-    if request.method == 'POST':
-        selected_genres = request.form.getlist('genres')
-
-        if selected_genres:
-            chart = build_linear_chart(selected_genres).to_html()
-    
-    return render_template('page2.html', genres=genres, selected_genres=selected_genres, chart=chart)
-
-@app.route('/page3', methods=['GET', 'POST'])
-def page3():
-    selected_genres = None
-    sankey = None
-
-    if request.method == 'POST':
-        selected_genres = request.form.getlist('genres')
-
-        if selected_genres:
-            sankey = build_sankey_diagram(selected_genres).to_html()
-            if sankey:
-                print("Sankey diagram HTML generated successfully.")
-            else:
-                print("Sankey diagram generation failed.")
-    
-    return render_template('page3.html', genres=genres, selected_genres=selected_genres, sankey=sankey)
-
-@app.route('/page4', methods=['GET', 'POST'])
-def page4():
-    selected_genres = None
-    radar_chart = None
-    bar_charts = []
-
-    if request.method == 'POST':
-        selected_genres = request.form.getlist('genres')
-
-        if selected_genres:
-            radar_chart = build_radar(selected_genres).to_html()
-            bar_charts = build_barcharts(selected_genres)
-
-    return render_template('page4.html', genres=genres, radar_chart=radar_chart, bar_charts=bar_charts)
-
+#Callbacks pour chaque page
+register_map_callback(app)
+register_linear_callback(app)
+register_sankey_callback(app)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run_server(debug=True)
+
