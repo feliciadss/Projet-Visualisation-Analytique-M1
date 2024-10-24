@@ -1,6 +1,6 @@
 from dash import Dash, html, dcc
 from dash.dependencies import Input, Output
-from view.accueil import layout as map_layout, register_callback as register_map_callback
+from view.popularite import layout as map_layout, register_callback as register_map_callback
 from view.evolution_genres import layout as linear_layout, register_callback as register_linear_callback
 from view.collaborations import layout as sankey_layout, register_callback as register_sankey_callback
 from view.caract_musicales import layout as radar_layout, register_callback as register_radar_callback
@@ -27,7 +27,7 @@ home_layout = html.Div(style={'backgroundColor': 'black', 'minHeight': '100vh', 
     html.Div([
         dcc.Link(
             html.Button('Popularité des genres', style={'margin': '10px', 'color': 'black', 'backgroundColor': 'white', 'fontSize': '20px', 'padding': '15px 30px'}),
-            href='/accueil'
+            href='/popularite'
         ),
         dcc.Link(
             html.Button('Évolution des genres', style={'margin': '10px', 'color': 'black', 'backgroundColor': 'white', 'fontSize': '20px', 'padding': '15px 30px'}),
