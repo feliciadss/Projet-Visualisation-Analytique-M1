@@ -3,32 +3,43 @@ import plotly.graph_objects as go
 from data.data_manager import DataManager
 from static.enumerations import genre_colors
 
-layout = html.Div([
+
+layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding': '20px'}, children=[
     html.H1('Collaboration entre genres', style={'textAlign': 'center', 'color': 'white'}),
+    
     html.H3(
-        "Sur cette page, des diagrammes de Sankey sont utilisés pour illustrer la collaboration entre un genre sélectionné et les autres ",
+        "Sur cette page, des diagrammes de Sankey sont utilisés pour illustrer les collaborations entre un ou plusieurs genres sélectionnés et les autres.",
         style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal'}
     ),
-    html.P("Sélectionnez un genre musical:", style={'color': 'white', 'fontWeight': 'bold'}),
-    dcc.RadioItems(
-        id='sankey-genre-radio', 
-        options=[{'label': genre, 'value': genre} for genre in genre_colors.keys()],
-        value=list(genre_colors.keys())[0], 
-        labelStyle={'display': 'block', 'color': 'white'}, 
-        style={'color': 'white', 'backgroundColor': 'black'}, 
-        inputStyle={'color': 'white'} 
-    ),
-    dcc.Graph(id='sankey-graph') 
-], style={'backgroundColor': 'black', 'padding': '20px'}) 
+    
+    # Conteneur général pour la sélection et le diagramme Sankey
+    html.Div(style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center'}, children=[
+        # Sélection multiple des genres à gauche
+        html.Div(style={'flex': '1', 'padding': '10px'}, children=[
+            html.P("Sélectionnez un ou plusieurs genres musicaux:", style={'fontWeight': 'bold', 'color': 'white'}),
+            dcc.Checklist(
+                id='sankey-genre-radio',
+                options=[{'label': genre.title(), 'value': genre} for genre in genre_colors.keys()],
+                value=[list(genre_colors.keys())[0]],  
+                style={'color': 'white', 'backgroundColor': 'black'}
+            ),
+        ]),
+        #centrer diagramme
+        html.Div(style={'flex': '2', 'padding': '10px'}, children=[
+            dcc.Graph(id='sankey-graph', style={'height': '500px'})
+        ])
+    ])
+])
 
 def register_callback(app):
     @app.callback(
         Output('sankey-graph', 'figure'),
         Input('sankey-genre-radio', 'value')
     )
-    def display_sankey(selected_genre):
+    def display_sankey(selected_genres):
         datamanager = DataManager()
-        genre_matrix = datamanager.create_genre_collaboration_matrix([selected_genre])
+        
+        genre_matrix = datamanager.create_genre_collaboration_matrix(selected_genres)
         
         if genre_matrix.empty:
             return go.Figure()
@@ -65,9 +76,9 @@ def register_callback(app):
         )])
 
         fig.update_layout(
-            paper_bgcolor='black',  
-            plot_bgcolor='black',   
-            font=dict(color='white') 
+            paper_bgcolor='black',
+            plot_bgcolor='black',
+            font=dict(color='white')
         )
 
         return fig
