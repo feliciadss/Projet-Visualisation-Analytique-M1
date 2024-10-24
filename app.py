@@ -16,10 +16,10 @@ def index():
     bubble_chart = None
 
     if request.method == 'POST':
-        selected_genre = request.form.get('genre')  # Récupère le genre sélectionné dans le formulaire
+        selected_genre = request.form.get('genre') 
 
         if selected_genre:
-            bubble_chart = build_bubble_chart(selected_genre)  # Génère le diagramme en fonction du genre
+            bubble_chart = build_bubble_chart(selected_genre)  
 
     return render_template('index.html', genres=genres, bubble_chart=bubble_chart)
 
