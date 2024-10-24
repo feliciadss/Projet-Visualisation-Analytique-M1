@@ -11,7 +11,6 @@ class DataManager:
         all_track_data = []
 
         for genre_selectionné in selected_genres:
-            # Requête SQL pour trouver les artistes correspondant au genre sélectionné
             self.cursor.execute("""
                 SELECT id FROM artists WHERE genres LIKE ?
             """, (f'%{genre_selectionné}%',))
@@ -21,7 +20,6 @@ class DataManager:
                 print(f"Aucun artiste trouvé pour le genre {genre_selectionné}")
                 continue
 
-            # Requête SQL pour trouver les tracks des artistes
             self.cursor.execute(f"""
                 SELECT id, name, tempo, energy, danceability, acousticness, valence, duration_ms
                 FROM tracks
@@ -49,23 +47,37 @@ class DataManager:
 
         df = pd.DataFrame(all_track_data)
         return df
-
-    # Fonction pour créer un DataFrame avec la popularité des genres par pays
-    def create_album_top_market_dataframe(self, selected_genre):
+    
+    # Fonciton pour créer un dataframe pour récupérer la popularité des artistes et les marchés
+    def create_genre_popularity_by_country(self, selected_genre):
         self.cursor.execute("""
-            SELECT albums.id, albums.name, albums.top_market
+            SELECT albums.available_markets, artists.popularity
             FROM albums
             JOIN artists ON albums.artist_id = artists.id
             WHERE artists.genres LIKE ?
         """, (f'%{selected_genre}%',))
 
         all_album_data = self.cursor.fetchall()
+        
         if not all_album_data:
-            print(f"Aucun album trouvé pour le genre {selected_genre}")
+            print(f"Aucun artiste trouvé pour le genre {selected_genre}")
             return pd.DataFrame()
 
-        df = pd.DataFrame(all_album_data, columns=['album_id', 'album_name', 'market'])
+        country_popularity = {}
+
+        for available_markets, artist_popularity in all_album_data:
+            markets = available_markets.split(',')
+            for market in markets:
+                market = market.strip()  
+                if market in country_popularity:
+                    country_popularity[market] += artist_popularity
+                else:
+                    country_popularity[market] = artist_popularity
+
+        df = pd.DataFrame(list(country_popularity.items()), columns=['country', 'total_popularity'])
+
         return df
+
 
     # Fonction pour récupérer les sous-genres les plus fréquents pour un genre
     def get_top_subgenres_per_genre(self, genre, top_n=15):
