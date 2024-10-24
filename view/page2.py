@@ -46,6 +46,7 @@ def register_callback(app):
     @app.callback(
         Output("linear-graph", "figure"), 
         Input("linear-checklist", "value"))
+    
     def update_line_chart(selected_genres):
         data_manager = DataManager()
         df = data_manager.create_album_release_dataframe(selected_genres)
