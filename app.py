@@ -1,8 +1,8 @@
 from dash import Dash, html, dcc
 from dash.dependencies import Input, Output
-from view.map import layout as map_layout, register_callback as register_map_callback
-from view.linear import layout as linear_layout, register_callback as register_linear_callback
-from view.sankey_diagram import layout as sankey_layout, register_callback as register_sankey_callback
+from view.page1 import layout as map_layout, register_callback as register_map_callback
+from view.page2 import layout as linear_layout, register_callback as register_linear_callback
+from view.page3 import layout as sankey_layout, register_callback as register_sankey_callback
 
 app = Dash(__name__, suppress_callback_exceptions=True)
 
@@ -22,15 +22,19 @@ home_layout = html.Div(style={'backgroundColor': 'black', 'height': '100vh', 'di
     html.Div([
         dcc.Link(
             html.Button('Popularité des genres', style={'margin': '10px', 'color': 'black', 'backgroundColor': 'white', 'fontSize': '20px', 'padding': '15px 30px'}),
-            href='/map'
+            href='/page1'
         ),
         dcc.Link(
             html.Button('Évolution des genres', style={'margin': '10px', 'color': 'black', 'backgroundColor': 'white', 'fontSize': '20px', 'padding': '15px 30px'}),
-            href='/linear'
+            href='/page2'
         ),
         dcc.Link(
-            html.Button('Collaborations entre genres ', style={'margin': '10px', 'color': 'black', 'backgroundColor': 'white', 'fontSize': '20px', 'padding': '15px 30px'}),
-            href='/sankey'
+            html.Button('Collaborations entre genres', style={'margin': '10px', 'color': 'black', 'backgroundColor': 'white', 'fontSize': '20px', 'padding': '15px 30px'}),
+            href='/page3'
+        ),
+        dcc.Link(
+            html.Button('Caractéristiques musicales', style={'margin': '10px', 'color': 'black', 'backgroundColor': 'white', 'fontSize': '20px', 'padding': '15px 30px'}),
+            href='/page4'
         ),
     ], style={'display': 'flex', 'justifyContent': 'center', 'flexDirection': 'row', 'gap': '20px'}) 
 ])
