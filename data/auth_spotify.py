@@ -6,7 +6,7 @@ import time
 import configparser
 
 config = configparser.ConfigParser()
-config.read("C:/Users/PC/OneDrive/Documents/projet-visualisation-analytique-m1/data/config.ini")
+config.read("./config.ini")
 
 TOKEN_URL = "https://accounts.spotify.com/api/token"
 

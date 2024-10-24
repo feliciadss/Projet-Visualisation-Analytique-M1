@@ -5,7 +5,7 @@ import configparser
 import time
 
 config = configparser.ConfigParser()
-config.read("C:/Users/PC/OneDrive/Documents/projet-visualisation-analytique-m1/data/config.ini")
+config.read("./config.ini")
 
 BASE_URL = "https://api.spotify.com/v1/"
 
