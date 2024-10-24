@@ -2,7 +2,7 @@ import sqlite3
 import pandas as pd
 
 class DataManager:
-    def __init__(self, db_path='./spotify.db'):
+    def __init__(self, db_path='./data/spotify.db'):
         self.conn = sqlite3.connect(db_path)
         self.cursor = self.conn.cursor()
 
@@ -25,7 +25,7 @@ class DataManager:
             self.cursor.execute(f"""
                 SELECT id, name, tempo, energy, danceability, acousticness, valence, duration_ms
                 FROM tracks
-                WHERE album_id IN (SELECT id FROM albums WHERE artists IN ({','.join('?' for _ in artist_ids)}))
+                WHERE album_id IN (SELECT id FROM albums WHERE artist_id IN ({','.join('?' for _ in artist_ids)}))
             """, artist_ids)
             tracks = self.cursor.fetchall()
 
@@ -55,7 +55,7 @@ class DataManager:
         self.cursor.execute("""
             SELECT albums.id, albums.name, albums.top_market
             FROM albums
-            JOIN artists ON albums.artists = artists.id
+            JOIN artists ON albums.artist_id = artists.id
             WHERE artists.genres LIKE ?
         """, (f'%{selected_genre}%',))
 
@@ -92,7 +92,7 @@ class DataManager:
             self.cursor.execute("""
                 SELECT albums.id, albums.name, albums.release_date, albums.available_markets
                 FROM albums
-                JOIN artists ON albums.artists = artists.id
+                JOIN artists ON albums.artist_id = artists.id
                 WHERE artists.genres LIKE ?
             """, (f'%{genre_selectionné}%',))
             albums = self.cursor.fetchall()
