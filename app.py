@@ -27,19 +27,19 @@ home_layout = html.Div(style={'backgroundColor': 'black', 'minHeight': '100vh', 
     html.Div([
         dcc.Link(
             html.Button('Popularité des genres', style={'margin': '10px', 'color': 'black', 'backgroundColor': 'white', 'fontSize': '20px', 'padding': '15px 30px'}),
-            href='/Accueil'
+            href='/accueil'
         ),
         dcc.Link(
             html.Button('Évolution des genres', style={'margin': '10px', 'color': 'black', 'backgroundColor': 'white', 'fontSize': '20px', 'padding': '15px 30px'}),
-            href='/Evolution des genres'
+            href='/evolution_genres'
         ),
         dcc.Link(
             html.Button('Collaborations entre genres', style={'margin': '10px', 'color': 'black', 'backgroundColor': 'white', 'fontSize': '20px', 'padding': '15px 30px'}),
-            href='/Collaborations entre genres'
+            href='/collaborations'
         ),
         dcc.Link(
             html.Button('Caractéristiques musicales', style={'margin': '10px', 'color': 'black', 'backgroundColor': 'white', 'fontSize': '20px', 'padding': '15px 30px'}),
-            href='/Caractéristiques musicales'
+            href='/caract_musicales'
         ),
     ], style={'display': 'flex', 'justifyContent': 'center', 'flexDirection': 'row', 'gap': '20px'}),
     
@@ -75,13 +75,13 @@ app.layout = html.Div([
 # Callback pour la navigation entre les pages
 @app.callback(Output('page-content', 'children'), [Input('url', 'pathname')])
 def display_page(pathname):
-    if pathname == '/Accueil':
+    if pathname == '/accueil':
         return map_layout
-    elif pathname == '/Evolution des genres':
+    elif pathname == '/evolution_genres':
         return linear_layout
-    elif pathname == '/Collaborations entre genres':
+    elif pathname == '/collaborations':
         return sankey_layout
-    elif pathname == '/Caractéristiques musicales':
+    elif pathname == '/caract_musicales':
         return radar_layout
     else:
         return home_layout  # Page d'accueil par défaut
