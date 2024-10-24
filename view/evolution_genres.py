@@ -24,6 +24,10 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
     ),
     # Conteneur pour centrer la checklist et le graphique
     html.Div(style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'flex-start'}, children=[
+        # Bouton pour revenir à l'accueil
+        html.Div(style={'position': 'absolute','top': '30px','right': '30px','z-index': '1000','font-size': '40px'},children=[
+            dcc.Link('🏠', href='/'),
+        ]),
         # Liste des genres
         html.Div(style={'marginRight': '20px'}, children=[
             dcc.Checklist(

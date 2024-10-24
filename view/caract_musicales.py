@@ -10,6 +10,10 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
     
     # Conteneur général ici
     html.Div(style={'display': 'flex', 'justifyContent': 'space-between', 'alignItems': 'center'}, children=[
+        # Bouton pour revenir à l'accueil
+        html.Div(style={'position': 'absolute','top': '30px','right': '30px','z-index': '1000','font-size': '40px'},children=[
+            dcc.Link('🏠', href='/'),
+        ]),
         # Checklist des genres sur la gauche
         html.Div(style={'flex': '1', 'padding': '10px'}, children=[
             html.P("Sélectionnez un ou plusieurs genres :", style={'fontWeight': 'bold', 'color': 'white'}),
