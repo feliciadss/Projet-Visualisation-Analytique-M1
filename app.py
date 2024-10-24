@@ -1,9 +1,9 @@
 from dash import Dash, html, dcc
 from dash.dependencies import Input, Output
-from view.page1 import layout as map_layout, register_callback as register_map_callback
-from view.page2 import layout as linear_layout, register_callback as register_linear_callback
-from view.page3 import layout as sankey_layout, register_callback as register_sankey_callback
-from view.page4 import layout as radar_layout, register_callback as register_radar_callback
+from view.accueil import layout as map_layout, register_callback as register_map_callback
+from view.evolution_genres import layout as linear_layout, register_callback as register_linear_callback
+from view.collaborations import layout as sankey_layout, register_callback as register_sankey_callback
+from view.caract_musicales import layout as radar_layout, register_callback as register_radar_callback
 
 import plotly.graph_objects as go 
 import plotly.express as px
@@ -27,19 +27,19 @@ home_layout = html.Div(style={'backgroundColor': 'black', 'minHeight': '100vh', 
     html.Div([
         dcc.Link(
             html.Button('Popularité des genres', style={'margin': '10px', 'color': 'black', 'backgroundColor': 'white', 'fontSize': '20px', 'padding': '15px 30px'}),
-            href='/page1'
+            href='/Accueil'
         ),
         dcc.Link(
             html.Button('Évolution des genres', style={'margin': '10px', 'color': 'black', 'backgroundColor': 'white', 'fontSize': '20px', 'padding': '15px 30px'}),
-            href='/page2'
+            href='/Evolution des genres'
         ),
         dcc.Link(
             html.Button('Collaborations entre genres', style={'margin': '10px', 'color': 'black', 'backgroundColor': 'white', 'fontSize': '20px', 'padding': '15px 30px'}),
-            href='/page3'
+            href='/Collaborations entre genres'
         ),
         dcc.Link(
             html.Button('Caractéristiques musicales', style={'margin': '10px', 'color': 'black', 'backgroundColor': 'white', 'fontSize': '20px', 'padding': '15px 30px'}),
-            href='/page4'
+            href='/Caractéristiques musicales'
         ),
     ], style={'display': 'flex', 'justifyContent': 'center', 'flexDirection': 'row', 'gap': '20px'}),
     
@@ -75,13 +75,13 @@ app.layout = html.Div([
 # Callback pour la navigation entre les pages
 @app.callback(Output('page-content', 'children'), [Input('url', 'pathname')])
 def display_page(pathname):
-    if pathname == '/page1':
+    if pathname == '/Accueil':
         return map_layout
-    elif pathname == '/page2':
+    elif pathname == '/Evolution des genres':
         return linear_layout
-    elif pathname == '/page3':
+    elif pathname == '/Collaborations entre genres':
         return sankey_layout
-    elif pathname == '/page4':
+    elif pathname == '/Caractéristiques musicales':
         return radar_layout
     else:
         return home_layout  # Page d'accueil par défaut
