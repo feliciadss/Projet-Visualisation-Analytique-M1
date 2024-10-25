@@ -10,7 +10,6 @@ from view.evolution_genres import layout as linear_layout, register_callback as 
 from view.collaborations import layout as sankey_layout, register_callback as register_sankey_callback
 from view.caract_musicales import layout as radar_layout, register_callback as register_radar_callback
 
-
 app = Dash(__name__, suppress_callback_exceptions=True)
 
 # Layout de la page d'accueil
@@ -46,12 +45,12 @@ home_layout = html.Div(style={'backgroundColor': 'black', 'minHeight': '100vh', 
     
     html.H3("Nous avons catégorisé les genres en 14 grandes catégories, mais voici les sous-genres se cachant dans chacune :", style={'color': 'white', 'paddingTop': '40px'}),
 
-    # Conteneur pour le bubble chart et l'histogramme
+    # Conteneur pour le pie chart et l'histogramme
     html.Div(style={'display': 'flex', 'justifyContent': 'flex-start', 'alignItems': 'center', 'width': '100%', 'padding': '20px'}, children=[
         
-        # Bubble chart à gauche
+        # Pie chart à gauche
         html.Div(style={'flex': '0 0 40%', 'padding': '10px'}, children=[
-            dcc.Graph(id="bubble-chart", style={'height': '600px', 'width': '100%'})
+            dcc.Graph(id="pie-chart", style={'height': '600px', 'width': '100%'})
         ]),
 
         # Histogramme horizontal à droite
@@ -87,11 +86,11 @@ register_sankey_callback(app)
 register_radar_callback(app)
 
 
-# Callback pour le bubble chart et l'histogramme
+# Callback pour le pie chart et l'histogramme
 @app.callback(
-    Output("bubble-chart", "figure"),
+    Output("pie-chart", "figure"),
     Output("histogram-chart", "figure"),
-    [Input("bubble-chart", "clickData")]
+    [Input("pie-chart", "clickData")]
 )
 
 def update_charts(click_data):
@@ -99,43 +98,30 @@ def update_charts(click_data):
 
     genre_counts_df = data_manager.create_genre_count_dataframe()
 
-    genre_counts_df['scaled_size'] = np.sqrt(genre_counts_df['total_count'])
+    # Création du pie chart
+    genre_counts_df['transformed_count'] = np.sqrt(genre_counts_df['total_count'])  # Transformation racine carrée
 
-    n_genres = len(genre_counts_df)
-    grid_size = int(np.ceil(np.sqrt(n_genres))) 
-    genre_counts_df['x'] = np.tile(np.linspace(-1, 1, grid_size), grid_size)[:n_genres]
-    genre_counts_df['y'] = np.repeat(np.linspace(-1, 1, grid_size), grid_size)[:n_genres]
-
-    
-    genre_counts_df['x'] += np.random.uniform(low=-0.05, high=0.05, size=n_genres)
-    genre_counts_df['y'] += np.random.uniform(low=-0.05, high=0.05, size=n_genres)
-
-    selected_genre = "indie"
-    if click_data:
-        selected_genre = click_data['points'][0]['hovertext']
-    
-    fig_bubble = px.scatter(
+    fig_pie = px.pie(
         genre_counts_df,
-        x='x',
-        y='y',
-        size='scaled_size',
+        names='genre',
+        values='transformed_count',  # On utilise la colonne transformée pour réduire l'impact de pop
         color='genre',
-        hover_name='genre',
-        size_max=100,
-        text='genre', 
-        color_discrete_map=genre_colors
+        color_discrete_map=genre_colors,
+        title='Répartition générale des genres musicaux (cliquez sur un genre pour voir apparaitre les sous cat)'
     )
-    fig_bubble.update_traces(textposition='middle center', textfont=dict(color='black'))  # Nom du genre en noir au centre
-    fig_bubble.update_layout(
+    fig_pie.update_traces(textinfo='percent+label', textposition='inside')
+    fig_pie.update_layout(
         plot_bgcolor='black',
         paper_bgcolor='black',
         font_color='white',
-        showlegend=False,
-        xaxis=dict(visible=False),
-        yaxis=dict(visible=False),
-        title="Cliquez sur un genre pour voir les sous-genres"
+        showlegend=False
     )
 
+    selected_genre = "indie"  # Sélection par défaut
+    if click_data:
+        selected_genre = click_data['points'][0]['label']
+
+    # Mise à jour de l'histogramme des sous-genres
     df_subgenres = data_manager.get_top_subgenres_per_genre(selected_genre)
     
     df_subgenres = df_subgenres[df_subgenres['subgenre'] != selected_genre]
@@ -158,7 +144,7 @@ def update_charts(click_data):
         yaxis=dict(title=None)  
     )
 
-    return fig_bubble, fig_histogram
+    return fig_pie, fig_histogram
 
 if __name__ == '__main__':
     app.run_server(debug=True)
