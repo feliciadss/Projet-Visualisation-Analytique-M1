@@ -20,7 +20,7 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
             dcc.Checklist(
                 id="genre-checklist",
                 options=genres,
-                value=[],
+                value=['indie'],
                 inline=False,
                 style={'color': 'white'}
             ),

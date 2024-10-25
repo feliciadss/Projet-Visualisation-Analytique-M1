@@ -4,11 +4,16 @@ import json
 import pycountry
 from static.enumerations import genres, genre_colors
 from data.data_manager import DataManager
+import numpy as np
 
 # Fonction pour convertir les codes ISO2 en ISO3
 def convert_iso2_to_iso3(iso2_code):
     country = pycountry.countries.get(alpha_2=iso2_code)
-    return country.alpha_3 if country else None
+    if country:
+        return country.alpha_3
+    else:
+        print(f"Code ISO2 non trouvé : {iso2_code}")  # Ajout pour vérifier les erreurs
+        return None
 
 #chargment carte europe
 geojson_path = "./static/custom.geo.json"
@@ -34,7 +39,7 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
             dcc.RadioItems(
                 id='map-genre',
                 options=[{'label': genre.title(), 'value': genre} for genre in genres],
-                value=[],
+                value='pop',
                 inline=False,  
                 style={'color': 'white'}
             ),
@@ -55,6 +60,7 @@ def register_callback(app):
         data_manager = DataManager()
 
         df = data_manager.create_genre_popularity_by_country(genre_filter)
+        df['total_popularity_log'] = np.log1p(df['total_popularity'])
         
         if df.empty:
             print(f"Aucune donnée disponible pour le genre {genre_filter}")
@@ -62,11 +68,11 @@ def register_callback(app):
 
         # Conversion des codes ISO2 en ISO3
         df['country'] = df['country'].apply(convert_iso2_to_iso3)
+        print(df.head())
 
         try:
             with open(geojson_path, "r", encoding="utf-8") as geojson_file:
                 europe_geojson = json.load(geojson_file)
-                print("GeoJSON chargé avec succès")
         except FileNotFoundError:
             print(f"Fichier non trouvé à l'emplacement : {geojson_path}")
             return None
@@ -77,9 +83,9 @@ def register_callback(app):
             df,
             geojson=europe_geojson,
             locations="country",
-            featureidkey="properties.ISO_A3",
+            featureidkey="properties.adm0_a3",
             color="total_popularity",
-            hover_name="country",
+            hover_name="total_popularity_log",
             color_continuous_scale=[[0, '#000000'], [1, color_for_genre]],  
             title=f"Popularité du genre '{genre_filter.title()}' par pays"
         )

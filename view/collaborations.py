@@ -31,7 +31,16 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
         #centrer diagramme
         html.Div(style={'flex': '2', 'padding': '10px'}, children=[
             dcc.Graph(id='sankey-graph', style={'height': '500px'})
-        ])
+                ])
+    ]),
+    html.Div(style={'width': '100%', 'textAlign': 'center', 'marginTop': '30px'}, children=[
+        html.P(
+            "Le diagramme de Sankey illustre les collaborations musicales entre les différents genres sélectionnés. "
+            "Chaque cercle représente un genre musical, et les tailles des cercles indiquent leur importance dans les collaborations. "
+            "Les branches qui relient les cercles représentent les collaborations entre les genres, avec leur épaisseur reflétant "
+            "le nombre de collaborations. Plus une branche est épaisse, plus les collaborations entre ces genres sont nombreuses.",
+            style={'color': 'white', 'fontSize': '16px', 'maxWidth': '800px', 'margin': '0 auto', 'lineHeight': '1.5'}
+        )
     ])
 ])
 
