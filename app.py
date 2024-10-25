@@ -75,7 +75,7 @@ app.layout = html.Div([
 # Callback pour la navigation entre les pages
 @app.callback(Output('page-content', 'children'), [Input('url', 'pathname')])
 def display_page(pathname):
-    if pathname == '/accueil':
+    if pathname == '/popularite':
         return map_layout
     elif pathname == '/evolution_genres':
         return linear_layout
