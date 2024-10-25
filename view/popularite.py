@@ -1,5 +1,6 @@
 from dash import dcc, html, Input, Output
 import plotly.express as px
+import plotly.graph_objects as go
 import json
 import pycountry
 from static.enumerations import genres, genre_colors
@@ -12,10 +13,10 @@ def convert_iso2_to_iso3(iso2_code):
     if country:
         return country.alpha_3
     else:
-        print(f"Code ISO2 non trouvé : {iso2_code}")  # Ajout pour vérifier les erreurs
+        print(f"Code ISO2 non trouvé : {iso2_code}")
         return None
 
-#chargment carte europe
+# Chargement carte Europe
 geojson_path = "./static/custom.geo.json"
 try:
     with open(geojson_path, "r", encoding="utf-8") as geojson_file:
@@ -23,85 +24,111 @@ try:
 except FileNotFoundError:
     european_geojson = None
 
-
+# Layout pour la page de popularité des genres musicaux
 layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding': '20px'}, children=[
     html.H1('Popularité des genres musicaux en Europe', style={'textAlign': 'center', 'color': 'white'}),
     
     # Conteneur général
     html.Div(style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center'}, children=[
         # Bouton pour revenir à l'accueil
-        html.Div(style={'position': 'absolute','top': '30px','right': '30px','z-index': '1000','font-size': '40px'},children=[
+        html.Div(style={'position': 'absolute', 'top': '30px', 'right': '30px', 'z-index': '1000', 'font-size': '40px'}, children=[
             dcc.Link('🏠', href='/'),
         ]),
-        # Sélection des genres à gauche
-        html.Div(style={'flex': '1', 'padding': '10px'}, children=[
-            html.P("Sélectionnez un genre musical :", style={'fontWeight': 'bold', 'color': 'white'}),
-            dcc.RadioItems(
-                id='map-genre',
-                options=[{'label': genre.title(), 'value': genre} for genre in genres],
-                value='pop',
-                inline=False,  
-                style={'color': 'white'}
-            ),
+
+        # Bubble chart à gauche
+        html.Div(style={'flex': '0 0 40%', 'padding': '10px'}, children=[
+            dcc.Graph(id="bubble-genre-chart", style={'height': '600px', 'width': '100%'})
         ]),
 
+        # Carte choroplèthe à droite
         html.Div(style={'flex': '2', 'padding': '10px'}, children=[
             dcc.Graph(id="map-graph", style={'height': '500px'})
         ])
     ])
 ])
 
+# Callback pour les bulles des genres et la carte
 def register_callback(app):
     @app.callback(
-        Output("map-graph", "figure"), 
-        Input("map-genre", "value")
+        Output("bubble-genre-chart", "figure"),
+        Output("map-graph", "figure"),
+        Input("bubble-genre-chart", "clickData")
     )
-    def display_choropleth(genre_filter):
+    def update_bubble_and_map(click_data):
         data_manager = DataManager()
 
-        df = data_manager.create_genre_popularity_by_country(genre_filter)
+        genre_counts_df = data_manager.create_genre_count_dataframe()
+        genre_counts_df['scaled_size'] = np.sqrt(genre_counts_df['total_count'])
+
+        n_genres = len(genre_counts_df)
+        grid_size = int(np.ceil(np.sqrt(n_genres)))
+        genre_counts_df['x'] = np.tile(np.linspace(-1, 1, grid_size), grid_size)[:n_genres]
+        genre_counts_df['y'] = np.repeat(np.linspace(-1, 1, grid_size), grid_size)[:n_genres]
+        genre_counts_df['x'] += np.random.uniform(low=-0.05, high=0.05, size=n_genres)
+        genre_counts_df['y'] += np.random.uniform(low=-0.05, high=0.05, size=n_genres)
+
+        selected_genre = "pop"
+        if click_data:
+            selected_genre = click_data['points'][0]['hovertext']
+
+        fig_bubble = px.scatter(
+            genre_counts_df,
+            x='x',
+            y='y',
+            size='scaled_size',
+            color='genre',
+            hover_name='genre',
+            size_max=100,
+            text='genre',
+            color_discrete_map=genre_colors
+        )
+        fig_bubble.update_traces(textposition='middle center', textfont=dict(color='black'))  # Nom du genre en noir au centre
+        fig_bubble.update_layout(
+            plot_bgcolor='black',
+            paper_bgcolor='black',
+            font_color='white',
+            showlegend=False,
+            xaxis=dict(visible=False),
+            yaxis=dict(visible=False),
+            title="Cliquez sur un genre pour voir la carte de popularité"
+        )
+
+        # Génération de la carte en fonction du genre sélectionné
+        df = data_manager.create_genre_popularity_by_country(selected_genre)
         df['total_popularity_log'] = np.log1p(df['total_popularity'])
         
         if df.empty:
-            print(f"Aucune donnée disponible pour le genre {genre_filter}")
-            return None
+            print(f"Aucune donnée disponible pour le genre {selected_genre}")
+            return fig_bubble, go.Figure()
 
         # Conversion des codes ISO2 en ISO3
         df['country'] = df['country'].apply(convert_iso2_to_iso3)
-        print(df.head())
 
-        try:
-            with open(geojson_path, "r", encoding="utf-8") as geojson_file:
-                europe_geojson = json.load(geojson_file)
-        except FileNotFoundError:
-            print(f"Fichier non trouvé à l'emplacement : {geojson_path}")
-            return None
+        color_for_genre = genre_colors.get(selected_genre.lower(), '#ffffff')
 
-        color_for_genre = genre_colors.get(genre_filter.lower(), '#ffffff')
-
-        fig = px.choropleth(
+        fig_map = px.choropleth(
             df,
-            geojson=europe_geojson,
+            geojson=european_geojson,
             locations="country",
             featureidkey="properties.adm0_a3",
-            color="total_popularity",
-            hover_name="total_popularity_log",
-            color_continuous_scale=[[0, '#000000'], [1, color_for_genre]],  
-            title=f"Popularité du genre '{genre_filter.title()}' par pays"
+            color="total_popularity_log",
+            hover_name="country",
+            color_continuous_scale=[[0, '#000000'], [1, color_for_genre]],
+            title=f"Popularité du genre '{selected_genre.title()}' par pays"
         )
 
-        fig.update_geos(
+        fig_map.update_geos(
             scope="europe",
             projection_type="equirectangular",
             showcoastlines=False,
             showland=True,
             landcolor="white",
-            bgcolor="black",  #fond noir
+            bgcolor="black",
             fitbounds="locations",
             visible=True
         )
 
-        fig.update_layout(
+        fig_map.update_layout(
             title_font_size=20,
             geo=dict(showframe=False, showcoastlines=False),
             paper_bgcolor='black',
@@ -112,4 +139,4 @@ def register_callback(app):
             height=500
         )
 
-        return fig
+        return fig_bubble, fig_map
