@@ -24,31 +24,23 @@ Ce dossier contient les scripts nécessaires pour initialiser et gérer la base 
   - **`update_sql.py`** : Ce script sert à migrer les données de MongoDB vers une base de données SQLite (spotify.db). Il crée les tables nécessaires (artistes, albums, tracks), les met à jour avec les données récupérées de MongoDB, et ajoute des colonnes supplémentaires afin de faciliter l'exécution rapide de requêtes SQL.
   - **`spotify.db`** : Fichier de base de données SQLite contenant les données structurées des artistes, albums, et tracks. Cette base de données est utilisée pour un accès plus rapide aux données lors des requêtes SQL, permettant de gérer efficacement les visualisations et analyses sans toujours interroger MongoDB.
 
-- **`data_manager`** : Ce sous-dossier regroupe les classes orientées objets pour gérer les différentes collections (tracks, albums, artistes, genres, marchés). Il contient aussi des fonctions permettant de construire des DataFrames adaptés à nos besoins de visualisation.
+- **`data_manager`** : Ce sous-dossier regroupe les classes orientées objets pour gérer les différentes tables (tracks, albums, artistes). Il contient aussi des fonctions permettant de construire des DataFrames adaptés à nos besoins de visualisation.
 
 ### **2. Dossier `static`**
 Ce dossier contient les ressources statiques nécessaires au projet.
 
-- **Fichiers JSON** : Données statiques telles que des cartes géographiques (pour les heatmaps), ou d'autres informations pré-chargées.
-- **`style.css`** : Fichier de style pour la mise en page des visualisations.
-- **Énumérations** : Fichiers contenant les différentes énumérations liées aux genres, marchés, etc.
+- **`custom.geo.json`** : Carte géographique pré-chargées
+- **`enumerations.py`** : Fichiers contenant les différentes énumérations liées aux genres, marchés, etc.
 
-### **3. Dossier `template`**
-Ce dossier contient les pages HTML pour l'interface utilisateur.
 
-- **`base.html`** : Le fichier de base qui inclut le cadre principal pour toutes les pages.
-- **`index.html`** : La page d'accueil du projet.
-- **Pages HTML** : Chaque page de visualisation est stockée ici
-
-### **4. Dossier `view`**
+### **3. Dossier `view`**
 Ce dossier stocke les objets de visualisation.
 
-- **`map.py`** 
-- **`sankey_diagram.py`**
-- **`barcharts.py`**
-- **`radar.py`**
-- **`bubblechart.py`**
-- **`linear.py`**
+- **`caract_musicales.py`** 
+- **`collaborations.py`**
+- **`evolution_genres.py`**
+- **`popularite.py`**
+
 
 ### **5. Fichier `requirements.txt`**
 Ce fichier contient toutes les dépendances nécessaires pour exécuter l'application. Il regroupe les packages et leurs versions, notamment Flask, MongoDB, Spotipy, Plotly, Pandas, et autres bibliothèques utilisées dans le projet.
