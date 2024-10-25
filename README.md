@@ -19,9 +19,10 @@ Ce dossier contient les scripts nécessaires pour initialiser et gérer la base 
 
 - **`initialise_db.py`** : Ce script utilise les fichiers suivants pour construire une base de données MongoDB avec les données récupérées via l'API Spotify.
   - **`auth_spotify.py`** : Gère l'authentification avec l'API Spotify.
-  - **`config`** : Fichier de configuration qui centralise les paramètres nécessaires à la récupération des données.
+  - **`config.ini`** : Fichier de configuration A REMPLIR contenant les identifiants secrets de votre compte Spotify Developer, et du compte Mongo DB depuis lequel vous allez créer la base de données.
   - **`constructeurDB.py`** : Contient les fonctions pour récupérer les données depuis l'API Spotify et les structurer dans la base MongoDB.
-  - **`update_sql.py`** : Ce script sert à migrer les données de MongoDB vers une base de données SQLite (spotify.db). Il crée les tables nécessaires (artistes, albums, tracks), les met à jour avec les données récupérées de MongoDB, et ajoute des colonnes supplémentaires afin de faciliter l'exécution rapide de requêtes SQL.
+
+- **`update_sql.py`** : Ce script sert à migrer les données de MongoDB vers une base de données SQLite (spotify.db). Il crée les tables nécessaires (artistes, albums, tracks), les met à jour avec les données récupérées de MongoDB, et ajoute des colonnes supplémentaires afin de faciliter l'exécution rapide de requêtes SQL.
   - **`spotify.db`** : Fichier de base de données SQLite contenant les données structurées des artistes, albums, et tracks. Cette base de données est utilisée pour un accès plus rapide aux données lors des requêtes SQL, permettant de gérer efficacement les visualisations et analyses sans toujours interroger MongoDB.
 
 - **`data_manager`** : Ce sous-dossier regroupe les classes orientées objets pour gérer les différentes tables (tracks, albums, artistes). Il contient aussi des fonctions permettant de construire des DataFrames adaptés à nos besoins de visualisation.
@@ -30,11 +31,11 @@ Ce dossier contient les scripts nécessaires pour initialiser et gérer la base 
 Ce dossier contient les ressources statiques nécessaires au projet.
 
 - **`custom.geo.json`** : Carte géographique pré-chargées
-- **`enumerations.py`** : Fichiers contenant les différentes énumérations liées aux genres, marchés, etc.
+- **`enumerations.py`** : Fichiers contenant les différentes énumérations liées aux genres, marchés, etc. Vous pouvez le modifier, notamment si vous souhaiter concentrer les résultats sur d'autres genres.
 
 
 ### **3. Dossier `view`**
-Ce dossier stocke les objets de visualisation.
+Ce dossier stocke les modules qui définissent les pages de l'application web Dash. Chaque fichier représente une page et contient le layout (structure HTML) et les callbacks (logique de mise à jour) associés à chaque fonctionnalité de visualisation de données. 
 
 - **`caract_musicales.py`** 
 - **`collaborations.py`**
@@ -43,7 +44,7 @@ Ce dossier stocke les objets de visualisation.
 
 
 ### **5. Fichier `requirements.txt`**
-Ce fichier contient toutes les dépendances nécessaires pour exécuter l'application. Il regroupe les packages et leurs versions, notamment Flask, MongoDB, Spotipy, Plotly, Pandas, et autres bibliothèques utilisées dans le projet.
+Ce fichier contient toutes les dépendances nécessaires pour exécuter l'application. Il regroupe les packages et leurs versions, notamment Dash, MongoDB, Spotipy, Plotly, Pandas, et d'autres bibliothèques utilisées dans le projet.
 
 ## **Fonctionnement de l'Application**
 
@@ -68,7 +69,7 @@ Si vous souhaitez migrer les données de MongoDB vers SQLite pour optimiser l'ac
 ```python
 python update_sql.py
 ```
-Ce script va créer et/ou mettre à jour la base de données spotify.db avec les tables d'artistes, d'albums, et de tracks, en récupérant les données depuis MongoDB et en les structurant pour des requêtes SQL efficaces.
+Ce script va créer et/ou mettre à jour la base de données `spotify.db` avec les tables d'artistes, d'albums, et de tracks, en récupérant les données depuis MongoDB et en les structurant pour des requêtes SQL efficaces.
 
 ### **Lancement de l'Application**
 Pour lancer l'application, exécutez la commande suivante :
