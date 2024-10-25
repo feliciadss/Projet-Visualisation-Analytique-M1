@@ -1,5 +1,6 @@
 import sqlite3
 import pandas as pd
+from static.enumerations import genres
 
 class DataManager:
     def __init__(self, db_path='./data/spotify.db'):
@@ -129,12 +130,6 @@ class DataManager:
 
     # Fonction pour collecter les collaborations entre genres dans les tracks featurings
     def create_genre_collaboration_matrix(self, selected_genres):
-        global_genres = [
-            "pop", "rock", "latin", "jazz", "classical",
-            "electronic", "indie", "reggae", "blues", "metal",
-            "folk", "country", "r&b", "soul"
-        ]
-
         genre_pairs = []
 
         for genre_selectionné in selected_genres:
@@ -151,7 +146,7 @@ class DataManager:
             for artist_id, artist_genres in artist_data:
                 artist_genres_list = artist_genres.split(',')
                 for genre in artist_genres_list:
-                    for global_genre in global_genres:
+                    for global_genre in genres:
                         if genre.lower().startswith(global_genre.lower()):
                             genre_pairs.append((genre_selectionné, global_genre))
                             break
@@ -162,6 +157,33 @@ class DataManager:
         df_collaborations = pd.DataFrame(genre_pairs, columns=['Genre1', 'Genre2'])
         genre_matrix = pd.crosstab(df_collaborations['Genre1'], df_collaborations['Genre2'])
         return genre_matrix
+
+
+    def create_genre_count_dataframe(self):
+        genre_count = {genre: 0 for genre in genres}  
+
+        self.cursor.execute("""
+            SELECT artists.genres, COUNT(albums.id)
+            FROM artists
+            JOIN albums ON artists.id = albums.artist_id
+            GROUP BY artists.genres
+        """)
+
+        artist_genres = self.cursor.fetchall()
+
+        for genres_in_db, album_count in artist_genres:
+            genre_list = genres_in_db.split(',') 
+            for genre in genre_list:
+                genre = genre.strip().lower()
+                for global_genre in genres:
+                    if genre.startswith(global_genre):
+                        genre_count[global_genre] += album_count  
+                        break
+
+        df_genre_count = pd.DataFrame(list(genre_count.items()), columns=['genre', 'total_count'])
+
+        return df_genre_count
+
 
     def close_connection(self):
         """Ferme la connexion à la base de données."""

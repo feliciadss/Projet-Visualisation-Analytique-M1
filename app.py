@@ -1,14 +1,10 @@
 from dash import Dash, html, dcc
 from dash.dependencies import Input, Output
-from view.popularite import layout as map_layout, register_callback as register_map_callback
-from view.evolution_genres import layout as linear_layout, register_callback as register_linear_callback
-from view.collaborations import layout as sankey_layout, register_callback as register_sankey_callback
-from view.caract_musicales import layout as radar_layout, register_callback as register_radar_callback
-
-import plotly.graph_objects as go 
+import plotly.graph_objects as go
 import plotly.express as px
 from data.data_manager import DataManager
-from static.enumerations import genres, genre_colors
+from static.enumerations import genre_colors
+import numpy as np
 
 app = Dash(__name__, suppress_callback_exceptions=True)
 
@@ -43,27 +39,20 @@ home_layout = html.Div(style={'backgroundColor': 'black', 'minHeight': '100vh', 
         ),
     ], style={'display': 'flex', 'justifyContent': 'center', 'flexDirection': 'row', 'gap': '20px'}),
     
-    
-    html.H3("Nous avons catégorisé les genres en 14 grandes catégories, mais voici les sous-genres se cachant dans chacune :",
-            style={'color': 'white', 'paddingTop': '40px'}),
+    html.H3("Nous avons catégorisé les genres en 14 grandes catégories, mais voici les sous-genres se cachant dans chacune :", style={'color': 'white', 'paddingTop': '40px'}),
 
-    # Conteneur général du bubble chart
+    # Conteneur pour le bubble chart et l'histogramme
     html.Div(style={'display': 'flex', 'justifyContent': 'flex-start', 'alignItems': 'center', 'width': '100%', 'padding': '20px'}, children=[
-        # Sélection des genres à gauche
-        html.Div(style={'flex': '0 0 20%', 'padding': '10px', 'textAlign': 'left'}, children=[
-            html.P("Sélectionnez un genre musical :", style={'fontWeight': 'bold', 'color': 'white'}),
-            dcc.RadioItems(
-                id='map-genre',
-                options=[{'label': genre.title(), 'value': genre} for genre in genres],
-                value="pop",
-                inline=False,  
-                style={'color': 'white'}
-            ),
+        
+        # Bubble chart à gauche
+        html.Div(style={'flex': '0 0 40%', 'padding': '10px'}, children=[
+            dcc.Graph(id="bubble-chart", style={'height': '600px', 'width': '100%'})
         ]),
 
-        html.Div(style={'flex': '1', 'padding': '10px'}, children=[
-            dcc.Graph(id="bubble-chart", style={'height': '600px', 'width': '100%'})  # Augmenter la taille du graphique
-        ])
+        # Histogramme horizontal à droite
+        html.Div(style={'flex': '1', 'padding': '10px', 'textAlign': 'left'}, children=[
+            dcc.Graph(id="histogram-chart", style={'height': '600px', 'width': '100%'})
+        ]),
     ])
 ])
 
@@ -75,71 +64,86 @@ app.layout = html.Div([
 # Callback pour la navigation entre les pages
 @app.callback(Output('page-content', 'children'), [Input('url', 'pathname')])
 def display_page(pathname):
-    if pathname == '/popularite':
-        return map_layout
-    elif pathname == '/evolution_genres':
-        return linear_layout
-    elif pathname == '/collaborations':
-        return sankey_layout
-    elif pathname == '/caract_musicales':
-        return radar_layout
-    else:
-        return home_layout  # Page d'accueil par défaut
+    return home_layout  # Page d'accueil par défaut
 
-# Callbacks pour chaque page
-register_map_callback(app)
-register_linear_callback(app)
-register_sankey_callback(app)
-register_radar_callback(app)
-
-# Callback pour la bubble chart sur la page principale
+# Callback pour le bubble chart et l'histogramme
 @app.callback(
     Output("bubble-chart", "figure"),
-    Input("map-genre", "value")
+    Output("histogram-chart", "figure"),
+    [Input("bubble-chart", "clickData")]
 )
-def update_bubble_chart(genre):
+def update_charts(click_data):
     data_manager = DataManager()
-    df_subgenres = data_manager.get_top_subgenres_per_genre(genre)
+
+    # Création du bubble chart
+    genre_counts_df = data_manager.create_genre_count_dataframe()
+
+    # Appliquer une transformation pour réduire l'écart (racine carrée)
+    genre_counts_df['scaled_size'] = np.sqrt(genre_counts_df['total_count'])
+
+    # Génération de positions X et Y avec une distribution plus régulière (grille + jitter)
+    n_genres = len(genre_counts_df)
+    grid_size = int(np.ceil(np.sqrt(n_genres)))  # Taille de la grille carrée
+    genre_counts_df['x'] = np.tile(np.linspace(-1, 1, grid_size), grid_size)[:n_genres]
+    genre_counts_df['y'] = np.repeat(np.linspace(-1, 1, grid_size), grid_size)[:n_genres]
+
+    # Ajouter un léger jitter pour éviter les chevauchements exacts
+    genre_counts_df['x'] += np.random.uniform(low=-0.05, high=0.05, size=n_genres)
+    genre_counts_df['y'] += np.random.uniform(low=-0.05, high=0.05, size=n_genres)
+
+    # Genre par défaut : 'indie' si aucun clic n'est fait
+    selected_genre = "indie"
+    if click_data:
+        selected_genre = click_data['points'][0]['hovertext']
     
-    if df_subgenres.empty:
-        print("Aucune donnée disponible pour les sous-genres.")
-        return go.Figure()
-
-    genre_color = genre_colors.get(genre.lower(), '#ffffff')  # Blanc par défaut
-
-    fig = px.scatter(df_subgenres, 
-                     x='subgenre', 
-                     y='count', 
-                     size='count', 
-                     color_discrete_sequence=[genre_color],  
-                     hover_name='subgenre',
-                     title=f'Diagramme en Bulles pour le genre {genre}',
-                     labels={'subgenre': 'Sous-genres', 'count': 'Nombre d\'artistes'},
-                     size_max=60)
-
-    fig.update_layout(
-        plot_bgcolor='black',  
-        paper_bgcolor='black',  # Fond noir 
-        font_color='white',  # Texte en blanc 
-        title_font_color='white',  # Titre blanc
-        xaxis=dict(
-            title_font=dict(color='white'), 
-            tickfont=dict(color='white'),    
-            showgrid=False, 
-            zeroline=False
-        ),
-        yaxis=dict(
-            title_font=dict(color='white'), 
-            tickfont=dict(color='white'), 
-            showgrid=False, 
-            zeroline=False
-        ),
-        title=dict(
-            font=dict(color='white') 
-        )
+    # Bubble chart avec noms en noir dans chaque bulle
+    fig_bubble = px.scatter(
+        genre_counts_df,
+        x='x',
+        y='y',
+        size='scaled_size',  # Utiliser la taille réduite avec racine carrée
+        color='genre',
+        hover_name='genre',
+        size_max=100,  # Taille maximale plus grande pour agrandir les bulles
+        text='genre',  # Afficher le nom du genre dans la bulle
+        color_discrete_map=genre_colors
+    )
+    fig_bubble.update_traces(textposition='middle center', textfont=dict(color='black'))  # Nom du genre en noir au centre
+    fig_bubble.update_layout(
+        plot_bgcolor='black',
+        paper_bgcolor='black',
+        font_color='white',
+        showlegend=False,
+        xaxis=dict(visible=False),
+        yaxis=dict(visible=False),
+        title="Cliquez sur un genre pour voir les sous-genres"
     )
 
-    return fig
+    # Si une bulle est cliquée, afficher l'histogramme des sous-genres
+    df_subgenres = data_manager.get_top_subgenres_per_genre(selected_genre)
+    
+    # Retirer le nom du genre de la liste des sous-genres
+    df_subgenres = df_subgenres[df_subgenres['subgenre'] != selected_genre]
+
+    fig_histogram = go.Figure()
+    fig_histogram.add_trace(
+        go.Bar(
+            x=df_subgenres['count'],
+            y=df_subgenres['subgenre'],
+            orientation='h',
+            marker=dict(color=genre_colors.get(selected_genre.lower(), 'white'))  # Barres de la couleur du genre sélectionné
+        )
+    )
+    fig_histogram.update_layout(
+        plot_bgcolor='black',
+        paper_bgcolor='black',
+        font_color='white',
+        title=f"Répartition des sous-genres pour {selected_genre}",
+        xaxis=dict(title="Nombre d'artistes"),
+        yaxis=dict(title=None)  # Supprimer le titre "Sous-genres" sur l'axe des ordonnées
+    )
+
+    return fig_bubble, fig_histogram
 
 if __name__ == '__main__':
     app.run_server(debug=True)
