@@ -34,7 +34,7 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
             dcc.RadioItems(
                 id='map-genre',
                 options=[{'label': genre.title(), 'value': genre} for genre in genres],
-                value="pop",
+                value=[],
                 inline=False,  
                 style={'color': 'white'}
             ),

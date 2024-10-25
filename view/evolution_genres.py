@@ -33,7 +33,7 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
             dcc.Checklist(
                 id="linear-checklist",
                 options=genres,
-                value=["pop", "rock"],
+                value=[],
                 inline=False, 
                 style={'color': 'white'}
             )
