@@ -91,15 +91,19 @@ def register_callback(app):
         Input("radar-graph", "clickData"), 
         Input("genre-checklist", "value")
     )
+    
     def update_barchart(clickData, selected_genres):
         if clickData is None or 'points' not in clickData:
-            return go.Figure()
-        clicked_feature = clickData['points'][0]['theta']
+            clicked_feature = "duration_ms" 
+        else:
+            clicked_feature = clickData['points'][0]['theta']
+
         data_manager = DataManager()
         df = data_manager.create_audiofeatures_dataframe(selected_genres)
 
         if df is None or df.empty:
             return go.Figure()
+        
         df_avg = df.groupby('genre')[clicked_feature].mean().reset_index()
         colors = [genre_colors.get(genre, '#ffffff') for genre in df_avg['genre']]
 
@@ -124,7 +128,7 @@ def register_callback(app):
         )
 
         return fig
-    
-#normalise colonnes
+
+# Fonction pour normaliser une colonne
 def normalize_column(col):
     return (col - col.min()) / (col.max() - col.min())
