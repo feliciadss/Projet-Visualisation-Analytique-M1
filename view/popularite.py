@@ -28,12 +28,16 @@ except FileNotFoundError:
 layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding': '20px'}, children=[
     html.H1('Popularité des genres musicaux en Europe', style={'textAlign': 'center', 'color': 'white'}),
     
+    html.H3("Découvrez la popularité de chaque genre à travers les pays européens", style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal'}),
+    
     # Conteneur général
     html.Div(style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center'}, children=[
         # Bouton pour revenir à l'accueil
         html.Div(style={'position': 'absolute', 'top': '30px', 'right': '30px', 'z-index': '1000', 'font-size': '40px'}, children=[
             dcc.Link('🏠', href='/'),
         ]),
+        
+
 
         # Bubble chart à gauche
         html.Div(style={'flex': '0 0 40%', 'padding': '10px'}, children=[
@@ -47,7 +51,7 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
     ])
 ])
 
-# Callback pour les bulles des genres et la carte
+
 def register_callback(app):
     @app.callback(
         Output("bubble-genre-chart", "figure"),
@@ -90,12 +94,14 @@ def register_callback(app):
             showlegend=False,
             xaxis=dict(visible=False),
             yaxis=dict(visible=False),
-            title="Cliquez sur un genre pour voir la carte de popularité"
         )
 
         # Génération de la carte en fonction du genre sélectionné
         df = data_manager.create_genre_popularity_by_country(selected_genre)
-        df['total_popularity_log'] = np.log1p(df['total_popularity'])
+        df['total_popularity_percentile'] = df['total_popularity'].rank(pct=True)
+
+
+
         
         if df.empty:
             print(f"Aucune donnée disponible pour le genre {selected_genre}")
@@ -111,10 +117,11 @@ def register_callback(app):
             geojson=european_geojson,
             locations="country",
             featureidkey="properties.adm0_a3",
-            color="total_popularity_log",
+            color="total_popularity_percentile",
             hover_name="country",
             color_continuous_scale=[[0, '#000000'], [1, color_for_genre]],
-            title=f"Popularité du genre '{selected_genre.title()}' par pays"
+            title=f"--> {selected_genre.title()}",
+            labels={"total_popularity_percentile": "Popularité (%)"} 
         )
 
         fig_map.update_geos(

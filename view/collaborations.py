@@ -8,7 +8,7 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
     html.H1('Collaboration entre genres', style={'textAlign': 'center', 'color': 'white'}),
     
     html.H3(
-        "Sur cette page, des diagrammes de Sankey sont utilisés pour illustrer les collaborations entre un ou plusieurs genres sélectionnés et les autres.",
+        "Analyser la diversité des genres au sein des featurings entre artistes de différents genres. Cette page montre comment les genres se mélangent et s’influencent mutuellement.",
         style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal'}
     ),
     

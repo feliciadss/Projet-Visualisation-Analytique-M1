@@ -8,6 +8,11 @@ from static.enumerations import genre_colors
 layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding': '20px'}, children=[
     html.H1('Caractéristiques musicales par genre', style={'color': 'white', 'textAlign': 'center'}),
     
+    html.H3(
+        "Voyez comment les caractéristiques audio varient d'un genre musical à l'autre. Pour plus de détails quantitatifs, cliquez sur la caractéristique musicale de votre choix au sein du radar chart.",
+        style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal'}
+    ),
+    
     # Conteneur général ici
     html.Div(style={'display': 'flex', 'justifyContent': 'space-between', 'alignItems': 'center'}, children=[
         # Bouton pour revenir à l'accueil
@@ -66,7 +71,7 @@ def register_callback(app):
                 r=mean_features.values,
                 theta=features,
                 fill='toself',
-                name=f'Average Features for {genre}',
+                name=f'{genre}',
                 line_color=genre_colors.get(genre, '#ffffff'), 
                 hoverinfo='theta+r', 
                 mode='lines+markers', 
@@ -79,7 +84,6 @@ def register_callback(app):
             plot_bgcolor='black',
             font=dict(color='white'),
             showlegend=True,
-            title='Radar Chart Comparing Audio Features by Genre',
             title_font=dict(color='white'),
             clickmode='event+select'  
         )
@@ -112,15 +116,13 @@ def register_callback(app):
         fig.add_trace(go.Bar(
             x=df_avg['genre'],
             y=df_avg[clicked_feature],
-            text=df_avg[clicked_feature],
+            text=df_avg[clicked_feature].round(2),
             textposition='auto',
             marker_color=colors,
         ))
 
         fig.update_layout(
-            title=f'Comparaison des genres pour {clicked_feature}',
-            xaxis_title='Genres',
-            yaxis_title=clicked_feature,
+            title=f'{clicked_feature}',
             paper_bgcolor='black',
             plot_bgcolor='black',
             font=dict(color='white'),

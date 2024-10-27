@@ -23,7 +23,7 @@ home_layout = html.Div(style={'backgroundColor': 'black', 'minHeight': '100vh', 
         "opportunités d'investissement dans de nouveaux artistes et collaborations.",
         style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal'}
     ),
-    html.P("Sélectionnez une analyse à explorer :"),
+    
     html.Div([
         dcc.Link(
             html.Button('Popularité des genres', style={'margin': '10px', 'color': 'black', 'backgroundColor': 'white', 'fontSize': '20px', 'padding': '15px 30px'}),
@@ -43,7 +43,7 @@ home_layout = html.Div(style={'backgroundColor': 'black', 'minHeight': '100vh', 
         ),
     ], style={'display': 'flex', 'justifyContent': 'center', 'flexDirection': 'row', 'gap': '20px'}),
     
-    html.H3("Nous avons catégorisé les genres en 14 grandes catégories, mais voici les sous-genres se cachant dans chacune :", style={'color': 'white', 'paddingTop': '40px'}),
+    html.H3("Pour rendre l'expérience plus agréable, nous avons classé les genres en 13 grandes catégories. Chaque catégorie regroupe des sous-genres que vous pouvez explorer en cliquant sur le diagramme circulaire.", style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal'}),
 
     # Conteneur pour le pie chart et l'histogramme
     html.Div(style={'display': 'flex', 'justifyContent': 'flex-start', 'alignItems': 'center', 'width': '100%', 'padding': '20px'}, children=[
@@ -107,7 +107,6 @@ def update_charts(click_data):
         values='transformed_count',  # On utilise la colonne transformée pour réduire l'impact de pop
         color='genre',
         color_discrete_map=genre_colors,
-        title='Répartition générale des genres musicaux (cliquez sur un genre pour voir apparaitre les sous cat)'
     )
     fig_pie.update_traces(textinfo='percent+label', textposition='inside')
     fig_pie.update_layout(
@@ -117,11 +116,10 @@ def update_charts(click_data):
         showlegend=False
     )
 
-    selected_genre = "indie"  # Sélection par défaut
+    selected_genre = "indie"  #par défaut
     if click_data:
         selected_genre = click_data['points'][0]['label']
 
-    # Mise à jour de l'histogramme des sous-genres
     df_subgenres = data_manager.get_top_subgenres_per_genre(selected_genre)
     
     df_subgenres = df_subgenres[df_subgenres['subgenre'] != selected_genre]
