@@ -98,7 +98,7 @@ def register_callback(app):
     
     def update_barchart(clickData, selected_genres):
         if clickData is None or 'points' not in clickData:
-            clicked_feature = "duration_ms" 
+            clicked_feature = "energy" 
         else:
             clicked_feature = clickData['points'][0]['theta']
 

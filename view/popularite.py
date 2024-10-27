@@ -40,12 +40,12 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
 
 
         # Bubble chart à gauche
-        html.Div(style={'flex': '0 0 40%', 'padding': '10px'}, children=[
+        html.Div(style={'flex': '1', 'padding': '10px'}, children=[
             dcc.Graph(id="bubble-genre-chart", style={'height': '600px', 'width': '100%'})
         ]),
 
         # Carte choroplèthe à droite
-        html.Div(style={'flex': '2', 'padding': '10px'}, children=[
+        html.Div(style={'flex': '1.5', 'padding': '10px'}, children=[
             dcc.Graph(id="map-graph", style={'height': '500px'})
         ])
     ])
@@ -129,6 +129,8 @@ def register_callback(app):
             projection_type="equirectangular",
             showcoastlines=False,
             showland=True,
+            center=dict(lat=51.9194, lon=19.1451),  
+            projection_scale=10,
             landcolor="white",
             bgcolor="black",
             fitbounds="locations",
@@ -141,7 +143,12 @@ def register_callback(app):
             paper_bgcolor='black',
             plot_bgcolor='black',
             font=dict(color='white'),
-            margin={"r": 0, "t": 50, "l": 0, "b": 0},
+            margin={"r": 50, "t": 50, "l": 0, "b": 0},
+            coloraxis_colorbar=dict(
+        x=0.85,
+        tickvals=[0.2, 0.4, 0.6, 0.8], 
+        title="Popularité (%)"
+    ),
             width=800,
             height=500
         )
