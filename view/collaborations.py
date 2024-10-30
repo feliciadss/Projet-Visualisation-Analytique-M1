@@ -138,8 +138,9 @@ def register_callback(app):
             return selected_genres, [{'backgroundColor': genre_colors.get(genre, '#CCCCCC'),
                                       'color': 'white',
                                       'border': 'none',
-                                      'padding': '10px 20px',
+                                      'padding': '15px 25px',
                                       'cursor': 'pointer',
+                                      'fontSize': '16px', 
                                       'borderRadius': '5px'} for genre in genres]
 
         # Extraire l'ID du bouton qui a été cliqué
@@ -154,8 +155,9 @@ def register_callback(app):
                 'backgroundColor': '#555555' if selected_genres[genre] else genre_colors.get(genre, '#CCCCCC'),
                 'color': 'white',
                 'border': 'none',
-                'padding': '10px 20px',
+                'padding': '15px 25px',
                 'cursor': 'pointer',
+                'fontSize': '16px',
                 'borderRadius': '5px'
             }
             button_styles.append(style)
