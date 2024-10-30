@@ -41,6 +41,32 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
         ]),
     ]),
     
+    html.Div(style={'width': '100%', 'textAlign': 'left', 'marginTop': '30px'}, children=[
+    html.P([
+        html.U("Danceability"), ": mesure l'aptitude d'une chanson à la danse selon le tempo, le rythme, et d'autres éléments"
+    ], style={'color': 'white', 'fontSize': '16px', 'maxWidth': '800px', 'margin': '0 auto', 'lineHeight': '1.5'}),
+    
+    html.P([
+        html.U("Tempo"), ": vitesse de la chanson en battements par minute (BPM)"
+    ], style={'color': 'white', 'fontSize': '16px', 'maxWidth': '800px', 'margin': '0 auto', 'lineHeight': '1.5'}),
+
+    html.P([
+        html.U("Énergie"), ": intensité de la chanson, influencée par le volume et l'intensité des instruments (%)"
+    ], style={'color': 'white', 'fontSize': '16px', 'maxWidth': '800px', 'margin': '0 auto', 'lineHeight': '1.5'}),
+
+    html.P([
+        html.U("Valence"), ": mesure de la positivité de l’émotion dans la musique"
+    ], style={'color': 'white', 'fontSize': '16px', 'maxWidth': '800px', 'margin': '0 auto', 'lineHeight': '1.5'}),
+
+    html.P([
+        html.U("Acousticness"), ": indique à quel point une chanson est acoustique, sans sons électroniques"
+    ], style={'color': 'white', 'fontSize': '16px', 'maxWidth': '800px', 'margin': '0 auto', 'lineHeight': '1.5'}),
+
+    html.P([
+        html.U("Duration"), ": durée de la chanson en millisecondes. Plus long = expérience immersive, plus court = percutant (ms)"
+    ], style={'color': 'white', 'fontSize': '16px', 'maxWidth': '800px', 'margin': '0 auto', 'lineHeight': '1.5'})
+]),
+    
     # Pied de page
     html.Footer(
         html.Small(

@@ -4,13 +4,15 @@ from constructeurDB import (
     connect_to_db, get_popular_playlists, 
     get_playlist_tracks
 )
+#from static.enumerations import european_countries
+
 
 def initialize_db():
     db = connect_to_db()
 
     european_countries = [
-        "NL", "MK", "NO", "PL", "PT", "RO", "RS", "SK", "SI", 
-        "ES", "SE", "CH", "UA", "GB"
+        "PL", "PT", "RO", "RS", "SK", "SI", 
+        "ES", "SE", "CH", "UA", "GB", "NO"
     ]#attention je retire des pays a chaque relance, pour eviter les requetes doublons 
 
     try:

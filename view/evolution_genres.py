@@ -7,7 +7,7 @@ from data.data_manager import DataManager
 # Layout de la page
 layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding': '20px', 'textAlign': 'center'}, children=[
     html.H1('Évolution de la popularité des genres', style={'color': 'white'}),
-    html.H3("En sélectionnant un ou plusieurs genres, découvrez l'évolution de leur popularité depuis 50 ans", 
+    html.H3("Découvrez l'évolution de leur popularité depuis 50 ans en sélectionnant un ou plusieurs genres.", 
             style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal'}),
 
     # Conteneur pour centrer la checklist et le graphique
