@@ -33,7 +33,7 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
         ]),
     ]),
 
-    # Encadré les liens des articles
+    # Encadré des liens des articles avec disposition en 3 lignes de 5 colonnes
     html.Div(id="articles-section", style={
         'marginTop': '20px',
         'padding': '10px',
@@ -44,7 +44,7 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
         'textAlign': 'left',
         'color': 'white'
     }),
-    
+
     # Pied de page
     html.Footer(
         html.Small(
@@ -83,37 +83,55 @@ def register_callback(app):
         fig = px.line(albums_per_year, x="year", y="album_count", color='genre')
         fig.update_layout(plot_bgcolor='black', paper_bgcolor='black', font_color='white')
 
-        articles = []
-        for genre in selected_genres:
-            if genre == "rock":
-                articles.append(html.A("L'histoire du rock", href="https://fr.wikipedia.org/wiki/Histoire_du_rock", target="_blank", style={'display': 'block', 'color': 'cyan'}))
-            elif genre == "pop":
-                articles.append(html.A("L'histoire de la pop", href="https://fr.wikipedia.org/wiki/Pop_(musique)", target="_blank", style={'display': 'block', 'color': 'cyan'}))
-            elif genre == "latin":
-                articles.append(html.A("L'histoire de la latino", href="https://fr.wikipedia.org/wiki/Musique_latine", target="_blank", style={'display': 'block', 'color': 'cyan'}))
-            elif genre == "jazz":
-                articles.append(html.A("L'histoire du jazz", href="https://fr.wikipedia.org/wiki/Histoire_du_jazz", target="_blank", style={'display': 'block', 'color': 'cyan'}))
-            elif genre == "classical":
-                articles.append(html.A("L'histoire de la classique", href="https://fr.wikipedia.org/wiki/Musique_classique", target="_blank", style={'display': 'block', 'color': 'cyan'}))
-            elif genre == "electronic":
-                articles.append(html.A("L'histoire de l'électronique", href="https://fr.wikipedia.org/wiki/Musique_%C3%A9lectronique", target="_blank", style={'display': 'block', 'color': 'cyan'}))
-            elif genre == "indie":
-                articles.append(html.A("L'histoire de l'indie", href="https://fr.wikipedia.org/wiki/Indie_pop", target="_blank", style={'display': 'block', 'color': 'cyan'}))
-            elif genre == "reggae":
-                articles.append(html.A("L'histoire du reggae", href="https://fr.wikipedia.org/wiki/Reggae", target="_blank", style={'display': 'block', 'color': 'cyan'}))
-            elif genre == "blues":
-                articles.append(html.A("L'histoire du blues", href="https://fr.wikipedia.org/wiki/Blues", target="_blank", style={'display': 'block', 'color': 'cyan'}))
-            elif genre == "metal":
-                articles.append(html.A("L'histoire du metal", href="https://fr.wikipedia.org/wiki/Metal", target="_blank", style={'display': 'block', 'color': 'cyan'}))
-            elif genre == "folk":
-                articles.append(html.A("L'histoire de la folk", href="https://fr.wikipedia.org/wiki/Musique_folk", target="_blank", style={'display': 'block', 'color': 'cyan'}))
-            elif genre == "country":
-                articles.append(html.A("L'histoire de la country", href="https://fr.wikipedia.org/wiki/Musique_country", target="_blank", style={'display': 'block', 'color': 'cyan'}))
-            elif genre == "r&b":
-                articles.append(html.A("L'histoire du r&b", href="https://fr.wikipedia.org/wiki/Rhythm_and_blues", target="_blank", style={'display': 'block', 'color': 'cyan'}))
-            elif genre == "soul":
-                articles.append(html.A("L'histoire de la soul", href="https://fr.wikipedia.org/wiki/Musique_soul", target="_blank", style={'display': 'block', 'color': 'cyan'}))
-            
-        articles_section = html.Div(articles) if articles else "Sélectionnez un genre pour voir les articles."
+        # Dictionnaire des genres avec leur article approprié
+        genre_links = {
+            "rock": ("du", "https://fr.wikipedia.org/wiki/Histoire_du_rock"),
+            "pop": ("de la", "https://fr.wikipedia.org/wiki/Pop_(musique)"),
+            "latin": ("de la", "https://fr.wikipedia.org/wiki/Musique_latine"),
+            "jazz": ("du", "https://fr.wikipedia.org/wiki/Histoire_du_jazz"),
+            "classical": ("de la", "https://fr.wikipedia.org/wiki/Musique_classique"),
+            "electronic": ("de l'", "https://fr.wikipedia.org/wiki/Musique_%C3%A9lectronique"),
+            "indie": ("de l'", "https://fr.wikipedia.org/wiki/Indie_pop"),
+            "reggae": ("du", "https://fr.wikipedia.org/wiki/Reggae"),
+            "blues": ("du", "https://fr.wikipedia.org/wiki/Blues"),
+            "metal": ("du", "https://fr.wikipedia.org/wiki/Metal"),
+            "folk": ("de la", "https://fr.wikipedia.org/wiki/Musique_folk"),
+            "country": ("de la", "https://fr.wikipedia.org/wiki/Musique_country"),
+            "r&b": ("du", "https://fr.wikipedia.org/wiki/Rhythm_and_blues"),
+            "soul": ("de la", "https://fr.wikipedia.org/wiki/Musique_soul"),
+            "musique": ("de la", "https://fr.wikipedia.org/wiki/Histoire_de_la_musique")
+        }
 
+        articles = []
+        for genre, (article, link) in genre_links.items():
+            img_src = f"/static/images/{genre}.jpg" 
+            title = f"L'histoire {article} {genre.capitalize()}" 
+
+            articles.append(
+                html.Div(
+                    children=[
+                        html.Img(src=img_src, style={'width': '100%', 'border-radius': '5px'}),
+                        html.H3(title, style={'text-align': 'center', 'color': 'white'}),
+                        html.A("Lire plus", href=link, target="_blank", style={'display': 'block', 'text-align': 'center', 'color': 'cyan'})
+                    ],
+                    style={
+                        'border': '1px solid #444',
+                        'border-radius': '5px',
+                        'padding': '10px',
+                        'background-color': '#333',
+                        'width': '100%',
+                        'box-shadow': '2px 2px 5px rgba(0,0,0,0.5)'
+                    }
+                )
+            )
+
+        #  3 rangées de 5 colonnes
+        articles_grid = html.Div(
+            children=[
+                html.Div(articles[i:i+5], style={'display': 'flex', 'justify-content': 'space-around', 'gap': '10px', 'margin-top': '10px'})
+                for i in range(0, len(articles), 5)
+            ]
+        )
+
+        articles_section = articles_grid
         return fig, articles_section
