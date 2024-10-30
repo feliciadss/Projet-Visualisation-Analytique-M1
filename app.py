@@ -57,7 +57,26 @@ home_layout = html.Div(style={'backgroundColor': 'black', 'minHeight': '100vh', 
         html.Div(style={'flex': '1', 'padding': '10px', 'textAlign': 'left'}, children=[
             dcc.Graph(id="histogram-chart", style={'height': '600px', 'width': '100%'})
         ]),
-    ])
+    ]),
+    # Pied de page
+    html.Footer(
+        html.Small(
+            [
+                "Les données sont fournies par l' ",
+                html.A("API Spotify", href="https://developer.spotify.com/documentation/web-api", target="_blank", style={'color': 'white'}),
+            ]
+        ),
+        style={
+            "textAlign": "center",
+            "padding": "10px",
+            "backgroundColor": "black",
+            "width": "100%",
+            "fontSize": "12px",
+            "color": "#999",
+            "position": "fixed",
+            "bottom": "0",
+        },
+    ),
 ])
 
 app.layout = html.Div([

@@ -41,7 +41,27 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
             "le nombre de collaborations. Plus une branche est épaisse, plus les collaborations entre ces genres sont nombreuses.",
             style={'color': 'white', 'fontSize': '16px', 'maxWidth': '800px', 'margin': '0 auto', 'lineHeight': '1.5'}
         )
-    ])
+    ]),
+    
+    # Pied de page
+    html.Footer(
+        html.Small(
+            [
+                "Les données sont fournies par l' ",
+                html.A("API Spotify", href="https://developer.spotify.com/documentation/web-api", target="_blank", style={'color': 'white'}),
+            ]
+        ),
+        style={
+            "textAlign": "center",
+            "padding": "10px",
+            "backgroundColor": "black",
+            "width": "100%",
+            "fontSize": "12px",
+            "color": "#999",
+            "position": "fixed",
+            "bottom": "0",
+        },
+    ),
 ])
 
 def register_callback(app):
