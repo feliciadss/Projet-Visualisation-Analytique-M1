@@ -184,6 +184,29 @@ class DataManager:
 
         return df_genre_count
 
+    # Fonction pour lire les données des festivals
+    def get_festival_data(self):
+        try:
+            df_festivals = pd.read_csv("./static/festivals_europe.csv")
+
+            # Conversion du nombre de participants en entier
+            df_festivals['Participants (approx)'] = df_festivals['Participants (approx)'].replace(',', '', regex=True).astype(int)
+
+            # Conversion du prix moyen en euros en entier
+            df_festivals['Prix moyen (€)'] = df_festivals['Prix moyen (€)'].replace(',', '', regex=True).astype(int)
+
+            # Optionnel : nettoyage des colonnes de texte
+            df_festivals['Genres musicaux'] = df_festivals['Genres musicaux'].str.strip()
+            df_festivals['Pays'] = df_festivals['Pays'].str.strip()
+            df_festivals['Nom du festival'] = df_festivals['Nom du festival'].str.strip()
+
+            return df_festivals
+        except FileNotFoundError:
+            print("Le fichier CSV des festivals n'a pas été trouvé.")
+            return pd.DataFrame()
+        except Exception as e:
+            print(f"Erreur lors de la lecture du fichier CSV : {e}")
+            return pd.DataFrame()
 
     def close_connection(self):
         """Ferme la connexion à la base de données."""

@@ -164,4 +164,4 @@ def update_charts(click_data):
     return fig_pie, fig_histogram
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=True, port=8051)
