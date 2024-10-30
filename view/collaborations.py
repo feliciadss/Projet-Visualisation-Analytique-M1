@@ -1,8 +1,8 @@
-from dash import html, dcc, Output, Input
+from dash import html, dcc, Output, Input, ALL, callback_context
+from dash.dependencies import State
 import plotly.graph_objects as go
 from data.data_manager import DataManager
-from static.enumerations import genre_colors
-
+from static.enumerations import genre_colors, genres
 
 layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding': '20px'}, children=[
     html.H1('Collaboration entre genres', style={'textAlign': 'center', 'color': 'white'}),
@@ -12,27 +12,36 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
         style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal'}
     ),
     
-    # Conteneur général pour la sélection et le diagramme Sankey
     html.Div(style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center'}, children=[
         # Bouton pour revenir à l'accueil
         html.Div(style={'position': 'absolute','top': '30px','right': '30px','z-index': '1000','font-size': '40px'},children=[
             dcc.Link('🏠', href='/'),
         ]),
-        # Sélection multiple des genres à gauche
-        html.Div(style={'flex': '1', 'padding': '10px'}, children=[
-            html.P("Sélectionnez un ou plusieurs genres musicaux:", style={'fontWeight': 'bold', 'color': 'white'}),
-            dcc.Checklist(
-                id='sankey-genre-radio',
-                options=[{'label': genre.title(), 'value': genre} for genre in genre_colors.keys()],
-                value=[list(genre_colors.keys())[0]],  
-                style={'color': 'white', 'backgroundColor': 'black'}
-            ),
+        # Sélection multiple des genres sous forme de boutons colorés à gauche
+        html.Div(id='genre-colored-button', style={'flex': '1', 'padding': '10px', 'display': 'flex', 'flexWrap': 'wrap', 'gap': '10px'}, 
+                 children=[
+            html.Button(
+                genre.title(),
+                id={'type': 'genre-button', 'index': genre},
+                n_clicks=0,
+                style={
+                    'backgroundColor': genre_colors.get(genre, '#CCCCCC'),
+                    'color': 'white',
+                    'border': 'none',
+                    'padding': '10px 20px',
+                    'cursor': 'pointer',
+                    'borderRadius': '5px'
+                }
+            ) for genre in genre_colors.keys()
         ]),
         #centrer diagramme
         html.Div(style={'flex': '2', 'padding': '10px'}, children=[
             dcc.Graph(id='sankey-graph', style={'height': '500px'})
-                ])
+        ]),
+        # Stockage de l'état des genres sélectionnés
+        dcc.Store(id='selected-genres', data={genre: genre == 'indie' for genre in genres}),
     ]),
+
     html.Div(style={'width': '100%', 'textAlign': 'center', 'marginTop': '30px'}, children=[
         html.P(
             "Le diagramme de Sankey illustre les collaborations musicales entre les différents genres sélectionnés. "
@@ -67,12 +76,13 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
 def register_callback(app):
     @app.callback(
         Output('sankey-graph', 'figure'),
-        Input('sankey-genre-radio', 'value')
+        Input('selected-genres', 'data')
     )
     def display_sankey(selected_genres):
+        active_genres = [genre for genre, selected in selected_genres.items() if selected]
         datamanager = DataManager()
         
-        genre_matrix = datamanager.create_genre_collaboration_matrix(selected_genres)
+        genre_matrix = datamanager.create_genre_collaboration_matrix(active_genres)
         
         if genre_matrix.empty:
             return go.Figure()
@@ -115,3 +125,39 @@ def register_callback(app):
         )
 
         return fig
+    
+    @app.callback(
+        Output('selected-genres', 'data'),
+        Output({'type': 'genre-button', 'index': ALL}, 'style'),
+        Input({'type': 'genre-button', 'index': ALL}, 'n_clicks'),
+        State('selected-genres', 'data')
+    )
+    def toggle_genre_selection(n_clicks_list, selected_genres):
+        triggered = callback_context.triggered
+        if not triggered:
+            return selected_genres, [{'backgroundColor': genre_colors.get(genre, '#CCCCCC'),
+                                      'color': 'white',
+                                      'border': 'none',
+                                      'padding': '10px 20px',
+                                      'cursor': 'pointer',
+                                      'borderRadius': '5px'} for genre in genres]
+
+        # Extraire l'ID du bouton qui a été cliqué
+        triggered_id = triggered[0]['prop_id'].split('.')[0]
+        genre = eval(triggered_id)['index']
+        selected_genres[genre] = not selected_genres[genre]
+
+        # MAJ des styles de boutons
+        button_styles = []
+        for genre in genres:
+            style = {
+                'backgroundColor': '#555555' if selected_genres[genre] else genre_colors.get(genre, '#CCCCCC'),
+                'color': 'white',
+                'border': 'none',
+                'padding': '10px 20px',
+                'cursor': 'pointer',
+                'borderRadius': '5px'
+            }
+            button_styles.append(style)
+
+        return selected_genres, button_styles
