@@ -11,8 +11,7 @@ def initialize_db():
     db = connect_to_db()
 
     european_countries = [
-        "RS", "SK", "SI", 
-        "ES", "SE", "CH", "UA", "GB", "NO"
+        "SI", "ES", "SE", "CH", "UA", "GB", "NO"
     ]#attention je retire des pays a chaque relance, pour eviter les requetes doublons 
 
     try:
