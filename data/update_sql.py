@@ -26,13 +26,19 @@ class UpdateSQLManager:
         """Crée les tables dans la base SQLite si elles n'existent pas déjà."""
         cursor = self.conn.cursor()
         cursor.execute('''CREATE TABLE IF NOT EXISTS artists
-                          (id TEXT PRIMARY KEY, name TEXT, popularity INTEGER, followers INTEGER, genres TEXT, market TEXT)''')
+                                (id TEXT PRIMARY KEY, name TEXT, popularity INTEGER, followers INTEGER, genres TEXT, market TEXT)''')
         cursor.execute('''CREATE TABLE IF NOT EXISTS tracks
-                          (id TEXT PRIMARY KEY, name TEXT, album_id TEXT, tempo REAL, energy REAL, danceability REAL, 
-                           acousticness REAL, valence REAL, duration_ms INTEGER)''')
+                                (id TEXT PRIMARY KEY, name TEXT, album_id TEXT, tempo REAL, energy REAL, danceability REAL, 
+                                acousticness REAL, valence REAL, duration_ms INTEGER)''')
         cursor.execute('''CREATE TABLE IF NOT EXISTS albums
-                          (id TEXT PRIMARY KEY, name TEXT, release_date TEXT, available_markets TEXT, total_tracks INTEGER, artist_id TEXT)''')  # Ajout de 'artist_id'
+                                (id TEXT PRIMARY KEY, name TEXT, release_date TEXT, available_markets TEXT, total_tracks INTEGER, artist_id TEXT)''')
+        cursor.execute('''CREATE TABLE IF NOT EXISTS track_artists
+                                (track_id TEXT, artist_id TEXT, 
+                                FOREIGN KEY (track_id) REFERENCES tracks(id), 
+                                FOREIGN KEY (artist_id) REFERENCES artists(id),
+                                PRIMARY KEY (track_id, artist_id))''')
         self.conn.commit()
+
 
     def update_artists(self):
         """Met à jour la table des artistes dans SQLite avec les données de MongoDB."""
@@ -62,6 +68,11 @@ class UpdateSQLManager:
                             audio_features.get('tempo'), audio_features.get('energy'),
                             audio_features.get('danceability'), audio_features.get('acousticness'),
                             audio_features.get('valence'), audio_features.get('duration_ms')))
+            # Insérer les associations artiste-morceau dans la table track_artists
+            artists = track.get('artists', [])
+            for artist in artists:
+                cursor.execute('''INSERT OR REPLACE INTO track_artists (track_id, artist_id) 
+                                VALUES (?, ?)''', (track['id'], artist['id']))
         self.conn.commit()
 
     def update_albums(self):

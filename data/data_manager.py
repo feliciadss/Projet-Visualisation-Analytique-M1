@@ -207,7 +207,52 @@ class DataManager:
         except Exception as e:
             print(f"Erreur lors de la lecture du fichier CSV : {e}")
             return pd.DataFrame()
+        
+        
+    # Fonction pour obtenir le classement des collaborations les plus populaires entre deux genres
+    def get_top_collabs_between_genres(self, genre1, genre2, top_n=10):
+        collabs = []
+
+        # Requête SQL pour trouver les collaborations entre artistes de deux genres différents sur le même morceau
+        query = f"""
+            SELECT t.id AS track_id, t.name AS track_name, a1.name AS artist1, a2.name AS artist2, 
+                (a1.popularity + a2.popularity) / 2 AS collab_popularity
+            FROM tracks AS t
+            JOIN track_artists AS ta1 ON t.id = ta1.track_id
+            JOIN artists AS a1 ON ta1.artist_id = a1.id
+            JOIN track_artists AS ta2 ON t.id = ta2.track_id
+            JOIN artists AS a2 ON ta2.artist_id = a2.id
+            WHERE a1.genres LIKE ? AND a2.genres LIKE ?
+            AND a1.id != a2.id
+            ORDER BY collab_popularity DESC
+            LIMIT {top_n}
+        """
+        self.cursor.execute(query, (f'%{genre1}%', f'%{genre2}%'))
+        collabs_data = self.cursor.fetchall()
+
+        if not collabs_data:
+            print(f"Aucune collaboration trouvée entre les genres {genre1} et {genre2}.")
+            return pd.DataFrame()
+
+        for track_id, track_name, artist1, artist2, collab_popularity in collabs_data:
+            collab_info = {
+                'track_id': track_id,
+                'track_name': track_name,
+                'artist1': artist1,
+                'artist2': artist2,
+                'collab_popularity': collab_popularity
+            }
+            collabs.append(collab_info)
+
+        df_collabs = pd.DataFrame(collabs)
+        print(df_collabs.columns.tolist())
+        df_collabs = df_collabs.drop(columns=['collab_popularity', 'track_id'], errors='ignore')
+        print(df_collabs.columns.tolist())
+        return df_collabs
+
 
     def close_connection(self):
         """Ferme la connexion à la base de données."""
         self.conn.close()
+        
+        

@@ -1,4 +1,4 @@
-from dash import html, dcc, Output, Input, ALL, callback_context
+from dash import html, dcc, Output, Input, ALL, callback_context, dash_table
 from dash.dependencies import State
 import plotly.graph_objects as go
 from data.data_manager import DataManager
@@ -39,7 +39,7 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
             dcc.Graph(id='sankey-graph', style={'height': '500px'})
         ]),
         # Stockage de l'état des genres sélectionnés
-        dcc.Store(id='selected-genres', data={genre: genre == 'indie' for genre in genres}),
+        dcc.Store(id='selected-genres', data={genre: genre == 'electronic' for genre in genres}),
     ]),
 
     html.Div(style={'width': '100%', 'textAlign': 'center', 'marginTop': '30px'}, children=[
@@ -49,6 +49,22 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
             "Les branches qui relient les cercles représentent les collaborations entre les genres, avec leur épaisseur reflétant "
             "le nombre de collaborations. Plus une branche est épaisse, plus les collaborations entre ces genres sont nombreuses.",
             style={'color': 'white', 'fontSize': '16px', 'maxWidth': '800px', 'margin': '0 auto', 'lineHeight': '1.5'}
+        )
+    ]),
+    
+    html.Div(id='collaboration-table-container', style={'marginTop': '30px'}, children=[
+        html.H4("Top 10 Collaborations entre genres", style={'color': 'white', 'textAlign': 'center'}),
+        dash_table.DataTable(
+            id='collaboration-table',
+            columns=[
+                {"name": "Artiste 1", "id": "artist1"},
+                {"name": "Artiste 2", "id": "artist2"},
+                {"name": "Popularité", "id": "track_popularity"},
+                {"name": "Track ID", "id": "track_id"}
+            ],
+            style_table={'width': '80%', 'margin': '0 auto'},
+            style_cell={'backgroundColor': 'black', 'color': 'white', 'textAlign': 'center'},
+            style_header={'backgroundColor': 'grey', 'fontWeight': 'bold'}
         )
     ]),
     
@@ -87,10 +103,11 @@ def register_callback(app):
         if genre_matrix.empty:
             return go.Figure()
 
+        # Liste de tous les genres uniques dans la matrice de collaboration
         all_genres = list(genre_matrix.columns.union(genre_matrix.index))
         genre_indices = {genre: i for i, genre in enumerate(all_genres)}
 
-        source, target, value, link_colors = [], [], [], []
+        source, target, value, link_colors, link_customdata = [], [], [], [], []
         for genre1 in genre_matrix.index:
             for genre2 in genre_matrix.columns:
                 collaborations = genre_matrix.loc[genre1, genre2]
@@ -99,22 +116,31 @@ def register_callback(app):
                     target.append(genre_indices[genre2])
                     value.append(collaborations)
                     link_colors.append(genre_colors.get(genre1.lower(), '#CCCCCC'))
+                    # Ajouter des données custom pour chaque lien indiquant les genres source et cible
+                    link_customdata.append(f"Collaboration entre {genre1} et {genre2}")
 
+        # Couleurs des nœuds
         node_colors = [genre_colors.get(genre.lower(), '#CCCCCC') for genre in all_genres]
+        node_customdata = [f"Genre: {genre}" for genre in all_genres]  # Données custom pour chaque nœud
 
+        # Créer la figure de Sankey avec customdata pour nœuds et liens
         fig = go.Figure(data=[go.Sankey(
             node=dict(
                 pad=15,
                 thickness=20,
                 line=dict(color="black", width=0.5),
-                label=all_genres, 
-                color=node_colors
+                label=all_genres,
+                color=node_colors,
+                customdata=node_customdata,  # Ajouter customdata aux nœuds
+                hovertemplate='%{label}<extra>%{customdata}</extra>'  # Afficher customdata au survol des nœuds
             ),
             link=dict(
                 source=source,
                 target=target,
                 value=value,
-                color=link_colors  
+                color=link_colors,
+                customdata=link_customdata,  # Ajouter customdata aux liens
+                hovertemplate='%{customdata}<extra></extra>'  # Afficher customdata au survol des liens
             )
         )])
 
@@ -125,6 +151,7 @@ def register_callback(app):
         )
 
         return fig
+
     
     @app.callback(
         Output('selected-genres', 'data'),
@@ -163,3 +190,26 @@ def register_callback(app):
             button_styles.append(style)
 
         return selected_genres, button_styles
+    
+    @app.callback(
+    Output('collaboration-table', 'data'),
+    Input('sankey-graph', 'clickData')
+    )
+    def update_collaboration_table(clickData):
+        if clickData is None:
+            return []
+
+        try:
+            customdata = clickData['points'][0]['customdata']
+            genres = customdata.replace("Collaboration entre ", "").split(" et ")
+            source_genre = genres[0]
+            target_genre = genres[1]
+        except KeyError:
+            return []
+
+        datamanager = DataManager()
+        top_collabs_df = datamanager.get_top_collabs_between_genres(source_genre, target_genre)
+
+        records = top_collabs_df.to_dict('records')
+
+        return records
