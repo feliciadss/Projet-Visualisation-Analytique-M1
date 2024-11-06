@@ -81,9 +81,14 @@ def register_callback(app):
         albums_per_year = df.groupby(['year', 'genre']).size().reset_index(name='album_count')
         
         fig = px.line(albums_per_year, x="year", y="album_count", color='genre')
-        fig.update_layout(plot_bgcolor='black', paper_bgcolor='black', font_color='white')
-
-        # Dictionnaire des genres avec leur article approprié
+        fig.update_layout(
+            plot_bgcolor='black', 
+            paper_bgcolor='black', 
+            font_color='white',
+            xaxis_title="Année",          
+            yaxis_title="Nombre d'albums"  
+        )
+        # Dictionnaire des genres avec article
         genre_links = {
             "rock": ("du", "https://fr.wikipedia.org/wiki/Histoire_du_rock"),
             "pop": ("de la", "https://fr.wikipedia.org/wiki/Pop_(musique)"),

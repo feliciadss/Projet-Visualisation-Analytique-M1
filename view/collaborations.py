@@ -51,9 +51,7 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
         dcc.Store(id='selected-genres', data={genre: genre == 'electronic' for genre in genres}),
     ]),
 
-
-    
-    html.Div(id='collaboration-table-container', style={'marginTop': '30px'}, children=[
+    html.Div(id='collaboration-table-container', style={'marginTop': '10px'}, children=[
         html.H4("Top 10 Collaborations", style={'color': 'white', 'textAlign': 'center'}),
         dash_table.DataTable(
             id='collaboration-table',
@@ -197,31 +195,31 @@ def register_callback(app):
     Output('collaboration-table', 'columns'),
     Input('sankey-graph', 'clickData')
 )
-    def update_collaboration_table(clickData):
-        source_genre = "pop"
-        target_genre = "indie" #par défaut
-        
-        if clickData is None:
-            return [], []
 
-        try:
-            customdata = clickData['points'][0]['customdata']
-            genres = customdata.replace("Collaboration entre ", "").split(" et ")
-            source_genre = genres[0]
-            target_genre = genres[1]
-        except KeyError:
-            return [], []
+
+    def update_collaboration_table(clickData):
+        if clickData is None or not callback_context.triggered:
+            source_genre = "electronic"
+            target_genre = "indie" #par defaut
+        else:
+            try:
+                customdata = clickData['points'][0]['customdata']
+                genres = customdata.replace("Collaboration entre ", "").split(" et ")
+                source_genre = genres[0]
+                target_genre = genres[1]
+            except KeyError:
+                source_genre = "pop"
+                target_genre = "electronic"
 
         datamanager = DataManager()
         top_collabs_df = datamanager.get_top_collabs_between_genres(source_genre, target_genre)
 
-        # Renommer colonnes
         top_collabs_df = top_collabs_df.rename(columns={
-            'artist1': source_genre,  # 'artist1' par le genre source
-            'artist2': target_genre,  # 'artist2' par le genre cible
-            'track_name': 'titre'  
+            'artist1': source_genre,  # Renomme 'artist1' par le genre source
+            'artist2': target_genre,  # Renomme 'artist2' par le genre cible
+            'track_name': 'titre'    
         })
-
+        
         columns = [{"name": col, "id": col} for col in top_collabs_df.columns]
         records = top_collabs_df.to_dict('records')
 

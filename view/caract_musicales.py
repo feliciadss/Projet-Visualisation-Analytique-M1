@@ -41,7 +41,8 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
         ]),
     ]),
     
-    html.Div(style={'width': '100%', 'textAlign': 'left', 'marginTop': '30px'}, children=[
+    html.Div(style={'width': '100%', 'textAlign': 'left', 'marginTop': '10px'}, children=[
+        
     html.P([
         html.U("Danceability"), ": mesure l'aptitude d'une chanson à la danse selon le tempo, le rythme, et d'autres éléments"
     ], style={'color': 'white', 'fontSize': '16px', 'maxWidth': '800px', 'margin': '0 auto', 'lineHeight': '1.5'}),
