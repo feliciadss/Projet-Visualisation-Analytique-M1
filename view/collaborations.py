@@ -11,6 +11,13 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
         "Analyser la diversité des genres au sein des featurings entre artistes de différents genres. Cette page montre comment les genres se mélangent et s’influencent mutuellement. Cliquez sur le lien entre deux genre pour afficher le top 10 des titres en collaboration associés à ces deux genres",
         style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal'}
     ),
+    html.P(
+        "Le diagramme de Sankey illustre les collaborations musicales entre les différents genres sélectionnés. "
+        "Chaque cercle représente un genre musical, et les tailles des cercles indiquent leur importance dans les collaborations. "
+        "Les branches qui relient les cercles représentent les collaborations entre les genres, avec leur épaisseur reflétant "
+        "le nombre de collaborations. Plus une branche est épaisse, plus les collaborations entre ces genres sont nombreuses.",
+        style={'color': 'white', 'fontSize': '14px', 'textAlign': 'center', 'marginTop': '10px'}
+    ),
     
     html.Div(style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center'}, children=[
         # Bouton pour revenir à l'accueil
@@ -18,15 +25,7 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
             dcc.Link('🏠', href='/'),
         ]),
         
-        html.Div(style={'width': '%', 'textAlign': 'center', 'marginTop': '30px'}, children=[
-        html.P(
-            "Le diagramme de Sankey illustre les collaborations musicales entre les différents genres sélectionnés. "
-            "Chaque cercle représente un genre musical, et les tailles des cercles indiquent leur importance dans les collaborations. "
-            "Les branches qui relient les cercles représentent les collaborations entre les genres, avec leur épaisseur reflétant "
-            "le nombre de collaborations. Plus une branche est épaisse, plus les collaborations entre ces genres sont nombreuses.",
-            style={'color': 'white', 'fontSize': '16px', 'maxWidth': '800px', 'margin': '0 auto', 'lineHeight': '1.5'}
-        )
-    ]),
+        
         # Sélection multiple des genres sous forme de boutons colorés à gauche
         html.Div(id='genre-colored-button', style={'flex': '1', 'padding': '10px', 'display': 'flex', 'flexWrap': 'wrap', 'gap': '10px'}, 
                  children=[
@@ -199,6 +198,9 @@ def register_callback(app):
     Input('sankey-graph', 'clickData')
 )
     def update_collaboration_table(clickData):
+        source_genre = "pop"
+        target_genre = "indie" #par défaut
+        
         if clickData is None:
             return [], []
 
@@ -213,14 +215,13 @@ def register_callback(app):
         datamanager = DataManager()
         top_collabs_df = datamanager.get_top_collabs_between_genres(source_genre, target_genre)
 
-        # Renommer dynamiquement les colonnes dans le DataFrame
+        # Renommer colonnes
         top_collabs_df = top_collabs_df.rename(columns={
-            'artist1': source_genre,  # Renomme la colonne 'artist1' par le genre source
-            'artist2': target_genre,  # Renomme la colonne 'artist2' par le genre cible
-            'track_name': 'titre'     # Remplace 'track_name' par 'titre'
+            'artist1': source_genre,  # 'artist1' par le genre source
+            'artist2': target_genre,  # 'artist2' par le genre cible
+            'track_name': 'titre'  
         })
 
-        # Création dynamique des colonnes pour le DataTable
         columns = [{"name": col, "id": col} for col in top_collabs_df.columns]
         records = top_collabs_df.to_dict('records')
 
