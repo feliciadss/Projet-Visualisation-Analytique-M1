@@ -10,7 +10,7 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
     
     html.H3(
         "Voyez comment les caractéristiques audio varient d'un genre musical à l'autre. Pour plus de détails quantitatifs, cliquez sur la caractéristique musicale de votre choix au sein du radar chart.",
-        style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal'}
+        style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal', 'paddingLeft': '50px', 'paddingRight': '50px'}
     ),
     
     # Conteneur général ici
@@ -42,7 +42,7 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
     ]),
     
     html.Div(style={'width': '100%', 'textAlign': 'left', 'marginTop': '10px'}, children=[
-        
+
     html.P([
         html.U("Danceability"), ": mesure l'aptitude d'une chanson à la danse selon le tempo, le rythme, et d'autres éléments"
     ], style={'color': 'white', 'fontSize': '16px', 'maxWidth': '800px', 'margin': '0 auto', 'lineHeight': '1.5'}),
@@ -82,9 +82,7 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
             "backgroundColor": "black",
             "width": "100%",
             "fontSize": "12px",
-            "color": "#999",
-            "position": "fixed",
-            "bottom": "0",
+            "color": "#999"
         },
     ),
 ])

@@ -19,7 +19,7 @@ def convert_iso2_to_iso3(iso2_code):
 # Layout pour la page de popularité des genres musicaux
 layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding': '20px'}, children=[
     html.H1('Popularité des genres musicaux en Europe', style={'textAlign': 'center', 'color': 'white'}),
-    html.H3("Découvrez la popularité de chaque genre à travers les pays européens", style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal'}),
+    html.H3("Découvrez la popularité de chaque genre à travers les pays européens", style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal','paddingLeft': '50px', 'paddingRight': '50px'}),
 
     # Conteneur général
     html.Div(style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center'}, children=[
@@ -47,9 +47,7 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
             "backgroundColor": "black",
             "width": "100%",
             "fontSize": "12px",
-            "color": "#999",
-            "position": "fixed",
-            "bottom": "0",
+            "color": "#999"
         },
     ),
 ])

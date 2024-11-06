@@ -9,14 +9,14 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
     
     html.H3(
         "Analyser la diversité des genres au sein des featurings entre artistes de différents genres. Cette page montre comment les genres se mélangent et s’influencent mutuellement. Cliquez sur le lien entre deux genre pour afficher le top 10 des titres en collaboration associés à ces deux genres",
-        style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal'}
+        style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal', 'paddingLeft': '50px', 'paddingRight': '50px'}
     ),
     html.P(
         "Le diagramme de Sankey illustre les collaborations musicales entre les différents genres sélectionnés. "
         "Chaque cercle représente un genre musical, et les tailles des cercles indiquent leur importance dans les collaborations. "
         "Les branches qui relient les cercles représentent les collaborations entre les genres, avec leur épaisseur reflétant "
         "le nombre de collaborations. Plus une branche est épaisse, plus les collaborations entre ces genres sont nombreuses.",
-        style={'color': 'white', 'fontSize': '14px', 'textAlign': 'center', 'marginTop': '10px'}
+        style={'color': 'white', 'fontSize': '12px', 'textAlign': 'center', 'marginTop': '10px','paddingLeft': '60px', 'paddingRight': '60px'}
     ),
     
     html.Div(style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center'}, children=[
@@ -45,7 +45,7 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
         ]),
         #centrer diagramme
         html.Div(style={'flex': '2', 'padding': '10px'}, children=[
-            dcc.Graph(id='sankey-graph', style={'height': '500px'})
+            dcc.Graph(id='sankey-graph', style={'height': '375px'})
         ]),
         # Stockage de l'état des genres sélectionnés
         dcc.Store(id='selected-genres', data={genre: genre == 'electronic' for genre in genres}),
@@ -81,9 +81,7 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
             "backgroundColor": "black",
             "width": "100%",
             "fontSize": "12px",
-            "color": "#999",
-            "position": "fixed",
-            "bottom": "0",
+            "color": "#999"
         },
     ),
 ])

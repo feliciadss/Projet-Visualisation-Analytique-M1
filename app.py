@@ -16,37 +16,33 @@ app = Dash(__name__, suppress_callback_exceptions=True)
 home_layout = html.Div(style={'backgroundColor': 'black', 'minHeight': '100vh', 'display': 'flex', 'flexDirection': 'column', 'alignItems': 'center', 'justifyContent': 'center', 'color': 'white'}, children=[
     html.H1("Analyse des Genres Musicaux en Europe"),
     html.H2(
-        "Ce site web vous fournit des informations clés sur la popularité des genres musicaux en Europe, "
-        "l'évolution des tendances par pays, ainsi que les collaborations entre artistes de différents genres. "
-        "En analysant les données des dernières années, vous pourrez suivre la croissance ou le déclin des genres, "
-        "évaluer la diversité et l'influence des genres à travers les featurings, et ainsi identifier les meilleures "
-        "opportunités d'investissement dans de nouveaux artistes et collaborations.",
-        style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal'}
+        "Ce site web vous offre des informations essentielles sur la popularité des genres musicaux en Europe, l’évolution des tendances par pays et les collaborations entre artistes. Grâce à l’analyse des données récentes, vous pourrez suivre l’essor ou le déclin des genres, évaluer leur diversité et leur influence via les featurings, et identifier les meilleures opportunités d’investissement dans de nouveaux artistes et collaborations.",
+        style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal','paddingLeft': '50px', 'paddingRight': '50px'}
     ),
     
     html.Div([
         dcc.Link(
-            html.Button('Popularité des genres', style={'margin': '10px', 'color': 'black', 'backgroundColor': 'white', 'fontSize': '20px', 'padding': '15px 30px'}),
+            html.Button('Popularité des genres', style={'margin': '10px', 'color': 'black', 'backgroundColor': '#fefee2', 'fontSize': '20px', 'padding': '15px 30px','borderRadius': '10px'}),
             href='/popularite'
         ),
         dcc.Link(
-            html.Button('Évolution des genres', style={'margin': '10px', 'color': 'black', 'backgroundColor': 'white', 'fontSize': '20px', 'padding': '15px 30px'}),
+            html.Button('Évolution des genres', style={'margin': '10px', 'color': 'black', 'backgroundColor': '#fefee2', 'fontSize': '20px', 'padding': '15px 30px','borderRadius': '10px'}),
             href='/evolution_genres'
         ),
         dcc.Link(
-            html.Button('Collaborations entre genres', style={'margin': '10px', 'color': 'black', 'backgroundColor': 'white', 'fontSize': '20px', 'padding': '15px 30px'}),
+            html.Button('Collaborations entre genres', style={'margin': '10px', 'color': 'black', 'backgroundColor': '#fefee2', 'fontSize': '20px', 'padding': '15px 30px', 'borderRadius': '10px'}),
             href='/collaborations'
         ),
         dcc.Link(
-            html.Button('Caractéristiques musicales', style={'margin': '10px', 'color': 'black', 'backgroundColor': 'white', 'fontSize': '20px', 'padding': '15px 30px'}),
+            html.Button('Caractéristiques musicales', style={'margin': '10px', 'color': 'black', 'backgroundColor': '#fefee2', 'fontSize': '20px', 'padding': '15px 30px', 'borderRadius': '10px'}),
             href='/caract_musicales'
         ),
-    ], style={'display': 'flex', 'justifyContent': 'center', 'flexDirection': 'row', 'gap': '20px'}),
+    ], style={'display': 'flex', 'justifyContent': 'center', 'flexDirection': 'row', 'gap': '10px'}),
     
-    html.H3("Pour rendre l'expérience plus agréable, nous avons classé les genres en 13 grandes catégories. Chaque catégorie regroupe des sous-genres que vous pouvez explorer en cliquant sur le diagramme circulaire.", style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal'}),
+    html.H3("Pour rendre l'expérience plus agréable, nous avons classé les genres en 13 grandes catégories, chacune regroupant des sous-genres que vous pouvez explorer en cliquant sur le diagramme circulaire ci-dessous:", style={'textAlign': 'left', 'color': 'white', 'fontWeight': 'normal', 'paddingLeft': '50px', 'paddingRight': '50px'}),
 
     # Conteneur pour le pie chart et l'histogramme
-    html.Div(style={'display': 'flex', 'justifyContent': 'flex-start', 'alignItems': 'center', 'width': '100%', 'padding': '20px'}, children=[
+    html.Div(style={'display': 'flex', 'justifyContent': 'flex-start', 'alignItems': 'center', 'width': '100%', 'padding': '10px'}, children=[
         
         # Pie chart à gauche
         html.Div(style={'flex': '0 0 40%', 'padding': '10px'}, children=[
@@ -73,8 +69,6 @@ home_layout = html.Div(style={'backgroundColor': 'black', 'minHeight': '100vh', 
             "width": "100%",
             "fontSize": "12px",
             "color": "#999",
-            "position": "fixed",
-            "bottom": "0",
         },
     ),
 ])

@@ -8,7 +8,7 @@ from data.data_manager import DataManager
 layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding': '20px', 'textAlign': 'center'}, children=[
     html.H1('Évolution de la popularité des genres', style={'color': 'white'}),
     html.H3("Découvrez l'évolution de leur popularité depuis 50 ans en sélectionnant un ou plusieurs genres.", 
-            style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal'}),
+            style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal','paddingLeft': '50px', 'paddingRight': '50px'}),
 
     # Conteneur pour centrer la checklist et le graphique
     html.Div(style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'flex-start'}, children=[
@@ -32,6 +32,8 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
             dcc.Graph(id="linear-graph", style={'backgroundColor': 'black'})
         ]),
     ]),
+    
+    html.H3("Quelques articles concernant l'histoire des genres :", style={'textAlign': 'left', 'color': 'white', 'fontWeight': 'normal', 'paddingLeft': '70px', 'paddingRight': '50px'}),
 
     # Encadré des liens des articles avec disposition en 3 lignes de 5 colonnes
     html.Div(id="articles-section", style={
@@ -44,6 +46,8 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
         'textAlign': 'left',
         'color': 'white'
     }),
+    
+    
 
     # Pied de page
     html.Footer(
@@ -59,9 +63,7 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
             "backgroundColor": "black",
             "width": "100%",
             "fontSize": "12px",
-            "color": "#999",
-            "position": "fixed",
-            "bottom": "0",
+            "color": "#999"
         },
     ),
 ])
