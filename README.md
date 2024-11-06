@@ -64,6 +64,7 @@ Si vous souhaitez créer ou mettre à jour la base de données MongoDB, vous pou
 python initialise_db.py
 ```
 Ce script récupérera les données via l'API Spotify et mettra à jour les collections MongoDB (artistes, albums, tracks). Cependant, cette étape a déjà été effectuée lors de la configuration initiale du projet, donc il n'est généralement pas nécessaire de la relancer, sauf si vous souhaitez actualiser les données.
+/!\ Ne pas oublier de remplir config.ini avec les identifiants Spotify et MongoDB !!!!
 
 Étant limités par l'API Spotify à un certain nombre de requêtes quotidiennes, de septembre à novembre 2023, nous avons récupéré les playlists populaires dans différents pays européens via l'API Spotify, puis extrait et stocké les informations sur les albums, les morceaux et les artistes associés, reconstituant ainsi un ensemble assez homogène des tendances musicales en Europe.
 
