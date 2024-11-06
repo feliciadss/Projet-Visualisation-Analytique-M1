@@ -245,9 +245,8 @@ class DataManager:
             collabs.append(collab_info)
 
         df_collabs = pd.DataFrame(collabs)
-        print(df_collabs.columns.tolist())
         df_collabs = df_collabs.drop(columns=['collab_popularity', 'track_id'], errors='ignore')
-        print(df_collabs.columns.tolist())
+
         return df_collabs
 
 
