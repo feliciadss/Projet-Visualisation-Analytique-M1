@@ -2,7 +2,7 @@ from dash import html, dcc, Output, Input, ALL, callback_context
 from dash.dependencies import State
 import pandas as pd
 import plotly.express as px
-from static.enumerations import genre_colors, genres
+from static.enumerations import genre_colors, genres, genre_links
 from data.data_manager import DataManager
 
 # Création des articles sous forme de Div statiques
