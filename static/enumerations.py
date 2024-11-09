@@ -28,4 +28,21 @@ genre_colors = {
     'soul': '#800000'      # Rouge foncé
 }
 
+genre_links = {
+            "rock": ("du", "https://fr.wikipedia.org/wiki/Histoire_du_rock"),
+            "pop": ("de la", "https://fr.wikipedia.org/wiki/Pop_(musique)"),
+            "latin": ("de la", "https://fr.wikipedia.org/wiki/Musique_latine"),
+            "jazz": ("du", "https://fr.wikipedia.org/wiki/Histoire_du_jazz"),
+            "classical": ("de la", "https://fr.wikipedia.org/wiki/Musique_classique"),
+            "electronic": ("de l'", "https://fr.wikipedia.org/wiki/Musique_%C3%A9lectronique"),
+            "indie": ("de l'", "https://fr.wikipedia.org/wiki/Indie_pop"),
+            "reggae": ("du", "https://fr.wikipedia.org/wiki/Reggae"),
+            "blues": ("du", "https://fr.wikipedia.org/wiki/Blues"),
+            "metal": ("du", "https://fr.wikipedia.org/wiki/Metal"),
+            "folk": ("de la", "https://fr.wikipedia.org/wiki/Musique_folk"),
+            "country": ("de la", "https://fr.wikipedia.org/wiki/Musique_country"),
+            "r&b": ("du", "https://fr.wikipedia.org/wiki/Rhythm_and_blues"),
+            "soul": ("de la", "https://fr.wikipedia.org/wiki/Musique_soul"),
+            "musique": ("de la", "https://fr.wikipedia.org/wiki/Histoire_de_la_musique")
+        }
 
