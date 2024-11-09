@@ -1,7 +1,7 @@
 from dash import html, dcc, callback, Input, Output
 import pandas as pd
 import plotly.express as px
-from static.enumerations import genres
+from static.enumerations import genres, genre_colors
 from data.data_manager import DataManager
 
 # Layout de la page
@@ -15,6 +15,24 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
         # Bouton pour revenir à l'accueil
         html.Div(style={'position': 'absolute', 'top': '30px', 'right': '30px', 'z-index': '1000', 'font-size': '40px'}, children=[
             dcc.Link('🏠', href='/'),
+        ]),
+        
+                # Genre selection buttons
+        html.Div(id='collab-genre-colored-button', style={'flex': '1', 'padding': '10px', 'display': 'flex', 'flexWrap': 'wrap', 'gap': '10px'}, 
+                 children=[
+            html.Button(
+                genre.title(),
+                id=f'collab-genre-button-{genre}',  # Unique ID for each genre button
+                n_clicks=0,
+                style={
+                    'backgroundColor': genre_colors.get(genre, '#CCCCCC'),
+                    'color': 'white',
+                    'border': 'none',
+                    'padding': '10px 20px',
+                    'cursor': 'pointer',
+                    'borderRadius': '5px'
+                }
+            ) for genre in genre_colors.keys()
         ]),
         
         # Liste des genres
@@ -142,3 +160,36 @@ def register_callback(app):
 
         articles_section = articles_grid
         return fig, articles_section
+    
+    # Callback to toggle selected genres and update button styles
+    @app.callback(
+        Output('selected-genres-collab', 'data'),
+        [Output(f'collab-genre-button-{genre}', 'style') for genre in genres],
+        [Input(f'collab-genre-button-{genre}', 'n_clicks') for genre in genres],
+        State('selected-genres-collab', 'data')
+    )
+    def toggle_genre_selection(*args):
+        n_clicks_list = args[:-1]
+        selected_genres = args[-1]
+        triggered = callback_context.triggered
+
+        if triggered:
+            triggered_id = triggered[0]['prop_id'].split('.')[0]
+            genre = triggered_id.split('-')[-1]
+            selected_genres[genre] = not selected_genres[genre]
+
+        # Update button styles
+        button_styles = [
+            {
+                'backgroundColor': genre_colors.get(genre, '#CCCCCC') if selected_genres[genre] else '#555555',
+                'color': 'white',
+                'border': 'none',
+                'padding': '15px 25px',
+                'cursor': 'pointer',
+                'fontSize': '16px',
+                'borderRadius': '5px'
+            }
+            for genre in genres
+        ]
+
+        return (selected_genres, *button_styles)
