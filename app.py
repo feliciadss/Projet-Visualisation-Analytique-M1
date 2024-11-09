@@ -113,6 +113,7 @@ def update_charts(click_data):
 
     # Création du pie chart
     genre_counts_df['transformed_count'] = np.sqrt(genre_counts_df['total_count'])  # Transformation racine carrée
+    customdata = np.array(genre_counts_df[['total_count']])
 
     fig_pie = px.pie(
         genre_counts_df,
@@ -121,7 +122,12 @@ def update_charts(click_data):
         color='genre',
         color_discrete_map=genre_colors,
     )
-    fig_pie.update_traces(textinfo='percent+label', textposition='inside')
+    fig_pie.update_traces(
+        textinfo='label',
+        textposition='inside',
+        customdata=customdata,  # Ajoute customdata pour afficher le nombre total
+        hovertemplate='Nombre de musiques: %{customdata[0]} <br>Proportion: %{percent}'
+    )
     fig_pie.update_layout(
         plot_bgcolor='black',
         paper_bgcolor='black',
