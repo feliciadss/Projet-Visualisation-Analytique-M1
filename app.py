@@ -146,8 +146,8 @@ def update_charts(click_data):
     fig_histogram = go.Figure()
     fig_histogram.add_trace(
         go.Bar(
-            x=df_subgenres['count'],
-            y=df_subgenres['subgenre'],
+            x=df_subgenres['count'][::-1],
+            y=df_subgenres['subgenre'][::-1],
             orientation='h',
             marker=dict(color=genre_colors.get(selected_genre.lower(), 'white'))  
         )
