@@ -58,6 +58,10 @@ layout = html.Div(
         html.Div(
             style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'flex-start'},
             children=[
+                        # Back to home button
+            html.Div(style={'position': 'absolute', 'top': '30px', 'right': '30px', 'z-index': '1000', 'font-size': '40px'}, children=[
+            dcc.Link('🏠', href='/'),
+        ]),
                 # Genre selection buttons with unique IDs
                 html.Div(
                     id='evolution-genre-colored-button',
