@@ -14,43 +14,12 @@ festivals_df = pd.read_csv('./static/festivals_europe.csv')
 # Fonction pour convertir les codes ISO2 en ISO3
 def convert_iso2_to_iso3(iso2_code):
     country = pycountry.countries.get(alpha_2=iso2_code)
-    return country.alpha_3 if country else None
+    if country:
+        return country.alpha_3
+    else:
+        print(f"Code ISO2 non trouvé : {iso2_code}")
+        return None
 
-# Layout pour la page de popularité des genres musicaux
-layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding': '20px'}, children=[
-    html.H1('Popularité des genres musicaux en Europe', style={'textAlign': 'center', 'color': 'white'}),
-    html.H3("Découvrez la popularité de chaque genre à travers les pays européens", style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal','paddingLeft': '50px', 'paddingRight': '50px'}),
-
-    # Conteneur général
-    html.Div(style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center'}, children=[
-        html.Div(style={'position': 'absolute', 'top': '30px', 'right': '30px', 'z-index': '1000', 'font-size': '40px'}, children=[
-            dcc.Link('🏠', href='/'),
-        ]),
-        html.Div(style={'flex': '1', 'padding': '10px'}, children=[dcc.Graph(id="bubble-genre-chart", style={'height': '600px', 'width': '100%'})]),
-        html.Div(style={'flex': '1.5', 'padding': '10px'}, children=[dcc.Graph(id="map-graph", style={'height': '500px'})])
-    ]),
-    
-    # Section timeline
-    html.Div(style={'padding': '20px'}, children=[
-        html.H3("Timeline des festivals pour le genre sélectionné"),
-        dcc.Graph(id="timeline-graph", style={'height': '400px', 'width': '100%'})
-    ]),
-
-    # Pied de page
-    html.Footer(
-        html.Small(
-            ["Les données sont fournies par l'API Spotify"],
-        ),
-        style={
-            "textAlign": "center",
-            "padding": "10px",
-            "backgroundColor": "black",
-            "width": "100%",
-            "fontSize": "12px",
-            "color": "#999"
-        },
-    ),
-])
 
 def register_callback(app):
     @app.callback(
@@ -107,23 +76,7 @@ def register_callback(app):
         )
 
         return fig_bubble, fig_map, fig_timeline
-from dash import dcc, html, Input, Output
-import plotly.express as px
-import plotly.graph_objects as go
-import json
-import pycountry
-from static.enumerations import genres, genre_colors
-from data.data_manager import DataManager
-import numpy as np
 
-# Fonction pour convertir les codes ISO2 en ISO3
-def convert_iso2_to_iso3(iso2_code):
-    country = pycountry.countries.get(alpha_2=iso2_code)
-    if country:
-        return country.alpha_3
-    else:
-        print(f"Code ISO2 non trouvé : {iso2_code}")
-        return None
 
 # Chargement carte Europe
 geojson_path = "./static/custom.geo.json"
@@ -132,6 +85,7 @@ try:
         european_geojson = json.load(geojson_file)
 except FileNotFoundError:
     european_geojson = None
+
 
 # Layout pour la page de popularité des genres musicaux
 layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding': '20px'}, children=[
@@ -145,8 +99,6 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
         html.Div(style={'position': 'absolute', 'top': '30px', 'right': '30px', 'z-index': '1000', 'font-size': '40px'}, children=[
             dcc.Link('🏠', href='/'),
         ]),
-        
-
 
         # Bubble chart à gauche
         html.Div(style={'flex': '1', 'padding': '10px'}, children=[
@@ -156,9 +108,28 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
         # Carte choroplèthe à droite
         html.Div(style={'flex': '1.5', 'padding': '10px'}, children=[
             dcc.Graph(id="map-graph", style={'height': '500px'})
-        ])
-    ])
+        ]),
+]),
+
+        # Pied de page
+    html.Footer(
+        html.Small(
+            [
+                "Les données sont fournies par l' ",
+                html.A("API Spotify", href="https://developer.spotify.com/documentation/web-api", target="_blank", style={'color': 'white'}),
+            ]
+        ),
+        style={
+            "textAlign": "center",
+            "padding": "10px",
+            "backgroundColor": "black",
+            "width": "100%",
+            "fontSize": "12px",
+            "color": "#999"
+        },
+    ),
 ])
+
 
 
 def register_callback(app):
@@ -191,7 +162,7 @@ def register_callback(app):
             size='scaled_size',
             color='genre',
             hover_name='genre',
-            size_max=100,
+            size_max=80,
             text='genre',
             color_discrete_map=genre_colors
         )
@@ -203,15 +174,14 @@ def register_callback(app):
             showlegend=False,
             xaxis=dict(visible=False),
             yaxis=dict(visible=False),
+            width=450,  # Augmenter ces valeurs pour forcer une taille de conteneur plus large
+            height=600,
         )
 
         # Génération de la carte en fonction du genre sélectionné
         df = data_manager.create_genre_popularity_by_country(selected_genre)
         df['total_popularity_percentile'] = df['total_popularity'].rank(pct=True)
 
-
-
-        
         if df.empty:
             print(f"Aucune donnée disponible pour le genre {selected_genre}")
             return fig_bubble, go.Figure()
@@ -255,7 +225,7 @@ def register_callback(app):
             plot_bgcolor='black',
             font=dict(color='white'),
             margin={"r": 10, "t": 50, "l": 0, "b": 0},
-            width=600,  # Augmenter ces valeurs pour forcer une taille de conteneur plus large
+            width=610,  # Augmenter ces valeurs pour forcer une taille de conteneur plus large
             height=500,
             coloraxis_colorbar=dict(
         x=0.85,
