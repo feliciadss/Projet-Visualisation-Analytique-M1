@@ -130,7 +130,7 @@ def register_callback(app):
             albums_per_year = pd.DataFrame(columns=['year', 'genre', 'album_count'])
 
         # Create line graph
-        fig = px.line(albums_per_year, x="year", y="album_count", color='genre')
+        fig = px.line(albums_per_year, x="year", y="album_count", color='genre', color_discrete_map=genre_colors)
         fig.update_layout(
             plot_bgcolor='black', 
             paper_bgcolor='black', 
