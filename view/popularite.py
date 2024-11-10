@@ -85,7 +85,7 @@ def register_callback(app):
         df['country'] = df['country'].apply(convert_iso2_to_iso3)
         fig_map = px.choropleth(
             df, geojson=json.load(open("./static/custom.geo.json")), locations="country", 
-            featureidkey="properties.adm0_a3", color="total_popularity", 
+            featureidkey="properties.adm0_a3", color="total_popularity", zoom =3,
             title=f"Popularité du genre '{selected_genre.title()}' par pays en Europe"
         )
         fig_map.update_geos(scope="europe", projection_type="mercator", showcoastlines=False, lakecolor='black')
@@ -229,7 +229,7 @@ def register_callback(app):
             color="total_popularity_percentile",
             hover_name="country",
             color_continuous_scale=[[0, '#000000'], [1, color_for_genre]],
-            title=f"--> {selected_genre.title()}",
+            title=f"→ {selected_genre.title()}",
             labels={"total_popularity_percentile": "Popularité (%)"} 
         )
 
@@ -239,27 +239,29 @@ def register_callback(app):
             showcoastlines=False,
             showland=True,
             center=dict(lat=51.9194, lon=19.1451),  
-            projection_scale=10,
+            projection_scale=1,
             landcolor="white",
             bgcolor="black",
-            fitbounds="locations",
-            visible=True
+            visible=True,
+            lonaxis=dict(range=[-50, 60]),  # Ajustez pour exclure les îles
+            lataxis=dict(range=[15, 85]) 
         )
 
         fig_map.update_layout(
             title_font_size=20,
+            autosize = True,
             geo=dict(showframe=False, showcoastlines=False),
             paper_bgcolor='black',
             plot_bgcolor='black',
             font=dict(color='white'),
-            margin={"r": 50, "t": 50, "l": 0, "b": 0},
+            margin={"r": 10, "t": 50, "l": 0, "b": 0},
+            width=800,  # Augmenter ces valeurs pour forcer une taille de conteneur plus large
+            height=500,
             coloraxis_colorbar=dict(
         x=0.85,
         tickvals=[0.2, 0.4, 0.6, 0.8], 
         title="Popularité (%)"
-    ),
-            width=800,
-            height=500
+    )
         )
 
         return fig_bubble, fig_map
