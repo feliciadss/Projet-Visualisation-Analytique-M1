@@ -111,7 +111,7 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
         ]),
 ]),
 
-        # Pied de page
+    # Pied de page
     html.Footer(
         html.Small(
             [
@@ -161,12 +161,18 @@ def register_callback(app):
             y='y',
             size='scaled_size',
             color='genre',
-            hover_name='genre',
+            hover_name=None,
             size_max=80,
             text='genre',
             color_discrete_map=genre_colors
         )
-        fig_bubble.update_traces(textposition='middle center', textfont=dict(color='black'))  # Nom du genre en noir au centre
+        fig_bubble.update_traces(
+            textposition='middle center', 
+            textfont=dict(color='black'), 
+            hovertemplate=' ',
+            hoverinfo = 'none'
+        )  # Nom du genre en noir au centre
+
         fig_bubble.update_layout(
             plot_bgcolor='black',
             paper_bgcolor='black',
@@ -174,7 +180,7 @@ def register_callback(app):
             showlegend=False,
             xaxis=dict(visible=False),
             yaxis=dict(visible=False),
-            width=450,  # Augmenter ces valeurs pour forcer une taille de conteneur plus large
+            width=450,
             height=600,
         )
 
