@@ -239,7 +239,7 @@ def register_callback(app):
             showcoastlines=False,
             showland=True,
             center=dict(lat=51.9194, lon=19.1451),  
-            projection_scale=1,
+            projection_scale=1.1,
             landcolor="white",
             bgcolor="black",
             visible=True,
@@ -255,7 +255,7 @@ def register_callback(app):
             plot_bgcolor='black',
             font=dict(color='white'),
             margin={"r": 10, "t": 50, "l": 0, "b": 0},
-            width=800,  # Augmenter ces valeurs pour forcer une taille de conteneur plus large
+            width=600,  # Augmenter ces valeurs pour forcer une taille de conteneur plus large
             height=500,
             coloraxis_colorbar=dict(
         x=0.85,
