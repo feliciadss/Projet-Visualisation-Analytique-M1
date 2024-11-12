@@ -1,6 +1,6 @@
 genres = [
-    "pop", "rock", "latin", "jazz", "classical", 
-    "electronic", "indie", "reggae", "blues", "metal",
+    "pop", "rock", "latin", "jazz", "opera", 
+    "electronic", "reggae", "blues", "metal",
     "folk", "country", "r&b", "soul"
 ]
 
@@ -16,14 +16,13 @@ genre_colors = {
     'rock': '#3cb44b',     # Vert vif
     'latin': '#ffe119',  # Jaune vif
     'jazz': '#4363d8',     # Bleu vif
-    'classical': '#f58231',# Orange vif
+    'opera': '#f58231',# Orange vif
     'electronic': '#911eb4',# Violet vif
-    'indie': '#42d4f4',    # Bleu cyan
     'reggae': '#fabebe',   # Rose pâle
     'blues': '#469990',    # Vert-bleu foncé
     'metal': '#f032e6',    # Rose vif
     'folk': '#bfef45',     # Vert lime
-    'country': '#a9a9a9',  # Gris
+    'country': '#42d4f4',  # bleu cyan
     'r&b': '#9A6324',      # Marron foncé
     'soul': '#800000'      # Rouge foncé
 }
@@ -33,7 +32,7 @@ genre_links = {
             "pop": ("de la", "https://fr.wikipedia.org/wiki/Pop_(musique)"),
             "latin": ("de la", "https://fr.wikipedia.org/wiki/Musique_latine"),
             "jazz": ("du", "https://fr.wikipedia.org/wiki/Histoire_du_jazz"),
-            "classical": ("de la", "https://fr.wikipedia.org/wiki/Musique_classique"),
+            "opera": ("de la", "https://fr.wikipedia.org/wiki/Musique_classique"),
             "electronic": ("de l'", "https://fr.wikipedia.org/wiki/Musique_%C3%A9lectronique"),
             "indie": ("de l'", "https://fr.wikipedia.org/wiki/Indie_pop"),
             "reggae": ("du", "https://fr.wikipedia.org/wiki/Reggae"),

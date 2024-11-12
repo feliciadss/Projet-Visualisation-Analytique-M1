@@ -135,7 +135,7 @@ def update_charts(click_data):
         showlegend=False
     )
 
-    selected_genre = "indie"  #par défaut
+    selected_genre = "reggae"  #par défaut
     if click_data:
         selected_genre = click_data['points'][0]['label']
 

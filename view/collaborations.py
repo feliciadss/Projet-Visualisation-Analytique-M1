@@ -191,7 +191,7 @@ def register_callback(app):
     )
     def update_collaboration_table(click_data):
         if not click_data or 'customdata' not in click_data['points'][0]:
-            source_genre, target_genre = "electronic", "indie"  # default genres
+            source_genre, target_genre = "electronic", "pop"  # default genres
         else:
             customdata = click_data['points'][0]['customdata']
             genres = customdata.replace("Collaboration entre ", "").split(" et ")
