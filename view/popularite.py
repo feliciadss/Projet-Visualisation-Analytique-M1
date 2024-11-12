@@ -161,7 +161,7 @@ def register_callback(app):
             y='y',
             size='scaled_size',
             color='genre',
-            hover_name=None,
+            hover_name='genre',
             size_max=80,
             text='genre',
             color_discrete_map=genre_colors
