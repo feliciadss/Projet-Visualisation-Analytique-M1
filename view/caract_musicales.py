@@ -4,6 +4,7 @@ import plotly.graph_objects as go
 from data.data_manager import DataManager
 from static.enumerations import genres
 from static.enumerations import genre_colors
+import pandas as pd
 
 layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding': '20px'}, children=[
     html.H1('Caractéristiques musicales par genre', style={'color': 'white', 'textAlign': 'center'}),
@@ -100,7 +101,7 @@ def register_callback(app):
             print("Le DataFrame est vide ou None")
             return go.Figure()
 
-        features = ['tempo', 'energy', 'danceability', 'acousticness', 'valence', 'duration_ms']
+        features = ['tempo', 'energy', 'danceability', 'acousticness', 'valence', 'duration_s']
         df[features] = df[features].apply(normalize_column)
 
         fig = go.Figure()
@@ -149,6 +150,7 @@ def register_callback(app):
 
         data_manager = DataManager()
         df = data_manager.create_audiofeatures_dataframe(selected_genres)
+        
 
         if df is None or df.empty:
             return go.Figure()
