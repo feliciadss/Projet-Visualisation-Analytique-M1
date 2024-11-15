@@ -13,8 +13,7 @@ articles = [
     html.Div(
         children=[
             html.Img(src=f"/static/images/{genre}.jpg", style={'width': '100%', 'border-radius': '5px'}),
-            html.H3(f"L'histoire {article} {genre.capitalize()}", style={'text-align': 'center', 'color': 'white'}),
-            html.A("Lire plus", href=link, target="_blank", style={'display': 'block', 'text-align': 'center', 'color': 'cyan'})
+            html.A(f"L'histoire {article} {genre.capitalize()}", href=link, target="_blank", style={'display': 'block', 'text-align': 'center', 'color': 'lightgrey'})
         ],
         style={
             'border': '1px solid #444',
