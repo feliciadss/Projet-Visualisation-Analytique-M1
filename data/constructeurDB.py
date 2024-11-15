@@ -78,24 +78,17 @@ def save_album_to_db(album, country, db):
     collection = db["albums"]
     album_id = album["id"]
     
-    # Rechercher l'album existant dans la base de données
     existing_album = collection.find_one({"id": album_id})
     
-    # Si l'album existe déjà, récupérer sa liste de marchés
     if existing_album:
         top_market_list = existing_album.get("top_market", [])
         
-        # Si le marché n'est pas déjà dans la liste, l'ajouter
         if country not in top_market_list:
             top_market_list.append(country)
     else:
-        # Si l'album n'existe pas encore, créer une nouvelle liste de marchés
         top_market_list = [country]
 
-    # Mettre à jour le document de l'album avec la liste mise à jour des marchés
     album["top_market"] = top_market_list
-
-    # Sauvegarder ou mettre à jour l'album dans MongoDB
     collection.update_one({"id": album_id}, {"$set": album}, upsert=True)
 
 # Récupérer les morceaux d'un album

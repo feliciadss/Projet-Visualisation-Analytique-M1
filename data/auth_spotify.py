@@ -33,7 +33,6 @@ class SpotifyAuth:
         response = requests.post(TOKEN_URL, headers=headers, data=data)
         if response.status_code == 200:
             token_info = response.json()
-            # Utilisation du champ expires_in pour déterminer la durée de validité du token
             self.token_expires = time.time() + int(token_info["expires_in"])
             return token_info["access_token"]
         else:

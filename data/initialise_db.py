@@ -4,16 +4,11 @@ from constructeurDB import (
     connect_to_db, get_popular_playlists, 
     get_playlist_tracks
 )
-#from static.enumerations import european_countries
+from static.enumerations import european_countries
 
 
 def initialize_db():
     db = connect_to_db()
-
-    european_countries = [
-    "GB", "NO","SE"
-    ]#attention je retire des pays a chaque relance, pour eviter les requetes doublons 
-
     try:
         for country in european_countries:
             print(f"Fetching popular playlists for {country}...")
