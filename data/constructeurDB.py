@@ -11,8 +11,14 @@ BASE_URL = "https://api.spotify.com/v1/"
 
 # Connexion à MongoDB
 def connect_to_db():
-    client = MongoClient(config['MONGO_DB']['MONGO_URI'])
-    db = client[config['MONGO_DB']['DB_NAME']]
+    try:
+        if 'MONGO_DB' not in config or 'MONGO_URI' not in config['MONGO_DB'] or 'DB_NAME' not in config['MONGO_DB']:
+            raise ValueError("Allez dans le dossier 'data', fichier 'config.ini', et entrez vos identifiants MongoDB et Spotify Developer.")
+        client = MongoClient(config['MONGO_DB']['MONGO_URI'])
+        db = client[config['MONGO_DB']['DB_NAME']]
+
+    except Exception as e:
+        raise ValueError("Allez dans le dossier 'data', fichier 'config.ini', et entrez vos identifiants MongoDB et Spotify Developer.") from e
     return db
 
 # Gestion des limitations d'API (limitation de requêtes)
