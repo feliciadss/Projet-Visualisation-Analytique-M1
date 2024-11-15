@@ -119,7 +119,7 @@ def update_charts(click_data):
         y='y',
         size='scaled_size',
         color='genre',
-        hover_name=None,
+        hover_name='genre',
         size_max=100,
         text='genre',
         color_discrete_map=genre_colors
