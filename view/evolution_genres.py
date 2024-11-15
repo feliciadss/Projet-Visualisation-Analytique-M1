@@ -63,11 +63,12 @@ layout = html.Div(
             dcc.Link('🏠', href='/'),
         ]),
                 # Genre selection buttons with unique IDs
-            html.Div(id='caract-genre-colored-button', style={'flex': '1', 'padding': '10px', 'display': 'flex', 'flexWrap': 'wrap', 'gap': '10px'}, 
-            children=[
+        # Genre selection buttons
+        html.Div(id='collab-genre-colored-button', style={'flex': '1', 'padding': '10px', 'display': 'flex', 'flexWrap': 'wrap', 'gap': '10px'}, 
+                 children=[
             html.Button(
                 genre.title(),
-                id=f'caract-genre-button-{genre}',  # Unique ID for each genre button
+                id=f'collab-genre-button-{genre}',  # Unique ID for each genre button
                 n_clicks=0,
                 style={
                     'backgroundColor': genre_colors.get(genre, '#CCCCCC'),
@@ -87,7 +88,7 @@ layout = html.Div(
                 ),
                 
                 # Store the selected genres with 'rock' selected by default
-                dcc.Store(id='selected-genres-evolution', data={genre: (genre == 'rock') for genre in genres}),
+                dcc.Store(id='selected-genres-collab', data={genre: genre == 'rock' for genre in genres}),
             ]
         ),
         
@@ -99,24 +100,17 @@ layout = html.Div(
 # Register callback function for Evolution of Genres page
 def register_callback(app):
     @app.callback(
-        [Output("linear-graph", "figure"),
-         Output('selected-genres-evolution', 'data'),
-         Output({'type': 'evolution-genre-button', 'index': ALL}, 'style')],
-        Input({'type': 'evolution-genre-button', 'index': ALL}, 'n_clicks'),
-        State('selected-genres-evolution', 'data')
+        Output('linear-graph', 'figure'),
+        Input('selected-genres-collab', 'data')
     )
-    def update_content_evolution(n_clicks_list, selected_genres):
-        # Determine which button was clicked
-        triggered = callback_context.triggered
-        if triggered:
-            triggered_id = eval(triggered[0]['prop_id'].split('.')[0])
-            genre = triggered_id['index']
-            selected_genres[genre] = not selected_genres[genre]  # Toggle the selected genre
+    def update_content_evolution(selected_genres):
 
         # Filter data based on selected genres
-        selected_genres_list = [genre for genre, selected in selected_genres.items() if selected]
+        active_genres = [genre for genre, selected in selected_genres.items() if selected]
         data_manager = DataManager()
-        df = data_manager.create_album_release_dataframe(selected_genres_list)
+        df = data_manager.create_album_release_dataframe(active_genres)
+        
+        print(df.head())
         
         # Check for 'release_date' and handle it if missing
         if 'release_date' in df.columns:
@@ -135,19 +129,4 @@ def register_callback(app):
             xaxis_title="Année",
             yaxis_title="Nombre d'albums"
         )
-
-        # Update button styles based on selection
-        button_styles = [
-            {
-                'backgroundColor': genre_colors.get(genre, '#CCCCCC') if selected_genres[genre] else '#555555',
-                'color': 'white',
-                'border': 'none',
-                'padding': '15px 25px',
-                'cursor': 'pointer',
-                'fontSize': '16px',
-                'borderRadius': '5px'
-            }
-            for genre in genres
-        ]
-
-        return fig, selected_genres, button_styles
+        return fig
