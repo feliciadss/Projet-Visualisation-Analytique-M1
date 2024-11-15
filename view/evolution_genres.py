@@ -63,26 +63,23 @@ layout = html.Div(
             dcc.Link('🏠', href='/'),
         ]),
                 # Genre selection buttons with unique IDs
-                html.Div(
-                    id='evolution-genre-colored-button',
-                    style={'flex': '1', 'padding': '10px', 'display': 'flex', 'flexWrap': 'wrap', 'gap': '10px'},
-                    children=[
-                        html.Button(
-                            genre.title(),
-                            id={'type': 'evolution-genre-button', 'index': genre},  # Unique type for this page
-                            n_clicks=0,
-                            style={
-                                'backgroundColor': genre_colors.get(genre, '#CCCCCC'),  # Ensure this gets the right color
-                                'color': 'white',
-                                'border': 'none',
-                                'padding': '10px 20px',
-                                'cursor': 'pointer',
-                                'borderRadius': '5px'
-                            }
-                        ) for genre in genres
-                    ]
-                ),
-
+            html.Div(id='caract-genre-colored-button', style={'flex': '1', 'padding': '10px', 'display': 'flex', 'flexWrap': 'wrap', 'gap': '10px'}, 
+            children=[
+            html.Button(
+                genre.title(),
+                id=f'caract-genre-button-{genre}',  # Unique ID for each genre button
+                n_clicks=0,
+                style={
+                    'backgroundColor': genre_colors.get(genre, '#CCCCCC'),
+                    'color': 'white',
+                    'border': 'none',
+                    'padding': '10px 20px',
+                    'cursor': 'pointer',
+                    'borderRadius': '5px'
+                }
+            ) for genre in genre_colors.keys()
+        ]),
+            
                 # Graph display area
                 html.Div(
                     style={'width': '70%'},

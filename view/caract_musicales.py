@@ -20,16 +20,23 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
         html.Div(style={'position': 'absolute','top': '30px','right': '30px','z-index': '1000','font-size': '40px'},children=[
             dcc.Link('🏠', href='/'),
         ]),
-        # Checklist des genres sur la gauche
-        html.Div(style={'flex': '1', 'padding': '10px'}, children=[
-            html.P("Sélectionnez un ou plusieurs genres :", style={'fontWeight': 'bold', 'color': 'white'}),
-            dcc.Checklist(
-                id="genre-checklist",
-                options=genres,
-                value=['latin', 'jazz'],
-                inline=False,
-                style={'color': 'white'}
-            ),
+        
+        # Genre selection buttons
+        html.Div(id='collab-genre-colored-button', style={'flex': '1', 'padding': '10px', 'display': 'flex', 'flexWrap': 'wrap', 'gap': '10px'}, 
+                 children=[
+            html.Button(
+                genre.title(),
+                id=f'collab-genre-button-{genre}',  # Unique ID for each genre button
+                n_clicks=0,
+                style={
+                    'backgroundColor': genre_colors.get(genre, '#CCCCCC'),
+                    'color': 'white',
+                    'border': 'none',
+                    'padding': '10px 20px',
+                    'cursor': 'pointer',
+                    'borderRadius': '5px'
+                }
+            ) for genre in genre_colors.keys()
         ]),
         
         # Radar chart au centre
@@ -40,6 +47,9 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
         html.Div(style={'flex': '1', 'padding': '10px'}, children=[
             dcc.Graph(id="bar-chart", style={'height': '400px', 'backgroundColor': 'black'})
         ]),
+        
+                # Store for selected genres
+        dcc.Store(id='selected-genres-collab', data={genre: genre == 'latin' for genre in genres}),
     ]),
     
     html.Div(style={'width': '100%', 'textAlign': 'left', 'marginTop': '10px'}, children=[
@@ -91,11 +101,12 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
 def register_callback(app):
     @app.callback(
         Output("radar-graph", "figure"),
-        Input("genre-checklist", "value")
+        Input("selected-genres-collab", "data")
     )
     def update_radar(selected_genres):
+        active_genres = [genre for genre, selected in selected_genres.items() if selected]
         data_manager = DataManager()
-        df = data_manager.create_audiofeatures_dataframe(selected_genres)
+        df = data_manager.create_audiofeatures_dataframe(active_genres)
 
         if df is None or df.empty:
             print("Le DataFrame est vide ou None")
@@ -106,7 +117,7 @@ def register_callback(app):
 
         fig = go.Figure()
 
-        for genre in selected_genres:
+        for genre in active_genres:
             df_genre = df[df['genre'] == genre]
             if df_genre.empty:
                 continue
@@ -139,7 +150,7 @@ def register_callback(app):
     @app.callback(
         Output("bar-chart", "figure"),
         Input("radar-graph", "clickData"), 
-        Input("genre-checklist", "value")
+        Input("selected-genres-collab", "data")
     )
     
     def update_barchart(clickData, selected_genres):
@@ -148,10 +159,10 @@ def register_callback(app):
         else:
             clicked_feature = clickData['points'][0]['theta']
 
+        active_genres = [genre for genre, selected in selected_genres.items() if selected]
         data_manager = DataManager()
-        df = data_manager.create_audiofeatures_dataframe(selected_genres)
+        df = data_manager.create_audiofeatures_dataframe(active_genres)
         
-
         if df is None or df.empty:
             return go.Figure()
         
