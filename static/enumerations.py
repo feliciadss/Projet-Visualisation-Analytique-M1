@@ -16,8 +16,8 @@ genre_colors = {
     'rock': '#3cb44b',     # Vert vif
     'latin': '#ffe119',  # Jaune vif
     'jazz': '#4363d8',     # Bleu vif
-    'opera': '#f58231',# Orange vif
-    'electronic': '#911eb4',# Violet vif
+    'opera': '#f58231', # Orange vif
+    'electronic': '#911eb4',    # Violet vif
     'reggae': '#fabebe',   # Rose pâle
     'blues': '#469990',    # Vert-bleu foncé
     'metal': '#f032e6',    # Rose vif

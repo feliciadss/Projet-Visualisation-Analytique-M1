@@ -124,7 +124,12 @@ def update_charts(click_data):
         text='genre',
         color_discrete_map=genre_colors
     )
-    fig_bubble.update_traces(textposition='middle center', textfont=dict(color='black'))  # Nom du genre en noir au centre
+    fig_bubble.update_traces(
+        textposition='middle center', 
+        textfont=dict(color='black'),
+        hovertemplate='',
+        hoverinfo='none',
+        )  # Nom du genre en noir au centre
     fig_bubble.update_layout(
         plot_bgcolor='black',
         paper_bgcolor='black',
