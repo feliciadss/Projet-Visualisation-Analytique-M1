@@ -1,8 +1,12 @@
-from dash import html, dcc, Output, Input, callback_context, dash_table
+from dash import html, dcc, Output, Input, callback_context, dash_table, callback
 from dash.dependencies import State
 import plotly.graph_objects as go
 from data.data_manager import DataManager
 from static.enumerations import genre_colors, genres
+import dash
+
+
+dash.register_page(__name__, path="/collaborations", name="Collaborations entre genres")
 
 # Layout for Collaborations page
 layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding': '20px'}, children=[
@@ -91,124 +95,122 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
     ),
 ])
 
-# Register callback function for Collaborations page
-def register_callback(app):
-    # Callback to update the Sankey graph based on selected genres
-    @app.callback(
-        Output('sankey-graph', 'figure'),
-        Input('selected-genres-collab', 'data')
-    )
-    def display_sankey(selected_genres):
-        active_genres = [genre for genre, selected in selected_genres.items() if selected]
-        data_manager = DataManager()
-        
-        genre_matrix = data_manager.create_genre_collaboration_matrix(active_genres)
-        
-        if genre_matrix.empty:
-            return go.Figure()
 
-        # Prepare data for Sankey diagram
-        all_genres = list(genre_matrix.columns.union(genre_matrix.index))
-        genre_indices = {genre: i for i, genre in enumerate(all_genres)}
-        source, target, value, link_colors, link_customdata = [], [], [], [], []
+@callback(
+    Output('sankey-graph', 'figure'),
+    Input('selected-genres-collab', 'data')
+)
+def display_sankey(selected_genres):
+    active_genres = [genre for genre, selected in selected_genres.items() if selected]
+    data_manager = DataManager()
+    
+    genre_matrix = data_manager.create_genre_collaboration_matrix(active_genres)
+    
+    if genre_matrix.empty:
+        return go.Figure()
 
-        for genre1 in genre_matrix.index:
-            for genre2 in genre_matrix.columns:
-                collaborations = genre_matrix.loc[genre1, genre2]
-                if collaborations > 0:
-                    source.append(genre_indices[genre1])
-                    target.append(genre_indices[genre2])
-                    value.append(collaborations)
-                    link_colors.append(genre_colors.get(genre1.lower(), '#CCCCCC'))
-                    link_customdata.append(f"Collaboration entre {genre1} et {genre2}")
+    # Prepare data for Sankey diagram
+    all_genres = list(genre_matrix.columns.union(genre_matrix.index))
+    genre_indices = {genre: i for i, genre in enumerate(all_genres)}
+    source, target, value, link_colors, link_customdata = [], [], [], [], []
 
-        # Colors for nodes
-        node_colors = [genre_colors.get(genre.lower(), '#CCCCCC') for genre in all_genres]
-        node_customdata = [f"Genre: {genre}" for genre in all_genres]
+    for genre1 in genre_matrix.index:
+        for genre2 in genre_matrix.columns:
+            collaborations = genre_matrix.loc[genre1, genre2]
+            if collaborations > 0:
+                source.append(genre_indices[genre1])
+                target.append(genre_indices[genre2])
+                value.append(collaborations)
+                link_colors.append(genre_colors.get(genre1.lower(), '#CCCCCC'))
+                link_customdata.append(f"Collaboration entre {genre1} et {genre2}")
 
-        # Create Sankey diagram
-        fig = go.Figure(data=[go.Sankey(
-            node=dict(
-                pad=15,
-                thickness=20,
-                line=dict(color="black", width=0.5),
-                label=all_genres,
-                color=node_colors,
-                customdata=node_customdata,
-                hovertemplate='%{label}<extra>%{customdata}</extra>'
-            ),
-            link=dict(
-                source=source,
-                target=target,
-                value=value,
-                color=link_colors,
-                customdata=link_customdata,
-                hovertemplate='%{customdata}<extra></extra>'
-            )
-        )])
+    # Colors for nodes
+    node_colors = [genre_colors.get(genre.lower(), '#CCCCCC') for genre in all_genres]
+    node_customdata = [f"Genre: {genre}" for genre in all_genres]
 
-        fig.update_layout(paper_bgcolor='black', plot_bgcolor='black', font=dict(color='white'))
-        return fig
+    # Create Sankey diagram
+    fig = go.Figure(data=[go.Sankey(
+        node=dict(
+            pad=15,
+            thickness=20,
+            line=dict(color="black", width=0.5),
+            label=all_genres,
+            color=node_colors,
+            customdata=node_customdata,
+            hovertemplate='%{label}<extra>%{customdata}</extra>'
+        ),
+        link=dict(
+            source=source,
+            target=target,
+            value=value,
+            color=link_colors,
+            customdata=link_customdata,
+            hovertemplate='%{customdata}<extra></extra>'
+        )
+    )])
 
-    # Callback to toggle selected genres and update button styles
-    @app.callback(
-        Output('selected-genres-collab', 'data'),
-        [Output(f'collab-genre-button-{genre}', 'style') for genre in genres],
-        [Input(f'collab-genre-button-{genre}', 'n_clicks') for genre in genres],
-        State('selected-genres-collab', 'data')
-    )
-    def toggle_genre_selection(*args):
-        n_clicks_list = args[:-1]
-        selected_genres = args[-1]
-        triggered = callback_context.triggered
+    fig.update_layout(paper_bgcolor='black', plot_bgcolor='black', font=dict(color='white'))
+    return fig
 
-        if triggered:
-            triggered_id = triggered[0]['prop_id'].split('.')[0]
-            genre = triggered_id.split('-')[-1]
-            selected_genres[genre] = not selected_genres[genre]
+# Callback to toggle selected genres and update button styles
+@callback(
+    Output('selected-genres-collab', 'data'),
+    [Output(f'collab-genre-button-{genre}', 'style') for genre in genres],
+    [Input(f'collab-genre-button-{genre}', 'n_clicks') for genre in genres],
+    State('selected-genres-collab', 'data')
+)
+def toggle_genre_selection(*args):
+    n_clicks_list = args[:-1]
+    selected_genres = args[-1]
+    triggered = callback_context.triggered
 
-        # Update button styles
-        button_styles = [
-            {
-                'backgroundColor': genre_colors.get(genre, '#CCCCCC') if selected_genres[genre] else '#555555',
-                'color': 'white',
-                'border': 'none',
-                'padding': '15px 25px',
-                'cursor': 'pointer',
-                'fontSize': '16px',
-                'borderRadius': '5px'
-            }
-            for genre in genres
-        ]
+    if triggered:
+        triggered_id = triggered[0]['prop_id'].split('.')[0]
+        genre = triggered_id.split('-')[-1]
+        selected_genres[genre] = not selected_genres[genre]
 
-        return (selected_genres, *button_styles)
+    # Update button styles
+    button_styles = [
+        {
+            'backgroundColor': genre_colors.get(genre, '#CCCCCC') if selected_genres[genre] else '#555555',
+            'color': 'white',
+            'border': 'none',
+            'padding': '15px 25px',
+            'cursor': 'pointer',
+            'fontSize': '16px',
+            'borderRadius': '5px'
+        }
+        for genre in genres
+    ]
 
-    # Callback to update the collaboration table based on the selected link in Sankey
-    @app.callback(
-        Output('collaboration-table', 'data'),
-        Output('collaboration-table', 'columns'),
-        Input('sankey-graph', 'clickData')
-    )
-    def update_collaboration_table(click_data):
-        if not click_data or 'customdata' not in click_data['points'][0]:
-            source_genre, target_genre = "electronic", "pop"  # default genres
-        else:
-            customdata = click_data['points'][0]['customdata']
-            genres = customdata.replace("Collaboration entre ", "").split(" et ")
-            source_genre, target_genre = genres[0], genres[1]
+    return (selected_genres, *button_styles)
 
-        # Fetch top collaborations
-        data_manager = DataManager()
-        top_collabs_df = data_manager.get_top_collabs_between_genres(source_genre, target_genre)
+# Callback to update the collaboration table based on the selected link in Sankey
+@callback(
+    Output('collaboration-table', 'data'),
+    Output('collaboration-table', 'columns'),
+    Input('sankey-graph', 'clickData')
+)
+def update_collaboration_table(click_data):
+    if not click_data or 'customdata' not in click_data['points'][0]:
+        source_genre, target_genre = "electronic", "pop"  # default genres
+    else:
+        customdata = click_data['points'][0]['customdata']
+        genres = customdata.replace("Collaboration entre ", "").split(" et ")
+        source_genre, target_genre = genres[0], genres[1]
 
-        # Rename columns and format data
-        top_collabs_df = top_collabs_df.rename(columns={
-            'artist1': f'{target_genre}',
-            'artist2': f'{source_genre}',
-            'track_popularity': 'Popularité',
-            'track_name': 'Nom du track'
-        })
-        columns = [{"name": col, "id": col} for col in top_collabs_df.columns]
-        records = top_collabs_df.to_dict('records')
+    # Fetch top collaborations
+    data_manager = DataManager()
+    top_collabs_df = data_manager.get_top_collabs_between_genres(source_genre, target_genre)
 
-        return records, columns
+    # Rename columns and format data
+    top_collabs_df = top_collabs_df.rename(columns={
+        'artist1': f'{target_genre}',
+        'artist2': f'{source_genre}',
+        'track_popularity': 'Popularité',
+        'track_name': 'Nom du track'
+    })
+    columns = [{"name": col, "id": col} for col in top_collabs_df.columns]
+    records = top_collabs_df.to_dict('records')
+
+    return records, columns

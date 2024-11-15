@@ -1,9 +1,13 @@
-from dash import html, dcc, Output, Input, ALL, callback_context
+from dash import html, dcc, Output, Input, ALL, callback_context, callback
 from dash.dependencies import State
 import pandas as pd
 import plotly.express as px
 from static.enumerations import genre_colors, genres, genre_links
 from data.data_manager import DataManager
+import dash
+
+
+dash.register_page(__name__, path="/evolutions", name="Evolution des genres")
 
 # Création des articles sous forme de Div statiques
 articles = [
@@ -98,34 +102,33 @@ layout = html.Div(
     ]
 )
 
-# Register callback function for Evolution of Genres page
-def register_callback(app):
-    @app.callback(
-        Output('linear-graph', 'figure'),
-        Input('selected-genres-collab', 'data')
+
+@callback(
+    Output('linear-graph', 'figure'),
+    Input('selected-genres-collab', 'data')
+)
+def update_content_evolution(selected_genres):
+
+    # Filter data based on selected genres
+    active_genres = [genre for genre, selected in selected_genres.items() if selected]
+    data_manager = DataManager()
+    df = data_manager.create_album_release_dataframe(active_genres)
+    
+    # Check for 'release_date' and handle it if missing
+    if 'release_date' in df.columns:
+        df['release_date'] = pd.to_datetime(df['release_date'], errors='coerce')
+        df['year'] = df['release_date'].dt.year
+        albums_per_year = df.groupby(['year', 'genre']).size().reset_index(name='album_count')
+    else:
+        albums_per_year = pd.DataFrame(columns=['year', 'genre', 'album_count'])
+
+    # Create line graph
+    fig = px.line(albums_per_year, x="year", y="album_count", color='genre', color_discrete_map=genre_colors)
+    fig.update_layout(
+        plot_bgcolor='black', 
+        paper_bgcolor='black', 
+        font_color='white',
+        xaxis_title="Année",
+        yaxis_title="Nombre d'albums"
     )
-    def update_content_evolution(selected_genres):
-
-        # Filter data based on selected genres
-        active_genres = [genre for genre, selected in selected_genres.items() if selected]
-        data_manager = DataManager()
-        df = data_manager.create_album_release_dataframe(active_genres)
-        
-        # Check for 'release_date' and handle it if missing
-        if 'release_date' in df.columns:
-            df['release_date'] = pd.to_datetime(df['release_date'], errors='coerce')
-            df['year'] = df['release_date'].dt.year
-            albums_per_year = df.groupby(['year', 'genre']).size().reset_index(name='album_count')
-        else:
-            albums_per_year = pd.DataFrame(columns=['year', 'genre', 'album_count'])
-
-        # Create line graph
-        fig = px.line(albums_per_year, x="year", y="album_count", color='genre', color_discrete_map=genre_colors)
-        fig.update_layout(
-            plot_bgcolor='black', 
-            paper_bgcolor='black', 
-            font_color='white',
-            xaxis_title="Année",
-            yaxis_title="Nombre d'albums"
-        )
-        return fig
+    return fig
