@@ -220,7 +220,7 @@ class DataManager:
         # Requête SQL pour trouver les collaborations entre artistes de deux genres différents sur le même morceau
         query = f"""
             SELECT t.id AS track_id, t.name AS track_name, a1.name AS artist1, a2.name AS artist2, 
-                (a1.popularity + a2.popularity) / 2 AS collab_popularity
+                (a1.popularity + a2.popularity) / 2 AS collab_popularity, t.preview_url
             FROM tracks AS t
             JOIN track_artists AS ta1 ON t.id = ta1.track_id
             JOIN artists AS a1 ON ta1.artist_id = a1.id
@@ -238,13 +238,14 @@ class DataManager:
             print(f"Aucune collaboration trouvée entre les genres {genre1} et {genre2}.")
             return pd.DataFrame()
 
-        for track_id, track_name, artist1, artist2, collab_popularity in collabs_data:
+        for track_id, track_name, artist1, artist2, collab_popularity, preview_url in collabs_data:
             collab_info = {
                 'track_id': track_id,
                 'track_name': track_name,
                 'artist1': artist1,
                 'artist2': artist2,
-                'collab_popularity': collab_popularity
+                'collab_popularity': collab_popularity,
+                'preview_url': preview_url
             }
             collabs.append(collab_info)
 

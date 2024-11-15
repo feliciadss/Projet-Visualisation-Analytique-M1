@@ -1,6 +1,7 @@
 from dash import html, dcc, Output, Input, callback_context, dash_table, callback
 from dash.dependencies import State
 import plotly.graph_objects as go
+import pandas as pd
 from data.data_manager import DataManager
 from static.enumerations import genre_colors, genres
 import dash
@@ -65,10 +66,11 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
                 {"name": "Artiste 1", "id": "artist1"},
                 {"name": "Artiste 2", "id": "artist2"},
                 {"name": "Popularité", "id": "track_popularity"},
-                {"name": "Track ID", "id": "track_id"}
+                {"name": "Track ID", "id": "track_id"},
+                {"name": "Écoute-moi", "id": "preview_url"}
             ],
-            style_table={'width': '80%', 'margin': '0 auto'},
-            style_cell={'backgroundColor': 'black', 'color': 'white', 'textAlign': 'center'},
+            style_table={'width': '80%', 'margin': '0 auto', 'fontFamily': 'Courier Newx'},
+            style_cell={'backgroundColor': 'black', 'color': 'white', 'textAlign': 'center', 'fontFamily': 'Courier New'},
             style_header={'backgroundColor': 'grey', 'fontWeight': 'bold'}
         )
     ]),
@@ -200,9 +202,15 @@ def update_collaboration_table(click_data):
         'artist1': f'{source_genre}',
         'artist2': f'{target_genre}',
         'track_popularity': 'Popularité',
-        'track_name': 'Nom du track'
+        'track_name': 'Nom du track',
+        'preview_url' : 'Lien vers le track'
     })
-    columns = [{"name": col, "id": col} for col in top_collabs_df.columns]
+    # Make "Lien vers le track" column clickable
+    top_collabs_df['Lien vers le track'] = top_collabs_df['Lien vers le track'].apply(
+        lambda url: f'[Écoute moi]({url})' if pd.notnull(url) else 'N/A'
+    )
+
+    columns = [{"name": col, "id": col, "presentation":"markdown"} for col in top_collabs_df.columns]
     records = top_collabs_df.to_dict('records')
 
     return records, columns
