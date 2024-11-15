@@ -61,11 +61,11 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
     ], style={'color': 'white', 'fontSize': '16px', 'maxWidth': '800px', 'margin': '0 auto', 'lineHeight': '1.5'}),
     
     html.P([
-        html.U("Tempo"), ": vitesse de la chanson en battements par minute (BPM)"
+        html.U("Tempo (BPM)"), ": vitesse de la chanson en battements par minute"
     ], style={'color': 'white', 'fontSize': '16px', 'maxWidth': '800px', 'margin': '0 auto', 'lineHeight': '1.5'}),
 
     html.P([
-        html.U("Énergie"), ": intensité de la chanson, influencée par le volume et l'intensité des instruments (%)"
+        html.U("Énergie (%)"), ": intensité de la chanson, influencée par le volume et l'intensité des instruments"
     ], style={'color': 'white', 'fontSize': '16px', 'maxWidth': '800px', 'margin': '0 auto', 'lineHeight': '1.5'}),
 
     html.P([
@@ -77,7 +77,7 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
     ], style={'color': 'white', 'fontSize': '16px', 'maxWidth': '800px', 'margin': '0 auto', 'lineHeight': '1.5'}),
 
     html.P([
-        html.U("Duration"), ": durée de la chanson en millisecondes. Plus long = expérience immersive, plus court = percutant (ms)"
+        html.U("Duration (sec)"), ": durée de la chanson"
     ], style={'color': 'white', 'fontSize': '16px', 'maxWidth': '800px', 'margin': '0 auto', 'lineHeight': '1.5'})
 ]),
     
@@ -114,7 +114,7 @@ def update_radar(selected_genres):
         print("Le DataFrame est vide ou None")
         return go.Figure()
 
-    features = ['tempo', 'energy', 'danceability', 'acousticness', 'valence', 'duration_s']
+    features = ['tempo', 'energy', 'danceability', 'acousticness', 'valence', 'duration']
     df[features] = df[features].apply(normalize_column)
 
     fig = go.Figure()

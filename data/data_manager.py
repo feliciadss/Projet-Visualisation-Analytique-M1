@@ -48,7 +48,7 @@ class DataManager:
 
         df = pd.DataFrame(all_track_data)
         df['duration_ms'] = pd.to_numeric(df['duration_ms'], errors='coerce')
-        df['duration_s'] = df['duration_ms'] / 1000  # milisec en sec
+        df['duration'] = df['duration_ms'] / 1000  # milisec en sec
         df.drop(columns=['duration_ms'], inplace=True)
 
         return df
