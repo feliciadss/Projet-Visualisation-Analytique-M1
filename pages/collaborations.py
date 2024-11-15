@@ -5,10 +5,8 @@ from data.data_manager import DataManager
 from static.enumerations import genre_colors, genres
 import dash
 
-
 dash.register_page(__name__, path="/collaborations", name="Collaborations entre genres")
 
-# Layout for Collaborations page
 layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding': '20px'}, children=[
     html.H1('Collaboration entre genres', style={'textAlign': 'center', 'color': 'white'}),
     
@@ -55,7 +53,6 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
             dcc.Graph(id='sankey-graph', style={'height': '375px'})
         ]),
 
-        # Store for selected genres
         dcc.Store(id='selected-genres-collab', data={genre: genre == 'electronic' for genre in genres}),
     ]),
 
@@ -108,8 +105,7 @@ def display_sankey(selected_genres):
     
     if genre_matrix.empty:
         return go.Figure()
-
-    # Prepare data for Sankey diagram
+    
     all_genres = list(genre_matrix.columns.union(genre_matrix.index))
     genre_indices = {genre: i for i, genre in enumerate(all_genres)}
     source, target, value, link_colors, link_customdata = [], [], [], [], []
@@ -152,7 +148,7 @@ def display_sankey(selected_genres):
     fig.update_layout(paper_bgcolor='black', plot_bgcolor='black', font=dict(color='white'))
     return fig
 
-# Callback to toggle selected genres and update button styles
+
 @callback(
     Output('selected-genres-collab', 'data'),
     [Output(f'collab-genre-button-{genre}', 'style') for genre in genres],
@@ -169,7 +165,6 @@ def toggle_genre_selection(*args):
         genre = triggered_id.split('-')[-1]
         selected_genres[genre] = not selected_genres[genre]
 
-    # Update button styles
     button_styles = [
         {
             'backgroundColor': genre_colors.get(genre, '#CCCCCC') if selected_genres[genre] else '#555555',
@@ -185,7 +180,6 @@ def toggle_genre_selection(*args):
 
     return (selected_genres, *button_styles)
 
-# Callback to update the collaboration table based on the selected link in Sankey
 @callback(
     Output('collaboration-table', 'data'),
     Output('collaboration-table', 'columns'),
@@ -199,11 +193,9 @@ def update_collaboration_table(click_data):
         genres = customdata.replace("Collaboration entre ", "").split(" et ")
         source_genre, target_genre = genres[0], genres[1]
 
-    # Fetch top collaborations
     data_manager = DataManager()
     top_collabs_df = data_manager.get_top_collabs_between_genres(source_genre, target_genre)
 
-    # Rename columns and format data
     top_collabs_df = top_collabs_df.rename(columns={
         'artist1': f'{target_genre}',
         'artist2': f'{source_genre}',

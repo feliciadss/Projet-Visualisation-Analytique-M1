@@ -37,6 +37,7 @@ Ce dossier contient les ressources statiques nécessaires au projet.
 ### **3. Dossier `pages`**
 Ce dossier stocke les modules qui définissent les pages de l'application web Dash. Chaque fichier représente une page et contient le layout (structure HTML) et les callbacks (logique de mise à jour) associés à chaque fonctionnalité de visualisation de données. 
 
+- **`accueil.py`** 
 - **`caract_musicales.py`** 
 - **`collaborations.py`**
 - **`evolution_genres.py`**

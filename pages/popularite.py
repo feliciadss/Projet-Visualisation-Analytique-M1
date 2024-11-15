@@ -9,18 +9,16 @@ from static.enumerations import genre_colors
 from data.data_manager import DataManager
 import dash
 
-# Enregistrement de la page
 dash.register_page(__name__, path="/popularite", name="Popularité des genres")
 
-# Charger les données des festivals
+
 festivals_path = './static/festivals_europe.csv'
 try:
     festivals_df = pd.read_csv(festivals_path)
 except FileNotFoundError:
-    festivals_df = pd.DataFrame()  # Crée un DataFrame vide si le fichier est introuvable
+    festivals_df = pd.DataFrame()
     print(f"Erreur : Fichier festivals_europe.csv introuvable à {festivals_path}")
 
-# Charger la carte GeoJSON de l'Europe
 geojson_path = "./static/custom.geo.json"
 try:
     with open(geojson_path, "r", encoding="utf-8") as geojson_file:
@@ -38,7 +36,6 @@ def convert_iso2_to_iso3(iso2_code):
         print(f"Code ISO2 non trouvé : {iso2_code}")
         return None
 
-# Layout de la page
 layout = html.Div(
     style={'backgroundColor': 'black', 'color': 'white', 'padding': '20px'},
     children=[
@@ -56,14 +53,14 @@ layout = html.Div(
                 style={'position': 'absolute', 'top': '30px', 'right': '30px', 'z-index': '1000', 'font-size': '40px'},
                 children=[dcc.Link('🏠', href='/')],
             ),
-            # Graphique des genres (Bubble chart)
+            # Bubble chart
             html.Div(
                 style={'flex': '1', 'padding': '10px'},
                 children=[
                     dcc.Graph(id="bubble-genre-chart", style={'height': '600px', 'width': '100%'})
                 ]
             ),
-            # Carte choroplèthe (Popularité par pays)
+            # Carte
             html.Div(
                 style={'flex': '1.5', 'padding': '10px'},
                 children=[
@@ -91,7 +88,7 @@ layout = html.Div(
     ]
 )
 
-# Callback pour mettre à jour les graphiques
+
 @callback(
     [
         Output("bubble-genre-chart", "figure"),
@@ -137,19 +134,14 @@ def update_charts(click_data):
         yaxis=dict(visible=False),
     )
 
-    # Génération de la carte en fonction du genre sélectionné
     df = data_manager.create_genre_popularity_by_country(selected_genre)
     df['total_popularity_percentile'] = df['total_popularity'].rank(pct=True)
 
-
-
-    
     if df.empty:
         print(f"Aucune donnée disponible pour le genre {selected_genre}")
         return fig_bubble, go.Figure()
 
-    # Conversion des codes ISO2 en ISO3
-    df['country'] = df['country'].apply(convert_iso2_to_iso3)
+    df['country'] = df['country'].apply(convert_iso2_to_iso3) #conversion ios2 en ios3
 
     color_for_genre = genre_colors.get(selected_genre.lower(), '#ffffff')
 
@@ -175,7 +167,7 @@ def update_charts(click_data):
         landcolor="white",
         bgcolor="black",
         visible=True,
-        lonaxis=dict(range=[-50, 60]),  # Ajustez pour exclure les îles
+        lonaxis=dict(range=[-50, 60]),
         lataxis=dict(range=[15, 85]) 
     )
 
@@ -187,7 +179,7 @@ def update_charts(click_data):
         plot_bgcolor='black',
         font=dict(color='white'),
         margin={"r": 10, "t": 50, "l": 0, "b": 0},
-        width=800,  # Augmenter ces valeurs pour forcer une taille de conteneur plus large
+        width=800,
         height=500,
         coloraxis_colorbar=dict(
     x=0.85,

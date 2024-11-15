@@ -9,7 +9,6 @@ from static.enumerations import genre_colors
 
 dash.register_page(__name__, path="/", name="Accueil")
 
-# Layout de la page d'accueil
 layout = html.Div(
     style={'backgroundColor': 'black', 'minHeight': '100vh', 'display': 'flex', 'flexDirection': 'column', 'alignItems': 'center', 'justifyContent': 'center', 'color': 'white'},
     children=[

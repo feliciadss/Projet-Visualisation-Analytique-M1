@@ -7,7 +7,6 @@ from static.enumerations import genre_colors
 import pandas as pd
 import dash
 
-
 dash.register_page(__name__, path="/caracteristiques", name="Caractéristiques des genres")
 
 layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding': '20px'}, children=[
@@ -18,7 +17,7 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
         style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal', 'paddingLeft': '50px', 'paddingRight': '50px'}
     ),
     
-    # Conteneur général ici
+    # Conteneur général
     html.Div(style={'display': 'flex', 'justifyContent': 'space-between', 'alignItems': 'center'}, children=[
         # Bouton pour revenir à l'accueil
         html.Div(style={'position': 'absolute','top': '30px','right': '30px','z-index': '1000','font-size': '40px'},children=[
@@ -52,7 +51,6 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
             dcc.Graph(id="bar-chart", style={'height': '400px', 'backgroundColor': 'black'})
         ]),
         
-                # Store for selected genres
         dcc.Store(id='selected-genres-collab', data={genre: genre in ['jazz', 'latin'] for genre in genres}),
     ]),
     

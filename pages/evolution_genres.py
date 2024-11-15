@@ -6,10 +6,9 @@ from static.enumerations import genre_colors, genres, genre_links
 from data.data_manager import DataManager
 import dash
 
-
 dash.register_page(__name__, path="/evolutions", name="Evolution des genres")
 
-# Création des articles sous forme de Div statiques
+#div static
 articles = [
     html.Div(
         children=[
@@ -49,7 +48,6 @@ articles_section = html.Div(
     ]
 )
 
-# Layout for Evolution of Genres page
 layout = html.Div(
     style={'backgroundColor': 'black', 'color': 'white', 'padding': '20px', 'textAlign': 'center'},
     children=[
@@ -66,8 +64,7 @@ layout = html.Div(
             html.Div(style={'position': 'absolute', 'top': '30px', 'right': '30px', 'z-index': '1000', 'font-size': '40px'}, children=[
             dcc.Link('🏠', href='/'),
         ]),
-                # Genre selection buttons with unique IDs
-        # Genre selection buttons
+            
         html.Div(id='collab-genre-colored-button', style={'flex': '1', 'padding': '10px', 'display': 'flex', 'flexWrap': 'wrap', 'gap': '10px'}, 
                  children=[
             html.Button(
@@ -85,19 +82,18 @@ layout = html.Div(
             ) for genre in genre_colors.keys()
         ]),
             
-                # Graph display area
-                html.Div(
-                    style={'width': '70%'},
-                    children=[dcc.Graph(id="linear-graph", style={'backgroundColor': 'black'})]
-                ),
+        # Graph display area
+        html.Div(
+            style={'width': '70%'},
+            children=[dcc.Graph(id="linear-graph", style={'backgroundColor': 'black'})]
+        ),
                 
-                # Store the selected genres with 'rock' selected by default
-                dcc.Store(id='selected-genres-collab', data={genre: genre in ['rock', 'r&b'] for genre in genres}),
-
-            ]
+             
+        dcc.Store(id='selected-genres-collab', data={genre: genre in ['rock', 'r&b'] for genre in genres}),
+        ]
         ),
         
-        # Section des articles statiques en 3 rangées de 5 colonnes
+        # Section des articles
         articles_section,
     ]
 )
@@ -109,12 +105,10 @@ layout = html.Div(
 )
 def update_content_evolution(selected_genres):
 
-    # Filter data based on selected genres
     active_genres = [genre for genre, selected in selected_genres.items() if selected]
     data_manager = DataManager()
     df = data_manager.create_album_release_dataframe(active_genres)
     
-    # Check for 'release_date' and handle it if missing
     if 'release_date' in df.columns:
         df['release_date'] = pd.to_datetime(df['release_date'], errors='coerce')
         df['year'] = df['release_date'].dt.year
@@ -122,7 +116,6 @@ def update_content_evolution(selected_genres):
     else:
         albums_per_year = pd.DataFrame(columns=['year', 'genre', 'album_count'])
 
-    # Create line graph
     fig = px.line(albums_per_year, x="year", y="album_count", color='genre', color_discrete_map=genre_colors)
     fig.update_layout(
         plot_bgcolor='black', 
