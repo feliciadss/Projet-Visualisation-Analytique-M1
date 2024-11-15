@@ -36,7 +36,7 @@ class UpdateSQLManager:
                                 (id TEXT PRIMARY KEY, name TEXT, popularity INTEGER, followers INTEGER, genres TEXT, market TEXT)''')
         cursor.execute('''CREATE TABLE IF NOT EXISTS tracks
                                 (id TEXT PRIMARY KEY, name TEXT, album_id TEXT, tempo REAL, energy REAL, danceability REAL, 
-                                acousticness REAL, valence REAL, duration_ms INTEGER)''')
+                                acousticness REAL, valence REAL, duration_ms INTEGER, preview_url TEXT)''')
         cursor.execute('''CREATE TABLE IF NOT EXISTS albums
                                 (id TEXT PRIMARY KEY, name TEXT, release_date TEXT, available_markets TEXT, total_tracks INTEGER, artist_id TEXT)''')
         cursor.execute('''CREATE TABLE IF NOT EXISTS track_artists
@@ -70,11 +70,11 @@ class UpdateSQLManager:
         for track in tracks:
             audio_features = track.get('audio_features', {})
             cursor.execute('''INSERT OR REPLACE INTO tracks (id, name, album_id, tempo, energy, danceability, acousticness, 
-                              valence, duration_ms) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''', 
+                              valence, duration_ms, preview_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', 
                            (track['id'], track.get('name', ''), track.get('album_id', ''),
                             audio_features.get('tempo'), audio_features.get('energy'),
                             audio_features.get('danceability'), audio_features.get('acousticness'),
-                            audio_features.get('valence'), audio_features.get('duration_ms')))
+                            audio_features.get('valence'), audio_features.get('duration_ms'), track.get('preview_url','')))
             # Insérer les associations artiste-morceau dans la table track_artists
             artists = track.get('artists', [])
             for artist in artists:
@@ -97,7 +97,39 @@ class UpdateSQLManager:
                             artist_id))  
         self.conn.commit()
         
-    def add_artist_id_column_if_not_exists(self):
+    def add_preview_url_column_if_not_exists(self):
+        """Vérifie si la colonne preview_url existe dans la table tracks et l'ajoute si nécessaire."""
+        cursor = self.conn.cursor()
+
+        cursor.execute("PRAGMA table_info(tracks)")
+        columns = cursor.fetchall()
+
+        column_names = [col[1] for col in columns]
+
+        if 'preview_url' not in column_names:
+            cursor.execute("ALTER TABLE tracks ADD COLUMN preview_url TEXT")
+            self.conn.commit()
+            print("Colonne preview_url ajoutée à la table tracks.")
+        else:
+            print("La colonne preview_url existe déjà.")
+
+            """Vérifie si la colonne preview_url existe dans la table tracks et l'ajoute si nécessaire."""
+            cursor = self.conn.cursor()
+            
+            cursor.execute("PRAGMA table_info(tracks)")
+            columns = cursor.fetchall()
+            
+            column_names = [col[1] for col in columns]
+            
+            if 'preview_url' not in column_names:
+                cursor.execute("ALTER TABLE albums ADD COLUMN preview_url TEXT")
+                self.conn.commit()
+                print("Colonne preview_url ajoutée à la table albums.")
+            else:
+                print("La colonne preview existe déjà.")
+                
+            
+    def add_artist_id_column_if_not_exists(self):  
         """Vérifie si la colonne artist_id existe dans la table albums et l'ajoute si nécessaire."""
         cursor = self.conn.cursor()
         
@@ -124,6 +156,7 @@ if __name__ == "__main__":
     
     manager.add_artist_id_column_if_not_exists()
     manager.update_artists()
+    manager.add_preview_url_column_if_not_exists()
     manager.update_tracks()
     manager.update_albums()
 
