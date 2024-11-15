@@ -197,8 +197,8 @@ def update_collaboration_table(click_data):
     top_collabs_df = data_manager.get_top_collabs_between_genres(source_genre, target_genre)
 
     top_collabs_df = top_collabs_df.rename(columns={
-        'artist1': f'{target_genre}',
-        'artist2': f'{source_genre}',
+        'artist1': f'{source_genre}',
+        'artist2': f'{target_genre}',
         'track_popularity': 'Popularité',
         'track_name': 'Nom du track'
     })
