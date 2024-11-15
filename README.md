@@ -34,7 +34,7 @@ Ce dossier contient les ressources statiques nécessaires au projet.
 - **`enumerations.py`** : Fichiers contenant les différentes énumérations liées aux genres, marchés, etc. Vous pouvez le modifier, notamment si vous souhaiter concentrer les résultats sur d'autres genres.
 
 
-### **3. Dossier `view`**
+### **3. Dossier `pages`**
 Ce dossier stocke les modules qui définissent les pages de l'application web Dash. Chaque fichier représente une page et contient le layout (structure HTML) et les callbacks (logique de mise à jour) associés à chaque fonctionnalité de visualisation de données. 
 
 - **`caract_musicales.py`** 
