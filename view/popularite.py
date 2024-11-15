@@ -151,7 +151,7 @@ def register_callback(app):
         genre_counts_df['x'] += np.random.uniform(low=-0.05, high=0.05, size=n_genres)
         genre_counts_df['y'] += np.random.uniform(low=-0.05, high=0.05, size=n_genres)
 
-        selected_genre = "jazz"
+        selected_genre = "folk"
         if click_data:
             selected_genre = click_data['points'][0]['hovertext']
 

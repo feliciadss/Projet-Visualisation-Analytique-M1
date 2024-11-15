@@ -203,10 +203,10 @@ def register_callback(app):
 
         # Rename columns and format data
         top_collabs_df = top_collabs_df.rename(columns={
-            'artist1': 'Artiste 1',
-            'artist2': 'Artiste 2',
+            'artist1': f'{target_genre}',
+            'artist2': f'{source_genre}',
             'track_popularity': 'Popularité',
-            'track_id': 'Track ID'
+            'track_name': 'Nom du track'
         })
         columns = [{"name": col, "id": col} for col in top_collabs_df.columns]
         records = top_collabs_df.to_dict('records')

@@ -49,7 +49,7 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
         ]),
         
                 # Store for selected genres
-        dcc.Store(id='selected-genres-collab', data={genre: genre == 'latin' for genre in genres}),
+        dcc.Store(id='selected-genres-collab', data={genre: genre in ['jazz', 'latin'] for genre in genres}),
     ]),
     
     html.Div(style={'width': '100%', 'textAlign': 'left', 'marginTop': '10px'}, children=[

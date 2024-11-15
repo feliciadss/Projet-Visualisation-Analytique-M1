@@ -88,7 +88,8 @@ layout = html.Div(
                 ),
                 
                 # Store the selected genres with 'rock' selected by default
-                dcc.Store(id='selected-genres-collab', data={genre: genre == 'rock' for genre in genres}),
+                dcc.Store(id='selected-genres-collab', data={genre: genre in ['rock', 'r&b'] for genre in genres}),
+
             ]
         ),
         
@@ -109,8 +110,6 @@ def register_callback(app):
         active_genres = [genre for genre, selected in selected_genres.items() if selected]
         data_manager = DataManager()
         df = data_manager.create_album_release_dataframe(active_genres)
-        
-        print(df.head())
         
         # Check for 'release_date' and handle it if missing
         if 'release_date' in df.columns:
