@@ -100,12 +100,12 @@ class UpdateSQLManager:
     def add_preview_url_column_if_not_exists(self):
         """Vérifie si la colonne preview_url existe dans la table tracks et l'ajoute si nécessaire."""
         cursor = self.conn.cursor()
-
+        
         cursor.execute("PRAGMA table_info(tracks)")
         columns = cursor.fetchall()
-
+        
         column_names = [col[1] for col in columns]
-
+        
         if 'preview_url' not in column_names:
             cursor.execute("ALTER TABLE tracks ADD COLUMN preview_url TEXT")
             self.conn.commit()
@@ -113,20 +113,6 @@ class UpdateSQLManager:
         else:
             print("La colonne preview_url existe déjà.")
 
-            """Vérifie si la colonne preview_url existe dans la table tracks et l'ajoute si nécessaire."""
-            cursor = self.conn.cursor()
-            
-            cursor.execute("PRAGMA table_info(tracks)")
-            columns = cursor.fetchall()
-            
-            column_names = [col[1] for col in columns]
-            
-            if 'preview_url' not in column_names:
-                cursor.execute("ALTER TABLE albums ADD COLUMN preview_url TEXT")
-                self.conn.commit()
-                print("Colonne preview_url ajoutée à la table albums.")
-            else:
-                print("La colonne preview existe déjà.")
                 
             
     def add_artist_id_column_if_not_exists(self):  
