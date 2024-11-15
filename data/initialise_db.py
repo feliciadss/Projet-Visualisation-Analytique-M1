@@ -1,9 +1,15 @@
+import sys
+import os
+
 from constructeurDB import (
     save_album_to_db, save_track_to_db,
     get_artist_info, save_artist_to_db,
     connect_to_db, get_popular_playlists, 
     get_playlist_tracks
 )
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from static.enumerations import european_countries
 
 
