@@ -11,7 +11,7 @@ import dash
 
 dash.register_page(__name__, path="/popularite", name="Popularité des genres")
 
-
+# Charger les données des festivals
 festivals_path = './static/festivals_europe.csv'
 try:
     festivals_df = pd.read_csv(festivals_path)
@@ -19,6 +19,7 @@ except FileNotFoundError:
     festivals_df = pd.DataFrame()
     print(f"Erreur : Fichier festivals_europe.csv introuvable à {festivals_path}")
 
+# Charger les données GeoJSON
 geojson_path = "./static/custom.geo.json"
 try:
     with open(geojson_path, "r", encoding="utf-8") as geojson_file:
@@ -35,6 +36,37 @@ def convert_iso2_to_iso3(iso2_code):
     else:
         print(f"Code ISO2 non trouvé : {iso2_code}")
         return None
+
+# Fonction pour créer la timeline des festivals
+def create_festival_timeline(selected_genre):
+    filtered_festivals = festivals_df[festivals_df['Genres musicaux'].str.contains(selected_genre, case=False, na=False)]
+    filtered_festivals = filtered_festivals.sort_values('Mois')
+    
+    fig_timeline = go.Figure()
+    
+    for month in filtered_festivals['Mois'].unique():
+        month_festivals = filtered_festivals[filtered_festivals['Mois'] == month]
+        for _, row in month_festivals.iterrows():
+            fig_timeline.add_trace(go.Scatter(
+                x=[month], 
+                y=[row['Nom du festival']], 
+                mode='markers+text',
+                marker=dict(size=10),
+                text=f"{row['Nom du festival']} ({row['Pays']})",
+                textposition='top center'
+            ))
+
+    fig_timeline.update_layout(
+        title=f"Festivals de {selected_genre.title()} en Europe",
+        xaxis=dict(title='Mois'),
+        yaxis=dict(title='Festival', visible=False, showticklabels=False),
+        paper_bgcolor='black',
+        plot_bgcolor='black',
+        font=dict(color='white'),
+        showlegend=False
+    )
+    
+    return fig_timeline
 
 layout = html.Div(
     style={'backgroundColor': 'black', 'color': 'white', 'padding': '20px'},
@@ -68,6 +100,13 @@ layout = html.Div(
                 ]
             ),
         ]),
+        # Timeline des festivals
+        html.Div(
+            style={'padding': '20px'},
+            children=[
+                dcc.Graph(id="festival-timeline", style={'height': '400px'})
+            ]
+        ),
         # Pied de page
         html.Footer(
             html.Small(
@@ -88,11 +127,11 @@ layout = html.Div(
     ]
 )
 
-
 @callback(
     [
         Output("bubble-genre-chart", "figure"),
         Output("map-graph", "figure"),
+        Output("festival-timeline", "figure")
     ],
     [Input("bubble-genre-chart", "clickData")]
 )
@@ -144,7 +183,7 @@ def update_charts(click_data):
 
     if df.empty:
         print(f"Aucune donnée disponible pour le genre {selected_genre}")
-        return fig_bubble, go.Figure()
+        return fig_bubble, go.Figure(), go.Figure()
 
     df['country'] = df['country'].apply(convert_iso2_to_iso3) #conversion ios2 en ios3
 
@@ -193,4 +232,6 @@ def update_charts(click_data):
 )
     )
 
-    return fig_bubble, fig_map
+    fig_timeline = create_festival_timeline(selected_genre)
+
+    return fig_bubble, fig_map, fig_timeline
