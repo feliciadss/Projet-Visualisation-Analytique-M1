@@ -37,6 +37,10 @@ def convert_iso2_to_iso3(iso2_code):
         print(f"Code ISO2 non trouvé : {iso2_code}")
         return None
 
+# Fonction pour obtenir le chemin de l'image du drapeau
+def get_flag_image_path(country_code):
+    return f"./static/flags/{country_code}.png"
+
 # Fonction pour créer la timeline des festivals
 def create_festival_timeline(selected_genre):
     filtered_festivals = festivals_df[festivals_df['Genres musicaux'].str.contains(selected_genre, case=False, na=False)]
