@@ -64,7 +64,7 @@ def create_festival_timeline(selected_genre):
             fig_timeline.add_trace(go.Scatter(
                 x=[month], 
                 y=[row['Nom du festival']], 
-                mode='markers+text',
+                mode='text',
                 marker=dict(size=10),
                 text=f"{row['Nom du festival']} {country_flag}", 
                 hovertext=hover_text, 
