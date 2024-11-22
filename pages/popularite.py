@@ -5,13 +5,13 @@ import pandas as pd
 import numpy as np
 import json
 import pycountry
-from static.enumerations import genre_colors
+from static.enumerations import genre_colors, flags
 from data.data_manager import DataManager
 import dash
 
 dash.register_page(__name__, path="/popularite", name="Popularité des genres")
 
-# Charger les données des festivals
+#Données des festivals
 festivals_path = './static/festivals_europe.csv'
 try:
     festivals_df = pd.read_csv(festivals_path)
@@ -37,11 +37,8 @@ def convert_iso2_to_iso3(iso2_code):
         print(f"Code ISO2 non trouvé : {iso2_code}")
         return None
 
-# Fonction pour obtenir le chemin de l'image du drapeau
-def get_flag_image_path(country_code):
-    return f"./static/flags/{country_code}.png"
 
-# Fonction pour créer la timeline des festivals
+#Timeline des festivals 
 def create_festival_timeline(selected_genre):
     filtered_festivals = festivals_df[festivals_df['Genres musicaux'].str.contains(selected_genre, case=False, na=False)]
     filtered_festivals = filtered_festivals.sort_values('Mois')
@@ -51,13 +48,28 @@ def create_festival_timeline(selected_genre):
     for month in filtered_festivals['Mois'].unique():
         month_festivals = filtered_festivals[filtered_festivals['Mois'] == month]
         for _, row in month_festivals.iterrows():
+            country_flag = flags.get(row['Pays'], '')
+            
+            #bulle pour afficher les autres infos (prix, etc..)
+            hover_text = (
+                f"Festival : {row['Nom du festival']}<br>"
+                f"Pays : {row['Pays']} {country_flag}<br>"
+                f"Participants (approx) : {row['Participants (approx)']}<br>"
+                f"Prix moyen : {row['Prix moyen (€)']} €<br>"
+                f"Mois : {row['Mois']}<br>"
+                f"Genres musicaux : {row['Genres musicaux']}"
+            )
+            
+
             fig_timeline.add_trace(go.Scatter(
                 x=[month], 
                 y=[row['Nom du festival']], 
                 mode='markers+text',
                 marker=dict(size=10),
-                text=f"{row['Nom du festival']} ({row['Pays']})",
-                textposition='top center'
+                text=f"{row['Nom du festival']} {country_flag}", 
+                hovertext=hover_text, 
+                textposition='top center',
+                showlegend=False
             ))
 
     fig_timeline.update_layout(
