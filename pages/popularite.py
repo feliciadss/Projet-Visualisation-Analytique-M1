@@ -38,9 +38,22 @@ def convert_iso2_to_iso3(iso2_code):
         return None
 
 
-#Timeline des festivals 
+# Ordre temporel des mois
+MONTH_ORDER = [
+    "Janvier", "Février", "Mars", "Avril", "Mai", "Juin", 
+    "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
+]
+
+# Timeline des festivals
 def create_festival_timeline(selected_genre):
+    festivals_df['Mois'] = pd.Categorical(
+        festivals_df['Mois'], 
+        categories=MONTH_ORDER, 
+        ordered=True
+    )
+    
     filtered_festivals = festivals_df[festivals_df['Genres musicaux'].str.contains(selected_genre, case=False, na=False)]
+
     filtered_festivals = filtered_festivals.sort_values('Mois')
     
     fig_timeline = go.Figure()
@@ -48,9 +61,10 @@ def create_festival_timeline(selected_genre):
     for month in filtered_festivals['Mois'].unique():
         month_festivals = filtered_festivals[filtered_festivals['Mois'] == month]
         for _, row in month_festivals.iterrows():
+            # R du pays
             country_flag = flags.get(row['Pays'], '')
             
-            #bulle pour afficher les autres infos (prix, etc..)
+
             hover_text = (
                 f"Festival : {row['Nom du festival']}<br>"
                 f"Pays : {row['Pays']} {country_flag}<br>"
@@ -60,7 +74,6 @@ def create_festival_timeline(selected_genre):
                 f"Genres musicaux : {row['Genres musicaux']}"
             )
             
-
             fig_timeline.add_trace(go.Scatter(
                 x=[month], 
                 y=[row['Nom du festival']], 
