@@ -68,10 +68,10 @@ def create_festival_timeline(selected_genre):
             hover_text = (
                 f"Festival : {row['Nom du festival']}<br>"
                 f"Pays : {row['Pays']} {country_flag}<br>"
-                f"Participants (approx) : {row['Participants (approx)']}<br>"
+                f"Participants : {row['Participants (approx)']}<br>"
                 f"Prix moyen : {row['Prix moyen (€)']} €<br>"
                 f"Mois : {row['Mois']}<br>"
-                f"Genres musicaux : {row['Genres musicaux']}"
+                f"Genres : {row['Genres musicaux']}"
             )
             
             fig_timeline.add_trace(go.Scatter(
@@ -81,13 +81,14 @@ def create_festival_timeline(selected_genre):
                 marker=dict(size=10),
                 text=f"{row['Nom du festival']} {country_flag}", 
                 hovertext=hover_text, 
+                textfont=dict(size=14),
                 textposition='top center',
                 showlegend=False
             ))
 
     fig_timeline.update_layout(
-        title=f"Festivals de {selected_genre.title()} en Europe",
-        xaxis=dict(title='Mois'),
+        title=f"Principaux festivals de {selected_genre.title()} en Europe sur une année",
+        xaxis=dict(showgrid=False),
         yaxis=dict(title='Festival', visible=False, showticklabels=False),
         paper_bgcolor='black',
         plot_bgcolor='black',
@@ -125,15 +126,15 @@ layout = html.Div(
             html.Div(
                 style={'flex': '1.5', 'padding': '10px'},
                 children=[
-                    dcc.Graph(id="map-graph", style={'height': '500px'})
+                    dcc.Graph(id="map-graph", style={'height': '300px'})
                 ]
             ),
         ]),
         # Timeline des festivals
         html.Div(
-            style={'padding': '20px'},
+            style={'padding': '10px', 'width': '100%','margin': '0 auto'},
             children=[
-                dcc.Graph(id="festival-timeline", style={'height': '400px'})
+                dcc.Graph(id="festival-timeline", style={'height': '500px'})
             ]
         ),
         # Pied de page
