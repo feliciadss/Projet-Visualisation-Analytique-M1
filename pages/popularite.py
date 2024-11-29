@@ -81,6 +81,7 @@ def create_festival_timeline(selected_genre):
                 marker=dict(size=10),
                 text=f"{row['Nom du festival']} {country_flag}", 
                 hovertext=hover_text, 
+                hoverinfo='text',
                 textfont=dict(size=14),
                 textposition='top center',
                 showlegend=False
@@ -225,10 +226,9 @@ def update_charts(click_data):
         locations="country",
         featureidkey="properties.adm0_a3",
         color="total_popularity_percentile",
-        hover_name="country",
         color_continuous_scale=[[0, '#000000'], [1, color_for_genre]],
         title=f"→ {selected_genre.title()}",
-        labels={"total_popularity_percentile": "Popularité (%)"} 
+        labels={"total_popularity_percentile": "Popularité (%)", "country" : "Pays"} 
     )
 
     fig_map.update_geos(
