@@ -66,11 +66,9 @@ def create_festival_timeline(selected_genre):
             
 
             hover_text = (
-                f"Festival : {row['Nom du festival']}<br>"
                 f"Pays : {row['Pays']} {country_flag}<br>"
-                f"Participants : {row['Participants (approx)']}<br>"
+                f"Spectateurs : {row['Participants (approx)']}<br>"
                 f"Prix moyen : {row['Prix moyen (€)']} €<br>"
-                f"Mois : {row['Mois']}<br>"
                 f"Genres : {row['Genres musicaux']}"
             )
             
@@ -90,11 +88,11 @@ def create_festival_timeline(selected_genre):
     fig_timeline.update_layout(
         title=f"Principaux festivals de {selected_genre.title()} en Europe sur une année",
         xaxis=dict(showgrid=False),
-        yaxis=dict(title='Festival', visible=False, showticklabels=False),
+        yaxis=dict(title='Festival', visible=False, showticklabels=False, range=[-1, len(filtered_festivals)]),
         paper_bgcolor='black',
         plot_bgcolor='black',
         font=dict(color='white'),
-        showlegend=False
+        showlegend=False,
     )
     
     return fig_timeline

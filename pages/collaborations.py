@@ -59,7 +59,7 @@ layout = html.Div(style={'backgroundColor': 'black', 'color': 'white', 'padding'
 
     # Collaboration table for top 10 collaborations
     html.Div(id='collaboration-table-container', style={'marginTop': '10px'}, children=[
-        html.H4("Top 10 Collaborations", style={'color': 'white', 'textAlign': 'center'}),
+        html.H4("Top Collaborations", style={'color': 'white', 'textAlign': 'center'}),
         dash_table.DataTable(
             id='collaboration-table',
             columns=[

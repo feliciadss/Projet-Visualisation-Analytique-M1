@@ -90,7 +90,7 @@ def update_charts(click_data):
         textinfo='label',
         textposition='inside',
         customdata=customdata,
-        hovertemplate='Nombre de musiques: %{customdata[0]} <br>Proportion: %{percent}'
+        hovertemplate='Nombre de titres: %{customdata[0]} <br>Proportion: %{percent}'
     )
     fig_pie.update_layout(
         plot_bgcolor='black',
@@ -98,6 +98,7 @@ def update_charts(click_data):
         font_color='white',
         showlegend=False
     )
+
 
     selected_genre = "reggae"
     if click_data:
@@ -112,7 +113,9 @@ def update_charts(click_data):
             x=df_subgenres['count'][::-1],
             y=df_subgenres['subgenre'][::-1],
             orientation='h',
-            marker=dict(color=genre_colors.get(selected_genre.lower(), 'white'))
+            marker=dict(color=genre_colors.get(selected_genre.lower(), 'white')),
+            hovertemplate='',
+            hoverinfo='skip' 
         )
     )
     fig_histogram.update_layout(
@@ -123,5 +126,6 @@ def update_charts(click_data):
         xaxis=dict(title="Nombre d'artistes"),
         yaxis=dict(title=None)
     )
+
 
     return fig_pie, fig_histogram
