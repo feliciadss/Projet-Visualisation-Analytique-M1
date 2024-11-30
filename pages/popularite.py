@@ -224,7 +224,8 @@ def update_charts(click_data):
         locations="country",
         featureidkey="properties.adm0_a3",
         color="total_popularity_percentile",
-        color_continuous_scale=[[0, '#000000'], [1, color_for_genre]],
+        color_continuous_scale=[[0, color_for_genre], [1, '#000000']],
+
         title=f"→ {selected_genre.title()}",
         labels={"total_popularity_percentile": "Popularité (%)", "country" : "Pays"} 
     )
