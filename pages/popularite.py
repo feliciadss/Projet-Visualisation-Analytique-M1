@@ -208,7 +208,7 @@ def update_charts(click_data):
         size='scaled_size',
         color='genre',
         hover_name='genre',
-        size_max=100,
+        size_max=70,
         text='genre',
         color_discrete_map=genre_colors
     )
@@ -219,12 +219,12 @@ def update_charts(click_data):
         hoverinfo='none',
         )  # Nom du genre en noir au centre
     fig_bubble.update_layout(
+        xaxis=dict(range=[-1.5, 0.9], visible=False), 
+        yaxis=dict(range=[-1.5, 1.5], visible=False), 
         plot_bgcolor='black',
         paper_bgcolor='black',
         font_color='white',
         showlegend=False,
-        xaxis=dict(visible=False),
-        yaxis=dict(visible=False),
     )
 
     df = data_manager.create_genre_popularity_by_country(selected_genre)
