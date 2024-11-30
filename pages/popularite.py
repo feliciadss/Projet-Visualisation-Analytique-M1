@@ -98,40 +98,59 @@ def create_festival_timeline(selected_genre):
     return fig_timeline
 
 layout = html.Div(
-    style={'backgroundColor': 'black', 'color': 'white', 'padding': '20px'},
+    style={'backgroundColor': 'black', 'color': 'white', 'padding': '1%'},
+
     children=[
+        # Titre principal
         html.H1(
             'Popularité des genres musicaux en Europe',
             style={'textAlign': 'center', 'color': 'white'}
         ),
+        # Sous-titre
         html.H3(
             "Découvrez la popularité de chaque genre à travers les pays européens.",
             style={'textAlign': 'center', 'color': 'white', 'fontWeight': 'normal'}
         ),
-        html.Div(style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center'}, children=[
-            # Bouton retour accueil
-            html.Div(
-                style={'position': 'absolute', 'top': '30px', 'right': '30px', 'z-index': '1000', 'font-size': '40px'},
-                children=[dcc.Link('🏠', href='/')],
-            ),
-            # Bubble chart
-            html.Div(
-                style={'flex': '1', 'padding': '10px'},
-                children=[
-                    dcc.Graph(id="bubble-genre-chart", style={'height': '600px', 'width': '100%'})
-                ]
-            ),
-            # Carte
-            html.Div(
-                style={'flex': '1.5', 'padding': '10px'},
-                children=[
-                    dcc.Graph(id="map-graph", style={'height': '300px'})
-                ]
-            ),
-        ]),
+        # Conteneur
+        html.Div(
+            style={
+                'display': 'flex', 
+                'flexDirection': 'row', 
+                'justifyContent': 'space-between', 
+                'alignItems': 'center',
+                'margin': '1%'  
+            },
+            children=[
+                # Bouton retour accueil
+                html.Div(
+                    style={'position': 'absolute', 'top': '30px', 'right': '30px', 'z-index': '1000', 'font-size': '40px'},
+                    children=[dcc.Link('🏠', href='/')],
+                ),
+                # Graphique en bulles (1/4 largeur)
+                html.Div(
+                    style={'flex': '1', 'padding': '0%', 'width': '35%'},
+                    children=[
+                        dcc.Graph(
+                            id="bubble-genre-chart", 
+                            style={'height': '600px', 'width': '100%'}
+                        )
+                    ]
+                ),
+                # Carte (3/4 largeur)
+                html.Div(
+                    style={'flex': '3', 'padding': '0%', 'width': '65%'},
+                    children=[
+                        dcc.Graph(
+                            id="map-graph", 
+                            style={'height': '600px', 'width': '100%'}
+                        )
+                    ]
+                ),
+            ]
+        ),
         # Timeline des festivals
         html.Div(
-            style={'padding': '10px', 'width': '100%','margin': '0 auto'},
+            style={'padding': '10px', 'width': '100%', 'margin': '0 auto'},
             children=[
                 dcc.Graph(id="festival-timeline", style={'height': '500px'})
             ]
@@ -155,6 +174,7 @@ layout = html.Div(
         ),
     ]
 )
+
 
 @callback(
     [
