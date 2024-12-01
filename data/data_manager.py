@@ -2,7 +2,6 @@ import sqlite3
 import pandas as pd
 from static.enumerations import genres
 
-
 class DataManager:
     def __init__(self, db_path="./data/spotify.db"):
         self.conn = sqlite3.connect(db_path)

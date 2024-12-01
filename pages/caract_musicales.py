@@ -4,7 +4,6 @@ import plotly.graph_objects as go
 from data.data_manager import DataManager
 from static.enumerations import genres
 from static.enumerations import genre_colors
-import pandas as pd
 import dash
 
 dash.register_page(

@@ -1,5 +1,4 @@
 from dash import Dash
-import dash
 
 # Initialisation de l'application avec support multipage
 app = Dash(__name__, use_pages=True, suppress_callback_exceptions=True)

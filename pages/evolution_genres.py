@@ -1,5 +1,4 @@
-from dash import html, dcc, Output, Input, ALL, callback
-from dash.dependencies import State
+from dash import html, dcc, Output, Input, callback
 import pandas as pd
 import plotly.express as px
 from static.enumerations import genre_colors, genres, genre_links
