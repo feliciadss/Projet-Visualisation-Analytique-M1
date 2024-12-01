@@ -19,13 +19,13 @@ Ce dossier contient les scripts nécessaires pour initialiser et gérer la base 
 
 ## **Fetching**
 - **`initialise_db.py`** : Ce script utilise les fichiers suivants pour construire une base de données MongoDB avec les données récupérées via l'API Spotify.
-  - **`auth_spotify.py`** : Gère l'authentification avec l'API Spotify.
-  - **`config.ini`** : Fichier de configuration A REMPLIR contenant les identifiants secrets de votre compte Spotify Developer, et du compte Mongo DB depuis lequel vous allez créer la base de données.
-  - **`constructeurDB.py`** : Contient les fonctions pour récupérer les données depuis l'API Spotify et les structurer dans la base MongoDB.
+- **`auth_spotify.py`** : Gère l'authentification avec l'API Spotify.
+- **`config.ini`** : Fichier de configuration A REMPLIR contenant les identifiants secrets de votre compte Spotify Developer, et du compte Mongo DB depuis lequel vous allez créer la base de données.
+- **`constructeurDB.py`** : Contient les fonctions pour récupérer les données depuis l'API Spotify et les structurer dans la base MongoDB.
 
 ## **Migration**
 - **`update_sql.py`** : Ce script sert à migrer les données de MongoDB vers une base de données SQLite (spotify.db). Il crée les tables nécessaires (artistes, albums, tracks), les met à jour avec les données récupérées de MongoDB, et ajoute des colonnes supplémentaires afin de faciliter l'exécution rapide de requêtes SQL.
-  - **`spotify.db`** : Fichier de base de données SQLite contenant les données structurées des artistes, albums, et tracks. Cette base de données est utilisée pour un accès plus rapide aux données lors des requêtes SQL, permettant de gérer efficacement les visualisations et analyses sans toujours interroger MongoDB.
+- **`spotify.db`** : Fichier de base de données SQLite contenant les données structurées des artistes, albums, et tracks. Cette base de données est utilisée pour un accès plus rapide aux données lors des requêtes SQL, permettant de gérer efficacement les visualisations et analyses sans toujours interroger MongoDB.
 
 ## **Gestion**
 - **`data_manager`** : Ce sous-dossier regroupe les classes orientées objets pour gérer les différentes tables (tracks, albums, artistes). Il contient aussi des fonctions permettant de construire des DataFrames adaptés à nos besoins de visualisation.
@@ -71,6 +71,7 @@ Si vous souhaitez créer ou mettre à jour la base de données MongoDB, vous pou
 python initialise_db.py
 ```
 Ce script récupérera les données via l'API Spotify et mettra à jour les collections MongoDB (artistes, albums, tracks).
+
 ⚠️ Ne pas oublier de remplir config.ini avec les identifiants Spotify et MongoDB !!!!
 
 Étant limités par l'API Spotify à un certain nombre de requêtes quotidiennes, de septembre à novembre 2023, nous avons récupéré les playlists populaires dans différents pays européens via l'API Spotify, puis extrait et stocké les informations sur les albums, les morceaux et les artistes associés, reconstituant ainsi un ensemble assez homogène des tendances musicales en Europe.
