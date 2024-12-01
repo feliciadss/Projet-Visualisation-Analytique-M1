@@ -1,4 +1,4 @@
-from dash import Dash, html, dcc
+from dash import Dash
 import dash
 
 # Initialisation de l'application avec support multipage

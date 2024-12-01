@@ -1,5 +1,4 @@
 import sqlite3
-import pandas as pd
 from pymongo import MongoClient
 import configparser
 import os
