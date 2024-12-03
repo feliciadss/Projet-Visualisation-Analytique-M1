@@ -238,7 +238,7 @@ def update_charts(click_data):
         size="scaled_size",
         color="genre",
         hover_name="genre",
-        size_max=70,
+        size_max=90,
         text="genre",
         color_discrete_map=genre_colors,
     )
@@ -249,7 +249,7 @@ def update_charts(click_data):
         hoverinfo="none",
     )  # Nom du genre en noir au centre
     fig_bubble.update_layout(
-        xaxis=dict(range=[-1.5, 0.9], visible=False),
+        xaxis=dict(range=[-1.5, 1.5], visible=False),
         yaxis=dict(range=[-1.5, 1.5], visible=False),
         plot_bgcolor="black",
         paper_bgcolor="black",
