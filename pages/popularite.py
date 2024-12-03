@@ -154,7 +154,7 @@ layout = html.Div(
                 ),
                 # Graphique en bulles (1/4 largeur)
                 html.Div(
-                    style={"flex": "2", "padding": "0%", "width": "50%", "overflow": "visible"},
+                    style={"flex": "2", "padding": "0%", "width": "100%", "overflow": "hidden"},
                     children=[
                         dcc.Graph(
                             id="bubble-genre-chart",
@@ -164,7 +164,7 @@ layout = html.Div(
                 ),
                 # Carte (3/4 largeur)
                 html.Div(
-                    style={"flex": "3", "padding": "0%", "width": "65%"},
+                    style={"flex": "3", "padding": "0%", "width": "65%", "margin-bottom": "0"},
                     children=[
                         dcc.Graph(
                             id="map-graph", style={"height": "600px", "width": "100%"}
@@ -175,7 +175,7 @@ layout = html.Div(
         ),
         # Timeline des festivals
         html.Div(
-            style={"padding": "10px", "width": "100%", "margin": "0 auto"},
+            style={"padding": "0", "margin-top": "0", "width": "100%", "margin": "0 auto"},
             children=[dcc.Graph(id="festival-timeline", style={"height": "500px"})],
         ),
         # Pied de page
