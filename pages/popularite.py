@@ -154,7 +154,7 @@ layout = html.Div(
                 ),
                 # Graphique en bulles (1/4 largeur)
                 html.Div(
-                    style={"flex": "1", "padding": "0%", "width": "35%"},
+                    style={"flex": "2", "padding": "0%", "width": "50%", "overflow": "visible"},
                     children=[
                         dcc.Graph(
                             id="bubble-genre-chart",
