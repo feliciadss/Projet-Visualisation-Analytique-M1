@@ -83,7 +83,7 @@ genre_links = {
     "blues": ("du", "https://fr.wikipedia.org/wiki/blues"),
     "metal": ("du", "https://fr.wikipedia.org/wiki/metal"),
     "folk": ("de la", "https://fr.wikipedia.org/wiki/Musique_folk"),
-    "country": ("de la", "https://fr.wikipedia.org/wiki/Musique_country"),
+    "afro": ("de l'", "https://fr.wikipedia.org/wiki/Musique_afro-am%C3%A9ricaine"),
     "r&b": ("du", "https://fr.wikipedia.org/wiki/Rhythm_and_blues"),
     "soul": ("de la", "https://fr.wikipedia.org/wiki/Musique_soul"),
     "musique": ("de la", "https://fr.wikipedia.org/wiki/Histoire_de_la_musique"),
