@@ -101,7 +101,7 @@ layout = html.Div(
             ],
         ),
         html.Div(
-            style={"width": "100%", "textAlign": "left", "marginTop": "10px"},
+            style={"width": "100%", "textAlign": "left", "marginTop": "20px"},
             children=[
                 html.P(
                     [

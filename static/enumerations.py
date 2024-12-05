@@ -9,7 +9,7 @@ genres = [
     "blues",
     "metal",
     "folk",
-    "country",
+    "afro",
     "r&b",
     "soul",
 ]
@@ -66,7 +66,7 @@ genre_colors = {
     "blues": "#469990",  # Vert-bleu foncé
     "metal": "#f032e6",  # Rose vif
     "folk": "#bfef45",  # Vert lime
-    "country": "#42d4f4",  # bleu cyan
+    "afro": "#42d4f4",  # bleu cyan
     "r&b": "#9A6324",  # Marron foncé
     "soul": "#800000",  # Rouge foncé
 }

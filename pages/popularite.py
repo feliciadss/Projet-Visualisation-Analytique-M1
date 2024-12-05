@@ -8,6 +8,7 @@ import pycountry
 from static.enumerations import genre_colors, flags
 from data.data_manager import DataManager
 import dash
+import matplotlib.colors as mcolors
 
 dash.register_page(__name__, path="/popularite", name="Popularité des genres")
 
@@ -37,6 +38,16 @@ def convert_iso2_to_iso3(iso2_code):
     else:
         print(f"Code ISO2 non trouvé : {iso2_code}")
         return None
+    
+# Fonction pour foncer une couleur
+def darken_color(color, factor=0.3):
+    """
+    Darken a given color by multiplying its RGB values by a factor.
+    Factor should be between 0 (black) and 1 (no change).
+    """
+    rgb = mcolors.to_rgb(color)  # Convert to RGB format
+    darker_rgb = tuple(c * factor for c in rgb)  # Reduce brightness
+    return mcolors.to_hex(darker_rgb)  # Convert back to hex
 
 
 # Ordre temporel des mois
@@ -267,6 +278,7 @@ def update_charts(click_data):
     df["country"] = df["country"].apply(convert_iso2_to_iso3)  # conversion ios2 en ios3
 
     color_for_genre = genre_colors.get(selected_genre.lower(), "#ffffff")
+    dark_color = darken_color(color_for_genre, factor=0.2)
 
     fig_map = px.choropleth(
         df,
@@ -274,7 +286,7 @@ def update_charts(click_data):
         locations="country",
         featureidkey="properties.adm0_a3",
         color="total_popularity_percentile",
-        color_continuous_scale=[[0, color_for_genre], [1, "#000000"]],
+        color_continuous_scale=[[0, color_for_genre], [1, dark_color]],
         title=f"→ {selected_genre.title()}",
         labels={"total_popularity_percentile": "Popularité (%)", "country": "Pays"},
     )
